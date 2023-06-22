@@ -24,10 +24,9 @@ export function waitForFirstPlayerInitialSpawn() {
     const players = world.getAllPlayers()
     if (players.length) return Promise.resolve(players[0])
     else return new Promise(resolve => {
-        const callback = event => {
+        const callback = world.afterEvents.playerSpawn.subscribe(event => {
             if (event.initialSpawn) resolve(event.player)
             world.afterEvents.playerSpawn.unsubscribe(callback)
-        }
-        world.afterEvents.playerSpawn.subscribe(callback)
+        })
     })
 }

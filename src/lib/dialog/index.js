@@ -55,7 +55,7 @@ export class Dialog {
             response = await this.dialog.show(target)
         } while (response.cancelationReason === FormCancelationReason.UserBusy)
         
-        if (response.canceled && response.cancelationReason === FormCancelationReason.userClosed) return await this.onClose()
+        if (response.canceled && response.cancelationReason === FormCancelationReason.UserClosed) return await this.onClose()
         else if (response instanceof ModalFormResponse) return await this.onSubmit(response.formValues)
         else if (response instanceof MessageFormResponse) {
             if (response.selection === 0) return await this.onSelectButton1()

@@ -8,7 +8,7 @@ export const setupHandler = async (target, opt) => {
     return {
         async SET({ name = "default", option = {} }) {
             const info = await tpxDB.set(Object.assign({ name }, option))
-            if (name !== "__back__") return { info }
+            if (name !== "__back__" && name !== "__death__") return { info }
         },
         async REMOVE({ name = "default" }) {
             return await tpxDB.remove(name)
@@ -19,7 +19,8 @@ export const setupHandler = async (target, opt) => {
                 if (
                     tpxOption
                         .getPlayer(target)
-                        .getItemVal("enable_auto_back_point")
+                        .getItemVal("auto_back_point")
+                    && name !== "__death__"
                 ) {
                     await this.SET({
                         name: "__back__",
@@ -35,6 +36,12 @@ export const setupHandler = async (target, opt) => {
                     keepVelocity: false
                 }))
                 return { info }
+            }
+        },
+        async TRY_TELEPORT({ names = [] }) {
+            for (const name of names) {
+                const result = await this.TELEPORT({ name })
+                if (result) return result
             }
         },
         LIST() {

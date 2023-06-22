@@ -50,7 +50,7 @@ export async function tpxCommand(argv, sender) {
         case "back":
         case "bk":
         case "-b": {
-            const result = await handler.TELEPORT({ name: "__back__" })
+            const result = await handler.TRY_TELEPORT({ names: [ "__death__", "__back__" ] })
             if (result) sender.sendMessage(`已返回到 ${result.info}`)
             else throw errorHandler("传送失败：未找到返回点", sender)
             break
@@ -89,7 +89,7 @@ export async function backCommand(argv, sender) {
     if (
         tpxOption
             .getPlayer(sender)
-            .getItemVal("enable_back_cmd")
+            .getItemVal("back_cmd")
     ) await Commands.asyncRun(`!tpx back`, sender)
     else sender.sendMessage("您未启用该命令")
 }
@@ -98,15 +98,15 @@ export async function homeCommand(argv, sender) {
     if (
         tpxOption
             .getPlayer(sender)
-            .getItemVal("enable_home_cmd")
+            .getItemVal("home_cmd")
     ) {
         switch (argv[1]) {
             case "set": {
-                await Commands.asyncRun(`!tpx set default_home`, sender)
+                await Commands.asyncRun(`!tpx set __home__`, sender)
                 break
             }
             default: {
-                await Commands.asyncRun(`!tpx default_home`, sender)
+                await Commands.asyncRun(`!tpx __home__`, sender)
             }
         }
     } else sender.sendMessage("您未启用该命令")

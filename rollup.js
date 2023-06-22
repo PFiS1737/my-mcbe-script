@@ -45,9 +45,9 @@ export default function(banner, pkg) {
                 nodeResolve({
                     preferBuiltins: false
                 }),
-                terser({
-                    maxWorkers: 4
-                })
+                // terser({
+                //     maxWorkers: 4
+                // })
             ]
         }
     }
