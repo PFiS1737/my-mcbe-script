@@ -53,7 +53,7 @@ export class Dialog {
         target.sendMessage("[!] 新对话框已发送，请关闭命令输入栏或其他对话框")
         do {
             response = await this.dialog.show(target)
-        } while (response.cancelationReason === FormCancelationReason.userBusy)
+        } while (response.cancelationReason === FormCancelationReason.UserBusy)
         
         if (response.canceled && response.cancelationReason === FormCancelationReason.userClosed) return await this.onClose()
         else if (response instanceof ModalFormResponse) return await this.onSubmit(response.formValues)
