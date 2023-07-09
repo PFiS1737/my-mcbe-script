@@ -1,5 +1,4 @@
-import { Vector3 } from "../vector/Vector3.class.js"
-import { Vector3Utils } from "../vector/Vector3Utils.class.js"
+import { Vector3, Vector3Utils } from "../vector/index.js"
 
 export class Location extends Vector3 {
     constructor(x, y, z) {
@@ -7,10 +6,10 @@ export class Location extends Vector3 {
     }
     
     get centerCorrected() {
-        return Vector3Utils.add(
+        return new Location(...Vector3Utils.add(
             this.floored,
             new Vector3(0.5, 0.5, 0.5)
-        )
+        ))
     }
     
     equals(v) {

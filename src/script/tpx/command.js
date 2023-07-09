@@ -1,4 +1,4 @@
-import Commands from "@/lib/commands/index.js"
+import { Commands } from "@/lib/commands/index.js"
 import { asyncRun, errorHandler } from "@/util/game.js"
 
 import { setupHandler } from "./handler.js"

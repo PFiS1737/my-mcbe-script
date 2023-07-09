@@ -1,5 +1,6 @@
+import { Vector3Utils } from "../vector/index.js"
+
 import { Location } from "./Location.class.js"
-import { Vector3Utils } from "../vector/Vector3Utils.class.js"
 
 export class BlockLocation extends Location {
     constructor(x, y, z) {
@@ -29,7 +30,7 @@ export class BlockLocation extends Location {
             for (let y = 0; y <= dy; y++) {
                 for (let z = 0; z <= dz; z++) {
                     output.push(
-                        Vector3Utils.add(this, { x, y, z })
+                        new BlockLocation(...Vector3Utils.add(this, { x, y, z }))
                     )
                 }
             }

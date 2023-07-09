@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server"
 
-import Commands from "@/lib/commands/index.js"
+import { Commands } from "@/lib/commands/index.js"
 import { each } from "@/util/index.js"
 
 import { tpxOption } from "./option.js"

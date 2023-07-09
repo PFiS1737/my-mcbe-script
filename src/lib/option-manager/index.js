@@ -1,4 +1,4 @@
-import Commands from "../commands/index.js"
+import { Commands } from "../commands/index.js"
 
 import { optionCommand } from "./command.js"
 
