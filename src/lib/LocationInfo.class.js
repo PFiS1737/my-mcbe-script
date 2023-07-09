@@ -1,14 +1,12 @@
 import { world, Dimension } from "@minecraft/server"
 
-import { Vector3 } from "./Vector3.class.js"
+import { Vector3 } from "./vector/Vector3.class.js"
 
 export class LocationInfo {
     constructor({ location, dimension }) {
         this.location = location instanceof Vector3
             ? location
-            : typeof location === "string"
-                ? Vector3.parse(location)
-                : Vector3.normalized(location)
+            : Vector3.create(location)
         this.dimension = dimension instanceof Dimension
             ? dimension
             : world.getDimension(dimension)
