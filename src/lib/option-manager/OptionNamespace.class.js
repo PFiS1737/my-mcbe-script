@@ -1,4 +1,5 @@
 import { each, eachAsync } from "../util/index.js"
+import { waitForFirstPlayerInitialSpawn } from "../util/game.js"
 
 import { PlayerOption } from "./PlayerOption.class.js"
 

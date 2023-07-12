@@ -9,8 +9,6 @@ const overworld = world.getDimension(MinecraftDimensionTypes.overworld)
 const CUSTOM_COMMAND_SET = new Set()
 
 export class Commands {
-    constructor() {}
-    
     // static run(commandString, option = {}, target = overworld) {
     //     if (target instanceof Dimension || Entity) {
     //         if (option.safe) system.run(() => {

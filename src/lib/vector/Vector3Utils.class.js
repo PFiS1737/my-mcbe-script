@@ -3,14 +3,9 @@ import { round, equals, binomial, sum } from "../util/math.js"
 import { Vector3Template } from "./Vector3Template.class.js"
 
 export class Vector3Utils {
-    static forward = new Vector3Template(0, 0, 1)
-    static back = new Vector3Template(0, 0, -1)
-    static right = new Vector3Template(1, 0, 0)
-    static left = new Vector3Template(-1, 0, 0)
-    static up = new Vector3Template(0, 1, 0)
-    static down = new Vector3Template(0, -1, 0)
-    static one = new Vector3Template(1, 1, 1)
-    static zero = new Vector3Template(0, 0, 0)
+    static clone(a) {
+        return Vector3Template.create(a)
+    }
     
     static add(a, b) {
         return new Vector3Template(a.x + b.x, a.y + b.y, a.z + b.z)
@@ -32,6 +27,16 @@ export class Vector3Utils {
     }
     static inverse(a) {
         return new Vector3Template(1 / a.x, 1 / a.y, 1 / a.z)
+    }
+    
+    static exchange(a, axes = []) {
+        if (axes.length !== 2) throw new Error("You could only exchange two axes.")
+        const output = this.clone(a)
+        const n0 = output[axes[0]]
+        const n1 = output[axes[1]]
+        output[axes[0]] = n1
+        output[axes[1]] = n0
+        return output
     }
     
     static exactEquals(a, b) {

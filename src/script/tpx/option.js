@@ -25,7 +25,7 @@ export const tpxOption = optionManager
         values: [[true], [false]],
         defaultValue: true,
         events: {
-            changed: (selected, original) => console.warn("auto_back_point -> from", original, "to", selected),
+            changed: (selected, original) => console.warn("tpx:auto_back_point -> from", original, "to", selected)
         }
     })
     .addItem({
@@ -35,11 +35,11 @@ export const tpxOption = optionManager
         defaultValue: true,
         events: {
             changed: (selected, original) => {
-                console.warn("back_after_death -> from", original, "to", selected)
+                console.warn("tpx:back_after_death -> from", original, "to", selected)
                 
                 if (selected) world.afterEvents.entityDie.subscribe(afterEntityDieCallback, { entityTypes: [ "minecraft:player" ] })
                 else world.afterEvents.entityDie.unsubscribe(afterEntityDieCallback)
-            },
+            }
         }
     })
     .addItem({
@@ -49,7 +49,7 @@ export const tpxOption = optionManager
         defaultValue: false,
         reload: true,
         events: {
-            changed: (selected, original) => console.warn("back_cmd -> from", original, "to", selected)
+            changed: (selected, original) => console.warn("tpx:back_cmd -> from", original, "to", selected)
         }
     })
     .addItem({
@@ -59,6 +59,6 @@ export const tpxOption = optionManager
         defaultValue: false,
         reload: true,
         events: {
-            changed: (selected, original) => console.warn("home_cmd -> from", original, "to", selected)
+            changed: (selected, original) => console.warn("tpx:home_cmd -> from", original, "to", selected)
         }
     })

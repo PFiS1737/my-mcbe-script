@@ -40,7 +40,9 @@ export const myOption = optionManager
     .addItem({
         // other options ...
     })
+```
 
+```javascript
 // index.js
 import { world } from "@minecraft/server"
 import { myOption } from "./option.js"

@@ -10,7 +10,11 @@ export class BlockLocation extends Location {
     }
     
     get centerCorrected() {
-        throw new Error('Couldn\'t get "centerCorrected" on BlockLocation')
+        throw new Error('Couldn\'t get "centerCorrected" on BlockLocation.')
+    }
+    
+    clone() {
+        return new BlockLocation(this.x, this.y, this.z)
     }
     
     divide(v) {

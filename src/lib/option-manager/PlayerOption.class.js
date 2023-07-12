@@ -97,13 +97,14 @@ export class PlayerOption {
         const nameMap = []
         each(this.items, item => {
             const { name, description, values, selected } = item
-            nameMap.push(name)
+            const valuesMap = [...values].map(e => e[0])
+            nameMap.push({ name, valuesMap })
             if (values.size === 2 && values.get(true) && values.get(false)) {
                 form.toggle(description, selected)
             } else {
-                // TODO 暂时用不到，先不写了
-                // form.dropdown(description, values)
+                form.dropdown(description, valuesMap.map(e => `${e}`), valuesMap.findIndex(e => e === selected))
             }
+            // TODO 滑块等其他方式
         })
         
         const dialog = new Dialog({
@@ -112,8 +113,11 @@ export class PlayerOption {
                 if (parentDialog) await parentDialog.show(this.player)
             },
             onSubmit: async result => {
-                each(result, (value, index) => {
-                    const name = nameMap[index]
+                each(result, (valueIndex, nameIndex) => {
+                    const { name, valuesMap } = nameMap[nameIndex]
+                    const value = typeof valueIndex === "boolean"
+                        ? valueIndex
+                        : valuesMap[valueIndex]
                     this.setItemVal(name, value)
                 })
                 await this.done(parentDialog)

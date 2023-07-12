@@ -30,3 +30,9 @@ export function sum(from, to, fn) {
     for (let k = from; k <= to; k++) output += fn(k)
     return output
 }
+
+export function range(from, to, step = 1) {
+    const output = []
+    for (let i = from; i < to; i += step) output.push(i)
+    return output
+}

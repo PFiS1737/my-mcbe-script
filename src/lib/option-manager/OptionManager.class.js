@@ -1,7 +1,6 @@
 import { ActionFormData } from "@minecraft/server-ui"
 
 import { each } from "../util/index.js"
-import { waitForFirstPlayerInitialSpawn } from "../util/game.js"
 
 import { Dialog } from "../dialog/index.js"
 
