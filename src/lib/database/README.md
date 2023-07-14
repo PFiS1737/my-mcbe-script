@@ -2,7 +2,7 @@
 
 ## Overview
 
-一个基于记分版的数据库，用于持续保存数据
+一个基于记分板的数据库，用于持续保存数据
 
 灵感来源：[jaylydb](https://github.com/JaylyDev/ScriptAPI/tree/main/scripts/jaylydb)
 
@@ -28,6 +28,9 @@ const db = Database.open("my-db")
 - get
     - `get(key: string): any`
     - 获得指定的数据
+- getAll
+    - `getAll(): Record<string, any>`
+    - 获得所有数据
 - has
     - `has(key: string): boolean`
     - 检查数据是否存在
@@ -47,9 +50,5 @@ const db = Database.open("my-db")
     - `values(): IterableIterator<any>`
     - return the values
 - Symbol.iterator
-    - `[Symbol.iterator](): Symbol.iterator<[string, any]>`
+    - `[Symbol.iterator](): IterableIterator<[string, any]>`
     - iterate over the entries
-
-### Notes
-
-- 创建的所有记分版以 `db:` 开头

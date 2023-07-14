@@ -30,3 +30,10 @@ export function waitForFirstPlayerInitialSpawn() {
         })
     })
 }
+
+export function getOrAddObjective(id, name) {
+    const objective = world.scoreboard.getObjective(id)
+    if (!objective && !name) throw new Error(`Couldn't find objective "${id}".`)
+    else if (!objective) return world.scoreboard.addObjective(id, name)
+    else return objective
+}

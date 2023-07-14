@@ -27,7 +27,7 @@ export const js = gulp.series(...rollupConfig.map(config => {
                 if (loc) {
                     console.warn(`${loc.file} (${loc.line}:${loc.column}) ${message} (${code})`)
                     if (frame) console.warn("\x1b[2m%s\x1b[0m", frame)
-                } else console.warn(message)
+                }  // else console.warn(message)
             }
         })
         await result.write(config.output)

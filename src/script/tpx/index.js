@@ -3,12 +3,12 @@ import { world } from "@minecraft/server"
 import { Commands } from "@/lib/commands/index.js"
 import { each } from "@/util/index.js"
 
-import { tpxOption } from "./option.js"
+import { option } from "./option.js"
 import { tpxCommand, backCommand, homeCommand } from "./command.js"
 
-tpxOption.applyMainPlayer()
-    .then(() => each(world.getAllPlayers(), player => tpxOption.applyPlayer(player)))
-    .then(() => tpxOption.init())
+option.applyMainPlayer()
+    .then(() => each(world.getAllPlayers(), player => option.applyPlayer(player)))
+    .then(() => option.init())
     .then(optMap => {
         Commands.register("!", "tpx", tpxCommand)
         

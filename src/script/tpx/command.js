@@ -2,7 +2,7 @@ import { Commands } from "@/lib/commands/index.js"
 import { asyncRun, errorHandler } from "@/util/game.js"
 
 import { setupHandler } from "./handler.js"
-import { tpxOption } from "./option.js"
+import { option } from "./option.js"
 
 const SUB_COMMANDS = [
     "set", "-s",

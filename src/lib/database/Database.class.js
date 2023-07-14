@@ -4,31 +4,32 @@ import { serialize } from "serialize-javascript"
 import md5 from "md5"
 
 import { each, eachAsync, deserialize } from "../util/index.js"
-import { asyncRun } from "../util/game.js"
+import { asyncRun, getOrAddObjective } from "../util/game.js"
 import { Commands } from "../commands/index.js"
 
-const ALL_DBS = new Map()
+export const ALL_DATABASES = new Map()
 
 export class Database {
     static open(player, dbName) {
-        return new Database(player, dbName)
+        return new this(player, dbName)
     }
     constructor(player, dbName) {
         const id = md5("db:" + dbName + "_" + player.id).slice(8, 24)
         this.id = id
-        this.objective = world.scoreboard.getObjective(id)
-            ?? world.scoreboard.addObjective(id, "db:" + dbName)
-        this.targetPlayer = player
-        this.store = new Map()
+        this.objective = getOrAddObjective(id, "db:" + dbName)
+        this.player = player
         
         this._syncDataFromScoreboard()
         
-        ALL_DBS.set(id, this)
+        ALL_DATABASES.set(id, this)
     }
+    
+    store = new Map()
+    
     _syncDataFromScoreboard() {
         this.store.clear()
         each(this.objective.getParticipants(), participant => {
-            const data = deserialize(`${participant.displayName}`)
+            const data = deserialize(participant.displayName)
             const key = Object.keys(data)[0]
             const value = data[key]
             this.store.set(key, { value, participant })
@@ -59,6 +60,11 @@ export class Database {
         await asyncRun(() => this.objective.setScore(data, 1))
         // await Commands.asyncRun(`scoreboard players set "${data}" ${this.objective.id} 1`)
         this._syncDataFromScoreboard()
+    }
+    getAll() {
+        const output = {}
+        for (const [ key, value ] of this) output[key] = value
+        return output
     }
     *entries() {
         for (const [ key, { value } ] of this.store.entries()) yield [ key, value ]

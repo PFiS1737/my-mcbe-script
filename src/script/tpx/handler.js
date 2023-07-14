@@ -1,7 +1,7 @@
 import { asyncRun } from "@/util/game.js"
 
 import { TpxDB } from "./db.js"
-import { tpxOption } from "./option.js"
+import { option } from "./option.js"
 
 export const setupHandler = async (target, opt) => {
     const tpxDB = await asyncRun(() => new TpxDB(target))

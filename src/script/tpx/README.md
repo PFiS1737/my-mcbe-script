@@ -1,8 +1,8 @@
 # Tpx
 
-> 快捷传送
+快捷传送
 
-## Grammar
+## Syntax
 
 - `!tpx set|-s [name] [disposable]`
     - 设置一个传送点，
@@ -39,13 +39,19 @@
 - 见 [option.js](./option.js)
 - `auto_back_point`
     - 允许使用 tpx 传送时自动添加返回点
+    - 默认：开启
 - `back_after_death`
     - 允许死亡时自动添加返回点
-    - 使用 back 命令返回死亡点时，不会在原地添加返回点
+    - 注意：使用 back 命令返回死亡点时，不会在原地添加返回点
+    - 默认：开启
 - `back_cmd`
     - 允许使用独立的 back 命令
+    - 默认：关闭
+    - 需要重启
 - `home_cmd`
     - 允许使用独立的 home 命令
+    - 默认：关闭
+    - 需要重启
 
 ## 多人使用
 

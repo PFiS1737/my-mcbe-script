@@ -17,7 +17,7 @@ async function afterEntityDieCallback(event) {
     })
 }
 
-export const tpxOption = optionManager
+export const option = optionManager
     .registerNamesapace("tpx")
     .addItem({
         name: "auto_back_point",

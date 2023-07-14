@@ -1,4 +1,9 @@
-import { Dimension, Entity, world, system, MinecraftDimensionTypes } from "@minecraft/server"
+import {
+    world,
+    Dimension,
+    Entity,
+    MinecraftDimensionTypes
+} from "@minecraft/server"
 
 // import { Parser } from "mcbe-command-parser"
 
@@ -9,23 +14,25 @@ const overworld = world.getDimension(MinecraftDimensionTypes.overworld)
 const CUSTOM_COMMAND_SET = new Set()
 
 export class Commands {
-    // static run(commandString, option = {}, target = overworld) {
-    //     if (target instanceof Dimension || Entity) {
-    //         if (option.safe) system.run(() => {
-    //             target.runCommand(commandString)
-    //         })
-    //         else return target.runCommand(commandString)
-    //     } else throw new TypeError("target must be Entity or Dimension.")
-    // }
+    static run(commandString, target = overworld) {
+        if (
+            target instanceof Dimension ||
+            target instanceof Entity
+        ) return target.runCommand(commandString)
+        else throw new TypeError("Target must be Entity or Dimension.")
+    }
     static async asyncRun(commandString, target = overworld) {
-        if (target instanceof Dimension || Entity) {
+        if (
+            target instanceof Dimension ||
+            target instanceof Entity
+        ) {
             const customCommands = [...CUSTOM_COMMAND_SET]
                 .filter(({ regex }) => regex.test(commandString))
                 .map(e => e.runner)
             if (customCommands.length) await eachAsync(customCommands, async runner => await runner(commandString, target))
             else return await target.runCommandAsync(commandString)
         }
-        else throw new TypeError("target must be Entity or Dimension.")
+        else throw new TypeError("Target must be Entity or Dimension.")
     }
     static register(prefix, command, /* grammar, */ callback) {
         if (prefix.startsWith("/")) throw new Error("Unable to register slash commands.")
@@ -45,8 +52,8 @@ export class Commands {
             if (regex.test(event.message)) {
                 event.cancel = true
                 
-                try { runner(event.message, event.sender) }
-                catch (err) { throw err }
+                runner(event.message, event.sender)
+                    .catch(err => console.error(err, "\n", err.stack))
             }
         })
     }

@@ -16,13 +16,13 @@ export class OptionNamespace {
         return this
     }
     applyPlayer(player) {
-        if (this.players.has(player.id)) return this.players.get(player.id)
+        if (this.players.has(player)) return this.players.get(player)
         const playerOpt = new PlayerOption(player, this.name)
         each(this._items, item => {
             item._player = player
             playerOpt.addItem(item)
         })
-        this.players.set(player.id, playerOpt)
+        this.players.set(player, playerOpt)
         return playerOpt
     }
     async applyMainPlayer() {
@@ -30,16 +30,16 @@ export class OptionNamespace {
         return this.applyPlayer(player)
     }
     async init() {
-        const valueMap = {}
-        await eachAsync(this.players, async ([ playerId, playerOpt ]) => {
+        const valueMap = new Map()
+        await eachAsync(this.players, async ([ player, playerOpt ]) => {
             const result = await playerOpt.init()
-            valueMap[playerId] = result
+            valueMap.set(player, result)
         })
         delete this.addPlayer
         return valueMap
     }
     
     getPlayer(player) {
-        return this.players.get(player.id)
+        return this.players.get(player)
     }
 }

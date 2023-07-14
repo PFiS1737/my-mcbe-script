@@ -2,7 +2,7 @@ import { BlockWrapperTemplate } from "./BlockWrapperTemplate.class.js"
 
 export class WrappedBlocks {
     constructor(blocks) {
-        this.blocks = blocks
+        this.blocks = (Array.isArray(blocks) ? blocks : [blocks])
             .map(block => {
                 return block instanceof BlockWrapperTemplate
                     ? block
