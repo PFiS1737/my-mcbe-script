@@ -12,9 +12,6 @@ export default ({ player, callback }) => ({
             }
         },
         playerSpawn: {
-            option: {
-                entities: [player]
-            },
             listener() {
                 callback({
                     type: "reset",
