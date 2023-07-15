@@ -16,10 +16,10 @@ option.applyMainPlayer()
         
         // 将所有玩家的数据库实例化并储存在 ALL_DATABASES 中
         // 同时避免在 beforeEvent 中构建导致的 read-only mode 问题
-        const players = Object.keys(optMap)
+        const players = optMap.keys()
         each(players, player => TpxDB.init(player))
         
-        const values = Object.values(optMap)
+        const values = [...optMap.values()]
         if (values.some(({ back_cmd }) => back_cmd)) Commands.register("!", "back", backCommand)
         if (values.some(({ home_cmd }) => home_cmd)) Commands.register("!", "home", homeCommand)
     })
