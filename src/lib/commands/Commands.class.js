@@ -8,6 +8,7 @@ import {
 // import { Parser } from "mcbe-command-parser"
 
 import { eachAsync } from "../util/index.js"
+import { BetterConsole } from "../BetterConsole.class.js"
 
 const overworld = world.getDimension(MinecraftDimensionTypes.overworld)
 
@@ -53,7 +54,7 @@ export class Commands {
                 event.cancel = true
                 
                 runner(event.message, event.sender)
-                    .catch(err => console.error(err, "\n", err.stack))
+                    .catch(BetterConsole.error)
             }
         })
     }

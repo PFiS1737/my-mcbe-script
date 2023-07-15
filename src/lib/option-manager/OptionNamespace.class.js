@@ -35,7 +35,7 @@ export class OptionNamespace {
             const result = await playerOpt.init()
             valueMap.set(player, result)
         })
-        delete this.addPlayer
+        delete this.applyPlayer
         return valueMap
     }
     

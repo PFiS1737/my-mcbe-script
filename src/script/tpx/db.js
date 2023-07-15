@@ -2,13 +2,22 @@ import { each } from "@/util/index.js"
 
 import { Database } from "@/lib/database/index.js"
 import { Dialog } from "@/lib/dialog/index.js"
-import { LocationInfo } from "@/lib/LocationInfo.class.js"
+import { LocationInfo } from "@/lib/location/index.js"
+
+export const ALL_DATABASES = new Map()
 
 export class TpxDB {
     constructor(player) {
         this.db = Database.open(player, "tpx")
         this.player = player
     }
+    
+    static init(player) {
+        const db = new this(player)
+        ALL_DATABASES.set(player, db)
+        return db
+    }
+    
     async set({ name, disposable, force }) {
         const info = new LocationInfo(this.player)
         const handleSet = async () => {

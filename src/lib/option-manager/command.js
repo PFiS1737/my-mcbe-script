@@ -1,8 +1,9 @@
+import { Commands } from "../commands/index.js"
 import { asyncRun, errorHandler } from "../util/game.js"
 
 import { optionManager } from "./manager.js"
 
-export async function optionCommand(argv, sender) {
+Commands.register("!", "option", async (argv, sender) => {
     switch (argv[1]) {
         case "dialog":
         case "-d":
@@ -14,4 +15,4 @@ export async function optionCommand(argv, sender) {
             throw errorHandler("未知的子命令", sender)
         }
     }
-}
+})

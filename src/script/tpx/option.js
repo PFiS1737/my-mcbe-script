@@ -6,7 +6,7 @@ import { setupHandler } from "./handler.js"
 
 async function afterEntityDieCallback(event) {
     const player = event.deadEntity
-    const handler = await setupHandler(player)
+    const handler = setupHandler(player)
     
     await handler.SET({
         name: "__death__",
@@ -30,7 +30,7 @@ export const option = optionManager
     })
     .addItem({
         name: "back_after_death",
-        description: "允许死亡时自动添加返回点",
+        description: "允许死亡时自动添加死亡点",
         values: [[true], [false]],
         defaultValue: true,
         events: {

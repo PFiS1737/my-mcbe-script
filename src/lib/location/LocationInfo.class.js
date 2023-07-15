@@ -1,6 +1,6 @@
 import { world, Dimension } from "@minecraft/server"
 
-import { Location } from "./location/Location.class.js"
+import { Location } from "./Location.class.js"
 
 export class LocationInfo {
     constructor({ location, dimension }) {

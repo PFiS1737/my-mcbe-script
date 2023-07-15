@@ -17,22 +17,19 @@
 - `!tpx back|kb|-b`
     - 返回死亡点（如果有）
     - 返回上一个传送位置
-- `!tpx map|-m`
-    - 在主世界和地狱直接映射
-    - 仅旁观者模式并飞行时
 - `!tpx help|-h`
     - 打印帮助
 
 ### 可选
 - `!home set`
     - 设置家
-    - `!tpx set __home__`
+    - 等效：`!tpx set __home__`
 - `!home`
     - 回家
-    - `!tpx __home__`
+    - 等效：`!tpx __home__`
 - `!back`
     - 返回
-    - `!tpx back`
+    - 等效：`!tpx back`
 
 ## Option
 
@@ -41,7 +38,7 @@
     - 允许使用 tpx 传送时自动添加返回点
     - 默认：开启
 - `back_after_death`
-    - 允许死亡时自动添加返回点
+    - 允许死亡时自动添加死亡点
     - 注意：使用 back 命令返回死亡点时，不会在原地添加返回点
     - 默认：开启
 - `back_cmd`

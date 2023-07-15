@@ -25,7 +25,7 @@ export const myOption = optionManager
         events: {
             changed: (selected, original, player) => {
                 // emited when `changed` and `inited`
-                console.warn("option1 -> from", original, "to", selected)
+                console.info("my-option:option1 -> from", original, "to", selected)
                 // other action ...
             },
             selected: (selected, original, player) => {
@@ -63,7 +63,7 @@ myOption.applyMainPlayer()        // apply to the first player jioned the world
         //     // other
         // }
     })
-    .catch(console.error)
+    .catch(err => console.error(err + "\n" + err.stack))
 ```
 
 ### Management

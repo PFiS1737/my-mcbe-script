@@ -7,7 +7,6 @@ import { option } from "./option.js"
 const SUB_COMMANDS = [
     "set", "-s",
     "remove", "rm", "-r",
-    "map", "-m",
     "back", "bk", "-b",
     "list", "ls", "-l",
     "help", "-h",
@@ -16,7 +15,7 @@ const SUB_COMMANDS = [
 
 export async function tpxCommand(argv, sender) {
     const name = argv[2] ?? "default"
-    const handler = await setupHandler(sender)
+    const handler = setupHandler(sender)
     switch (argv[1]) {
         case "set":
         case "-s": {
@@ -40,11 +39,6 @@ export async function tpxCommand(argv, sender) {
             const result = await handler.REMOVE({ name })
             if (result === true) sender.sendMessage(`成功删除 ${name}`)
             else if (result === false) throw errorHandler(`删除失败：未找到 ${name}`, sender)
-            break
-        }
-        case "map":
-        case "-m": {  // TODO
-            sender.sendMessage("制作中...")
             break
         }
         case "back":
@@ -74,7 +68,7 @@ export async function tpxCommand(argv, sender) {
         case "option":
         case "opt":
         case "-o": {
-            await asyncRun(() => tpxOption.getPlayer(sender).showDialog())
+            await asyncRun(() => option.getPlayer(sender).showDialog())
             break
         }
         default: {
@@ -87,7 +81,7 @@ export async function tpxCommand(argv, sender) {
 
 export async function backCommand(argv, sender) {
     if (
-        tpxOption
+        option
             .getPlayer(sender)
             .getItemVal("back_cmd")
     ) await Commands.asyncRun(`!tpx back`, sender)
@@ -96,7 +90,7 @@ export async function backCommand(argv, sender) {
 
 export async function homeCommand(argv, sender) {
     if (
-        tpxOption
+        option
             .getPlayer(sender)
             .getItemVal("home_cmd")
     ) {

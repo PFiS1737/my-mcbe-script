@@ -1,10 +1,10 @@
 import { asyncRun } from "@/util/game.js"
 
-import { TpxDB } from "./db.js"
+import { ALL_DATABASES } from "./db.js"
 import { option } from "./option.js"
 
-export const setupHandler = async (target, opt) => {
-    const tpxDB = await asyncRun(() => new TpxDB(target))
+export const setupHandler = target => {
+    const tpxDB = ALL_DATABASES.get(target)
     return {
         async SET({ name = "default", option = {} }) {
             const info = await tpxDB.set(Object.assign({ name }, option))
@@ -17,7 +17,7 @@ export const setupHandler = async (target, opt) => {
             const info = await tpxDB.get(name)
             if (info) {
                 if (
-                    tpxOption
+                    option
                         .getPlayer(target)
                         .getItemVal("auto_back_point")
                     && name !== "__death__"
@@ -47,9 +47,6 @@ export const setupHandler = async (target, opt) => {
         LIST() {
             const datas = tpxDB.getAll().map(({ text }) => text)
             if (datas.length) return { msg: datas }
-        },
-        async MAP({ dimension, option = {} }) {
-            
         }
     }
 }

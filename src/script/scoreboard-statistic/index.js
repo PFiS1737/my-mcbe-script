@@ -1,6 +1,7 @@
 import { world } from "@minecraft/server"
 
 import { Commands } from "@/lib/commands/index.js"
+import { BetterConsole } from "@/lib/BetterConsole.class.js"
 import { each, eachAsync } from "@/util/index.js"
 
 import { option } from "./option.js"
@@ -22,4 +23,4 @@ option.applyMainPlayer()
             })
         })
     })
-    .catch(console.error)
+    .catch(BetterConsole.error)

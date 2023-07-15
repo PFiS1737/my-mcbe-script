@@ -9,8 +9,8 @@
 - `!scoreboard objectives add <objectiveId> <criteria> [displayName]`
     - 设置一个新的统计记分板，并将自己添加进去
     - 对于未进入此记分板的玩家，使用同样的命令既可进入
-    - 已进入的玩家再次是一会报错
-- `!scoreboard objectives add <objectiveId>`
+    - 已进入的玩家再次使用会报错
+- `!scoreboard objectives remove <objectiveId>`
     - 将自己从一个统计记分板中移除（**统计数据不会被保留**）
     - 若此记分板中只有一个玩家，将会删除此记分板
     - **注意：请勿仅使用原版命令删除记分板**

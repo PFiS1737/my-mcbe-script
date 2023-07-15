@@ -1,7 +1,3 @@
-import { Commands } from "../commands/index.js"
-
-import { optionCommand } from "./command.js"
-
-Commands.register("!", "option", optionCommand)
+import "./command.js"
 
 export { optionManager } from "./manager.js"

@@ -1,8 +1,6 @@
 import { each } from "@/util/index.js"
 
 import { Database } from "@/lib/database/index.js"
-import { Dialog } from "@/lib/dialog/index.js"
-import { LocationInfo } from "@/lib/LocationInfo.class.js"
 
 export const ALL_DATABASES = new Map()
 
