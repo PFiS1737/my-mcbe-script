@@ -27,7 +27,7 @@ jobs:
         run: npm install
         
       - name: Clone dist branch
-        run: git clone -b dist ${{ github.repositoryUrl }} dist
+        run: git clone -b dist https://github.com/${{ github.repository }} dist
         
       - name: Bundle project
         run: gulp
