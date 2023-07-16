@@ -1,11 +1,12 @@
 // import { MinecraftBlockTypes } from "@minecraft/vanilla-data"
 import { MinecraftBlockTypes } from "@minecraft/server"
 
-import { BlockLocation } from "../../location/index.js"
-import { Vector3Utils } from "../../vector/index.js"
+import { BlockLocation, LocationUtils } from "../../location/index.js"
 
 import { WrappedBlocks } from "./WrappedBlocks.class.js"
 import { BlockWrapperTemplate } from "./BlockWrapperTemplate.class.js"
+
+import { WrappedPlayer } from "../entity/index.js"
 
 export const WOODEN_TRAPDOORS = new Set([
     MinecraftBlockTypes.acaciaTrapdoor,
@@ -61,26 +62,14 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
         this.block.setState("open_bit", false)
     }
     
-    getRelated(maxLength = 1) {
+    getRelated(player, maxLength = 1) {
         // 获取可以与该活板门双开的另外一些活板门和这个活板门组成的列表
         
         // 1. 获取另一个活板门的位置
         // e.g. 如果一个活板门位于一个方块的东边
         //      那么另一个活板门应该位于东边，即 x+1 的位置
         const facingDirection = this.facingDirection
-        const offset = BlockLocation.create({
-            x: facingDirection === 0
-                ? +1
-                : facingDirection === 2
-                    ? -1
-                    : 0,
-            y: 0,
-            z: facingDirection === 1
-                ? +1
-                : facingDirection === 3
-                    ? -1
-                    : 0
-        })
+        const offset = LocationUtils.getFacingOffset(facingDirection)
         const relatedBlock = this.block.getOffsetBlock(offset)
         
         const output = [this]
@@ -99,10 +88,10 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
                 
                 // 3. 获取扩展活板门
                 //    即能与该活板门延伸联动的另一个活板门
-                const extensiveBlock = this.block.getOffsetBlock(
-                    // TODO: 改为根据玩家视线方向确定延伸方向
-                    Vector3Utils.exchange(offset, ["x", "z"])
-                )
+                const wrappedPlayer = new WrappedPlayer(player)
+                const playerFacing = wrappedPlayer.getFacing()
+                const extensiveOffset = LocationUtils.getFacingOffset(playerFacing)
+                const extensiveBlock = this.block.getOffsetBlock(extensiveOffset)
                 if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(extensiveBlock)) {
                     const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock)
                     
@@ -112,8 +101,8 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
                         extensiveTrapdoor.upsideOrDown === this.upsideOrDown
                     ) {
                         // 进行递归运算
-                        const result = extensiveTrapdoor.getRelated(maxLength - 1)
-                        if (result.length > 1) output.push(...result)
+                        const result = extensiveTrapdoor.getRelated(player, maxLength - 1)
+                        if (result.length > 1) output.push(...result)  // TODO: 如果指定的长度还未达到，就反向运行
                     }
                 }
             }

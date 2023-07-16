@@ -11,6 +11,15 @@ export class WrappedPlayer {
         this.dimension = player.dimension
     }
     
+    getFacing() {
+        const rotation = this.player.getRotation().y
+        
+        if (rotation > -135 && rotation <= -45) return 0  // east (x+)
+        else if (rotation > -45 && rotation <= 45) return 1  // south (z+)
+        else if (rotation > 45 && rotation <= 135) return 2  // west (x-)
+        else if (rotation > 135 || rotation <= -135) return 3  // north (z-)
+    }
+    
     getGameMode() {
         const matches = []
         each(GameMode, mode => {

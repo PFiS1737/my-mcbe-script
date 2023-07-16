@@ -72,17 +72,17 @@ export class PlayerOption {
         return result
     }
     async done(parentDialog) {
-        const handleDone = async () => {
+        const handleDone = async ({ reply = true } = {}) => {
             await this._syncToDB()
-            this.player.sendMessage("设置选项修改成功")
+            if (reply) this.player.sendMessage("设置选项修改成功")
         }
         if (this.reload) {
             this.reload = false
             await Dialog.confirm({
-                body: "你选择的项目更改后需要刷新脚本，请手动运行 /reload 命令。\n\n您可以取消您的更改",
+                body: '你选择的项目更改后需要刷新脚本，请手动运行 "/reload" 命令。\n\n您也可以取消您的更改',
                 target: this.player,
                 onConfirm: async () => {
-                    await handleDone()
+                    await handleDone({ reply: false })
                     // await Commands.asyncRun("reload")
                 },
                 onCancel: async () => {

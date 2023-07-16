@@ -12,6 +12,7 @@ import { option } from "./option.js"
 export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event => {
     const { block, source: player } = event
     const playerOption = option.getPlayer(player)
+    
     if (
         WoodenDoorBlock.isWoodenDoorBlock(block) &&
         playerOption.getItemVal("door")
@@ -28,7 +29,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
     ) {
         event.cancel = true
         const maxLength = playerOption.getItemVal("max_trapdoor_length")
-        const trapdoors = (new WoodenTrapdoorBlock(block)).getRelated(maxLength)
+        const trapdoors = (new WoodenTrapdoorBlock(block)).getRelated(player, maxLength)
         asyncRun(() => {
             if (trapdoors[0].opened) each(trapdoors, _ => _.close())
             else each(trapdoors, _ => _.open())
