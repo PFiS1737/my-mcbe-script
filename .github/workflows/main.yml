@@ -20,7 +20,7 @@ jobs:
         
       - name: Clone repository
         run: |
-          git clone -b main ${{ github.repositoryUrl }} main
+          git clone -b main https://github.com/${{ github.repository }} main
           cd main
         
       - name: Install dependencies
