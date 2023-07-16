@@ -18,30 +18,25 @@ jobs:
         with:
           node-version: 17
         
-      - name: Clone repository
-        run: |
-          git clone -b main https://github.com/${{ github.repository }} main
-        
       - name: Install dependencies
-        run: |
-          cd main
-          npm install
+        run: npm install
         
       - name: Clone dist branch
-        run: |
-          cd main
-          git clone -b dist https://github.com/${{ github.repository }} dist
+        run: git clone -b dist https://github.com/${{ github.repository }} dist
         
       - name: Bundle project
+        run: gulp
+        
+      - name: Commit
         run: |
-          cd main
-          gulp
+          cd dist
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Auto-push dist"
         
       - name: Push to dist branch
         run: |
-          cd main/dist
-          git config --global user.name "Automated"
-          git config --global user.email "actions@users.noreply.github.com"
-          git add -A
-          git commit -m "Auto-push dist"
+          cd dist
+          git remote set-url origin https://PFiS1737:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git push origin dist
