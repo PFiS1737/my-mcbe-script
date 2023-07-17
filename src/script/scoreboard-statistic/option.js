@@ -21,11 +21,20 @@ export const option = optionManager
         }
     })
     .addItem({
-        name: "enable_confirm",
+        name: "enable_confirm_dialog",
         description: "启用删除记分板时的警告",
         values: [[true], [false]],
         defaultValue: true,
         events: {
-            changed: (selected, original) => console.warn("scoreboard-statistic:enable_confirm -> from", original, "to", selected)
+            changed: (selected, original) => console.warn("scoreboard-statistic:enable_confirm_dialog -> from", original, "to", selected)
+        }
+    })
+    .addItem({
+        name: "auto_start",
+        description: "添加记分板后是否自动开始统计",
+        values: [[true], [false]],
+        defaultValue: true,
+        events: {
+            changed: (selected, original) => console.warn("scoreboard-statistic:auto_start -> from", original, "to", selected)
         }
     })

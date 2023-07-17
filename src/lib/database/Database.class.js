@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server"
+import { world, Player } from "@minecraft/server"
 
 import { serialize } from "serialize-javascript"
 import md5 from "md5"
@@ -17,7 +17,9 @@ export class Database {
         const id = md5("db:" + dbName + "_" + player.id).slice(8, 24)
         this.id = id
         this.objective = getOrAddObjective(id, "db:" + dbName)
-        this.player = player
+        // this.player = player
+        
+        // if (!(player instanceof Player)) this.fakePlayer = true
         
         this._syncDataFromScoreboard()
         
@@ -58,7 +60,7 @@ export class Database {
         const data = serialize({ [key]: value }).replaceAll("\"", "'")
         if (data.length > 32767) throw new RangeError("Database: Only accepts a string value less than 32767 characters.");
         await asyncRun(() => this.objective.setScore(data, 1))
-        // await Commands.asyncRun(`scoreboard players set "${data}" ${this.objective.id} 1`)
+        
         this._syncDataFromScoreboard()
     }
     getAll() {

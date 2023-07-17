@@ -6,14 +6,16 @@
 
 > 注意：请避免同时开启多个统计或频繁触发更新，这可能导致卡顿
 
-- `!scoreboard objectives add <objectiveId> <criteria> [displayName]`
-    - 设置一个新的统计记分板，并将自己添加进去
-    - 对于未进入此记分板的玩家，使用同样的命令既可进入
+- `!statistic add <objectiveId> <criteria> [displayName]`
+    - 添加一个新的统计记分板
     - 已进入的玩家再次使用会报错
-- `!scoreboard objectives remove <objectiveId>`
-    - 将自己从一个统计记分板中移除（**统计数据不会被保留**）
-    - 若此记分板中只有一个玩家，将会删除此记分板
+- `!statistic remove <objectiveId>`
+    - 删除一个统计记分板（**统计数据不会被保留**）
     - **注意：请勿仅使用原版命令删除记分板**
+- `!statistic stop <objectiveId>`
+    - 暂停自己在某个统计记分板中的统计
+- `!statistic start <objectiveId>`
+    - 开启自己在某个统计记分板中的统计
 
 ### Criteria
 
@@ -57,4 +59,7 @@
     - 默认：关闭
 - `enable_confirm`
     - 启用删除记分板时的警告
+    - 默认：开启
+- `auto_start`
+    - 添加记分板后是否自动将自己添加进去并开始统计
     - 默认：开启

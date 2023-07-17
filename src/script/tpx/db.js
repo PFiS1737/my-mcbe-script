@@ -4,7 +4,7 @@ import { Database } from "@/lib/database/index.js"
 import { Dialog } from "@/lib/dialog/index.js"
 import { LocationInfo } from "@/lib/location/index.js"
 
-export const ALL_DATABASES = new Map()
+export const ALL_PLAYER_DATABASES = new Map()
 
 export class TpxDB {
     constructor(player) {
@@ -14,7 +14,7 @@ export class TpxDB {
     
     static init(player) {
         const db = new this(player)
-        ALL_DATABASES.set(player, db)
+        ALL_PLAYER_DATABASES.set(player, db)
         return db
     }
     

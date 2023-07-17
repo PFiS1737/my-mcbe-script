@@ -2,51 +2,63 @@ import { each } from "@/util/index.js"
 
 import { Database } from "@/lib/database/index.js"
 
-export const ALL_DATABASES = new Map()
+export const globalDB = new Database({ id: "global" }, "scoreboard-statistic-global")
 
-export class DB extends Database {
+export const ALL_PLAYER_DATABASES = new Map()
+
+import { serialize } from "serialize-javascript"
+
+export class EventDB {
     constructor(player) {
-        super(player, "scoreboard-statistic")
+        this.db = new Database(player, "scoreboard-statistic-player")
+        this.player = player
     }
     
     events = new Map()
     
     // 此次因为有 events 这个运行时存储项，
     // 而不能多次 construct，
-    // 故使用此方法将实例储存到 ALL_DATABASES 中
+    // 故使用此方法将实例储存到 ALL_PLAYER_DATABASES 中
     static init(player) {
         const db = new this(player)
-        ALL_DATABASES.set(player, db)
+        ALL_PLAYER_DATABASES.set(player, db)
         return db
     }
     
-    async set(objectiveId, criteria, events) {
-        await super.set(objectiveId, criteria)
+    async addParticipated(objectiveId) {
+        const participated = this.getParticipated()
+        participated.add(objectiveId)
+        await this.db.set("__participated__", participated)
+    }
+    getParticipated() {
+        return new Set(this.db.get("__participated__") ?? [])
+    }
+    
+    setEvents(objectiveId, events) {
         this.events.set(objectiveId, events)
     }
-    async clear() {
-        await super.clear()
-        this.events.clear()
+    getEvents(objectiveId) {
+        return this.events.get(objectiveId)
+    }
+    
+    async add(objectiveId, events) {
+        await this.addParticipated(objectiveId)
+        this.setEvents(objectiveId, events)
+    }
+    has(objectiveId) {
+        return this.events.has(objectiveId) && this.getParticipated().has(objectiveId)
     }
     async delete(objectiveId) {
-        await super.delete(objectiveId)
-        this.events.delete(objectiveId)
-    }
-    get(objectiveId) {
-        const criteria = super.get(objectiveId)
-        const events = this.events.get(objectiveId)
-        return {
-            criteria,
-            events
+        const participated = this.getParticipated()
+        if (participated.has(objectiveId)) {
+            participated.delete(objectiveId)
+            await this.db.set("__participated__", participated)
+            this.events.delete(objectiveId)
+            return true
         }
     }
-    getAll() {
-        const output = {}
-        each(this, ([ objectiveId, criteria ]) => {
-            const events = this.events.get(objectiveId)
-            output[objectiveId] = { criteria, events }
-        })
-        return output
+    async clear() {
+        await this.db.clear()
+        this.events.clear()
     }
 }
-

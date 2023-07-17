@@ -2,13 +2,13 @@ import { world } from "@minecraft/server"
 
 import { optionManager } from "@/lib/option-manager/index.js"
 
-import { setupHandler } from "./handler.js"
+import { Handler } from "./Handler.class.js"
 
 async function afterEntityDieCallback(event) {
     const player = event.deadEntity
-    const handler = setupHandler(player)
+    const handler = new Handler(player)
     
-    await handler.SET({
+    await handler.set({
         name: "__death__",
         option: {
             disposable: true,

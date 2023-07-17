@@ -12,7 +12,7 @@ export default function(banner, pkg) {
         const name = `${pkg.name}${ _name ? `-${_name}` : "" }.js`
         return {
             name, 
-            input: src.startsWith(".") ? src : `./src/script/${src}`,
+            input: src.startsWith(".") ? src : `./src/${src}`,
             output: {
                 file: dest.startsWith(".") ? dest : `./dist/${dest}`,
                 strict: true,
@@ -52,28 +52,57 @@ export default function(banner, pkg) {
         }
     }
     
-    const output = [
-        // bundle.js
-        _({
-            src: "index.js",
-            dest: "bundle.min.js",
-            name: "bundle"
-        })
-    ]
+    const output = {}
     
+    
+    // bundle.js
+    output.bundled = _({
+        src: "script/index.js",
+        dest: "bundle.min.js",
+        name: "bundle"
+    })
+    
+   
     // single script
-    const result = fs.readdirSync("./src/script", {
-        withFileTypes: true
-    })
-    each(result, dirent => {
-        if (dirent.isDirectory()) {
-            output.push(_({
-                src: `${dirent.name}/index.js`,
-                dest: `${dirent.name}.min.js`,
-                name: dirent.name
-            }))
+    output.scripts = []
+    each(
+        fs.readdirSync("./src/script", {
+            withFileTypes: true
+        }),
+        dirent => {
+            if (dirent.isDirectory()) {
+                const name = dirent.name
+                output.scripts.push(_({
+                    src: `script/${name}/index.js`,
+                    dest: `${name}.min.js`,
+                    name
+                }))
+            }
         }
-    })
+    )
+    
+    // libraries
+    output.libraries = []
+    each(
+        fs.readdirSync("./src/lib", {
+            withFileTypes: true
+        }),
+        dirent => {
+            if (dirent.isDirectory()) {
+                const name = dirent.name
+                if (
+                    name === "database" ||
+                    name === "option-manager"
+                ) {
+                    output.libraries.push(_({
+                        src: `lib/${name}/index.js`,
+                        dest: `${name}.min.js`,
+                        name
+                    }))
+                }
+            }
+        }
+    )
     
     return output
 }

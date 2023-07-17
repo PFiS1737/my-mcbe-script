@@ -1,79 +1,57 @@
-import {
-    world,
-    DisplaySlotId,
-    ObjectiveSortOrder,
-    ScoreboardObjective,
-    GameMode
-} from "@minecraft/server"
-
-import { Commands } from "@/lib/commands/index.js"
 import { Dialog } from "@/lib/dialog/index.js"
-import { WrappedPlayer } from "@/lib/wrapper/entity/index.js"
 import { eachAsync } from "@/util/index.js"
 import { asyncRun, errorHandler, getOrAddObjective } from "@/util/game.js"
 
 import { option } from "./option.js"
-import { ALL_DATABASES } from "./db.js"
-
-import CRITERIA from "./criteria/index.js"
+import { Handler } from "./Handler.class.js"
 
 export async function command(argv, sender) {
-    if (argv[1] !== "objectives") throw errorHandler("仅支持 objectives 子命令", sender)
-    
-    const playerDB = ALL_DATABASES.get(sender)
     const playerOption = option.getPlayer(sender)
+    const handler = new Handler(sender)
     
-    switch (argv[2]) {
+    const objectiveId = argv[2]
+    switch (argv[1]) {
         case "add": {
-            if (!playerOption.getItemVal("enable_creative")) sender.sendMessage("注意：当前设置不会统计创造模式下的行为")
-            
-            const [ , , , objectiveId, criteria, displayName ] = argv
+            const [ , , , criteria, displayName ] = argv
             if (!objectiveId) throw errorHandler("objectiveId 是必须的", sender)
             if (!criteria) throw errorHandler("criteria 是必须的", sender)
             
-            if (playerDB.has(objectiveId)) throw errorHandler("添加失败：您已位于该记分板", sender)
+            if (!playerOption.getItemVal("enable_creative"))
+                sender.sendMessage("注意：当前设置不会统计创造模式下的行为")
             
-            const objective = await asyncRun(() => {
-                const _objective = getOrAddObjective(objectiveId, displayName || objectiveId)
-                world.scoreboard.setObjectiveAtDisplaySlot(DisplaySlotId.Sidebar, {
-                    objective: _objective,
-                    sortOrder: ObjectiveSortOrder.Ascending
-                })
-                return _objective
-            })
+            const result = await handler.add({ objectiveId, criteria, displayName })
+            if (result.code) sender.sendMessage(`成功添加记分板 "${displayName}" (${objectiveId}) 使用 "${criteria}"`)
+            else {
+                switch (result.message) {
+                    case "DUPLICATE_OBJECTIVE": {
+                        throw errorHandler(`添加失败：记分板 ${objectiveId} 已存在`, sender)
+                        break
+                    }
+                    case "UNKNOWN_CRITERIA": {
+                        throw errorHandler(`添加失败：未知的准则 ${criteria}`, sender)
+                        break
+                    }
+                }
+            }
             
-            // 如果该玩家不存在任何一个记分板中，直接 setScore(sender) 会报错
-            // 所以这里设置一下初始分数
-            if (!objective.hasParticipant(sender))
-                await Commands.asyncRun(`scoreboard players set @s ${objectiveId} 0`, sender)
-            
-            await setupListener(objective, criteria, sender)
-            sender.sendMessage(`成功设置 "${displayName}" 使用 "${criteria}"`)
+            if (playerOption.getItemVal("auto_start")) {
+                const startResult = await handler.start({ objectiveId, criteria })
+                if (startResult) sender.sendMessage(`已自动开启您在 ${displayName} 上的统计`)
+            }
             
             break
         }
-        case "remove": {
-            const objectiveId = argv[3]
-            
-            if (!playerDB.has(objectiveId)) throw errorHandler("移除失败：您并不位于该记分板", sender)
-            
-            const objective = getOrAddObjective(objectiveId)
-            const { events } = playerDB.get(objectiveId)
-            
+        case "remove":
+        case "rm":
+        case "-r": {
             async function _remove() {
-                await eachAsync(events, async ({ listener }, eventName) => {
-                    await asyncRun(() => world.afterEvents[eventName].unsubscribe(listener))
-                })
-                objective.removeParticipant(sender)
-                if (objective.getParticipants()) world.scoreboard.removeObjective(objective)
-                
-                await playerDB.delete(objectiveId)
-                
-                sender.sendMessage("删除成功")
+                const result = await handler.remove({ objectiveId })
+                if (result) sender.sendMessage(`删除成功 ${objectiveId}`)
+                else throw errorHandler(`移除失败：记分板 ${objectiveId} 不存在或不是统计用记分板`, sender)
             }
             
-            if (playerOption.getItemVal("enable_confirm")) await Dialog.confirm({
-                body: `是否清除你在 ${objectiveId} 上的统计数据，你将永远失去它们`,
+            if (playerOption.getItemVal("enable_confirm_dialog")) await Dialog.confirm({
+                body: `是否清除记分板 ${objectiveId} 上的统计数据，你将永远失去它们`,
                 target: sender,
                 onConfirm: _remove
             })
@@ -81,66 +59,30 @@ export async function command(argv, sender) {
             
             break
         }
-        default: {
-            throw errorHandler(`未知的子命令 objectives ${argv[2]}`, sender)
+        case "stop": {
+            const result = await handler.stop({ objectiveId })
+            
+            if (result) sender.sendMessage(`已暂停您在 ${objectiveId} 上的统计`)
+            else throw errorHandler(`暂停失败：您可能没有开启您在记分板 ${objectiveId} 上的统计，或该记分板不存在`, sender)
+            
+            break
         }
-    }
-}
-
-export async function setupListener(objectiveId, criteria, sender) {
-    const [ criteriaType, criteriaName ] = criteria
-        .split(":")
-        .map(e => e.replace(".", ":"))
-        .map((e, i) => {
-            if (i === 0) return e
-            return e.match(/^(.+)\:/) ? e : `minecraft:${e}`
-        })
-    const objective = objectiveId instanceof ScoreboardObjective
-        ? objectiveId
-        : getOrAddObjective(objectiveId)
-    
-    const setupTigger = CRITERIA.get(criteriaType)
-    if (setupTigger) {
-        const playerDB = ALL_DATABASES.get(sender)
-        const playerOption = option.getPlayer(sender)
-        const wrappedPlayer = new WrappedPlayer(sender)
-        
-        const tigger = setupTigger({
-            player: sender,
-            target: criteriaName,
-            async callback(result) {
-                if (
-                    !wrappedPlayer.testGameMode(GameMode.creative) ||
-                    playerOption.getItemVal("enable_creative")
-                ) {
-                    switch (result.type) {
-                        case "decrease": {
-                            if (playerOption.getItemVal("enable_cancel_out"))
-                                objective.setScore(sender, objective.getScore(sender) - result.value)
-                            break
-                        }
-                        case "reset": {
-                            objective.setScore(sender, result.value)
-                            break
-                        }
-                        case "increase":
-                        case undefined:
-                        default: {
-                            // TODO: scoreboard wrapper #addScore()
-                            objective.setScore(sender, objective.getScore(sender) + result.value)
-                        }
-                    }
-                }
-            }
-        })
-        
-        await eachAsync(tigger.events, async ({ option: subscribeOption, listener }, eventName) => {
-            if (subscribeOption) await asyncRun(() => world.afterEvents[eventName].subscribe(listener, subscribeOption))
-            else await asyncRun(() => world.afterEvents[eventName].subscribe(listener))  // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
-        })
-        
-        await playerDB.set(objective.id, criteria, tigger.events)
-    } else {
-        throw errorHandler(`未知的准则：${criteria}`, sender)
+        case "start": {
+            const result = await handler.start({ objectiveId })
+            
+            if (result) sender.sendMessage(`已开启您在 ${objectiveId} 上的统计`)
+            else throw errorHandler(`开启失败：您可能已经开启您在记分板 ${objectiveId} 上的统计，或该记分板不存在`, sender)
+            
+            break
+        }
+        case "option":
+        case "opt":
+        case "-o": {
+            await asyncRun(() => playerOption.showDialog())
+            break
+        }
+        default: {
+            throw errorHandler(`未知的子命令 ${argv[1]}`, sender)
+        }
     }
 }

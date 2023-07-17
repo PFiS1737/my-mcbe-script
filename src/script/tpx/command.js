@@ -1,7 +1,7 @@
 import { Commands } from "@/lib/commands/index.js"
 import { asyncRun, errorHandler } from "@/util/game.js"
 
-import { setupHandler } from "./handler.js"
+import { Handler } from "./Handler.class.js"
 import { option } from "./option.js"
 
 const SUB_COMMANDS = [
@@ -15,12 +15,17 @@ const SUB_COMMANDS = [
 
 export async function tpxCommand(argv, sender) {
     const name = argv[2] ?? "default"
-    const handler = setupHandler(sender)
+    const handler = new Handler(sender)
+    
     switch (argv[1]) {
         case "set":
         case "-s": {
-            if (SUB_COMMANDS.includes(name) || name === "__back__") throw errorHandler(`添加失败：不能使用 ${name} 作为名称`, sender)
-            const result = await handler.SET({
+            if (
+                SUB_COMMANDS.includes(name) ||
+                name === "__back__"
+            ) throw errorHandler(`添加失败：不能使用 ${name} 作为名称`, sender)
+            
+            const result = await handler.set({
                 name,
                 option: {
                     disposable: argv[3] === "true"
@@ -30,34 +35,42 @@ export async function tpxCommand(argv, sender) {
                             : null
                 }
             })
+            
             if (result) sender.sendMessage(`成功设置 ${name} 在 ${result.info}`)
+            
             break
         }
         case "remove":
         case "rm":
         case "-r": {
-            const result = await handler.REMOVE({ name })
+            const result = await handler.remove({ name })
+            
             if (result === true) sender.sendMessage(`成功删除 ${name}`)
             else if (result === false) throw errorHandler(`删除失败：未找到 ${name}`, sender)
+            
             break
         }
         case "back":
         case "bk":
         case "-b": {
-            const result = await handler.TRY_TELEPORT({ names: [ "__death__", "__back__" ] })
+            const result = await handler.tryTeleport({ names: [ "__death__", "__back__" ] })
+            
             if (result) sender.sendMessage(`已返回到 ${result.info}`)
             else throw errorHandler("传送失败：未找到返回点", sender)
+            
             break
         }
         case "list":
         case "ls":
         case "-l": {
-            const result = handler.LIST()
+            const result = handler.list()
+            
             if (result) {
                 result.msg.unshift("您的传送点有：")
                 sender.sendMessage(result.msg.join("\n- "))
             }
             else sender.sendMessage("您目前没有传送点")
+            
             break
         }
         case "help":
@@ -72,7 +85,8 @@ export async function tpxCommand(argv, sender) {
             break
         }
         default: {
-            const result = await handler.TELEPORT({ name: argv[1] })
+            const result = await handler.teleport({ name: argv[1] })
+            
             if (result) sender.sendMessage(`已传送到 ${result.info}`)
             else throw errorHandler(`传送失败：未找到传送点 ${argv[1]}`, sender)
         }

@@ -12,16 +12,25 @@
 
 ```javascript
 // import
-import Database from "./index.js"
+import { world } from "@minecraft/srrver"
+import { Database } from "./index.js"
+
+// get player
+const player = world.getAllPlayers()[0]
+
+// or you can just use a fake player
+// NOTE: Do not use numeric ids,
+//       this may duplicate an entity in the game
+// const player = { id: "fake_player" }
 
 // create or open a database
-const db = Database.open("my-db")
+const db = Database.open(player, "my-db")
 ```
 
 ### Method
 
 - open
-    - `static open(player, dbName): Database`
+    - `static open(player: Player, dbName: string): Database`
 - set
     - `set(key: string, value: any): void`
     - 添加一组数据
