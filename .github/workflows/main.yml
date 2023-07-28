@@ -25,7 +25,7 @@ jobs:
           node-version: 17
         
       - name: Install dependencies
-        run: npm install
+        run: npm install --include=dev
         
       - name: Clone dist branch
         run: git clone -b dist https://github.com/${{ github.repository }} dist
