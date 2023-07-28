@@ -1,19 +1,44 @@
+import { Vector3Utils } from "../vector/index.js"
+
 import { Location } from "./Location.class.js"
+import { Direction } from "./Directions.class.js"
 
 export class LocationUtils {
-    static getFacingOffset(facing) {
+    static getDirectionOffset(directionCode) {
+        const direction = directionCode instanceof Direction
+            ? directionCode
+            : new Direction(directionCode)
+        
         return Location.create({
-            x: facing === 0  // east (x+)
+            x: direction.isEast()
                 ? +1
-                : facing === 2  // west (x-)
+                : direction.isWest()
                     ? -1
                     : 0,
-            y: 0,
-            z: facing === 1  // south (z+)
+            y: direction.isUp()
                 ? +1
-                : facing === 3  // north (z-)
+                : direction.isDown()
+                    ? -1
+                    : 0,
+            z: direction.isSouth()
+                ? +1
+                : direction.isNorth()
                     ? -1
                     : 0
         })
+    }
+    
+    static between(a, b, s = 1) {
+        const output = []
+        for (let x = a.x; x <= b.x; x += s) {
+            for (let y = a.y; y <= b.y; y += s) {
+                for (let z = a.z; z <= b.z; z += s) {
+                    output.push(
+                        new Location(x, y, z)
+                    )
+                }
+            }
+        }
+        return output
     }
 }

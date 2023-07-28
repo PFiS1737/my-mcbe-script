@@ -1,9 +1,7 @@
 import { world } from "@minecraft/server"
 
-import {
-    WoodenDoorBlock,
-    WoodenTrapdoorBlock
-} from "@/lib/wrapper/block/index.js"
+import { BetterConsole } from "@/lib/BetterConsole.class.js"
+import { WoodenDoorBlock, WoodenTrapdoorBlock } from "@/lib/wrapper/block/index.js"
 import { each } from "@/util/index.js"
 import { asyncRun, errorHandler } from "@/util/game.js"
 
@@ -22,7 +20,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
         asyncRun(() => {
             if (doors[0].opened) each(doors, _ => _.close())
             else each(doors, _ => _.open())
-        })
+        }).catch(BetterConsole.error)
     } else if (
         WoodenTrapdoorBlock.isWoodenTrapdoorBlock(block) &&
         playerOption.getItemVal("trapdoor")
@@ -33,6 +31,6 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
         asyncRun(() => {
             if (trapdoors[0].opened) each(trapdoors, _ => _.close())
             else each(trapdoors, _ => _.open())
-        })
+        }).catch(BetterConsole.error)
     }
 })

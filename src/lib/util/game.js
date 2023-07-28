@@ -37,3 +37,13 @@ export function getOrAddObjective(id, name) {
     else if (!objective) return world.scoreboard.addObjective(id, name)
     else return objective
 }
+
+export function removeMinecraftNamespace(identifier) {
+    return identifier.replace(/^minecraft\:/, "")
+}
+
+export function addMinecraftNamespaceIfNeed(identifier) {
+    return /^(.+)\:/.test(identifier)
+        ? identifier
+        : "minecraft:" + identifier
+}

@@ -1,37 +1,17 @@
-// import { MinecraftBlockTypes } from "@minecraft/vanilla-data"
-import { MinecraftBlockTypes } from "@minecraft/server"
-
-import { BlockLocation, LocationUtils } from "../../location/index.js"
-
-import { WrappedBlocks } from "./WrappedBlocks.class.js"
-import { BlockWrapperTemplate } from "./BlockWrapperTemplate.class.js"
+import { BlockLocation, Directions } from "../../location/index.js"
 
 import { WrappedPlayer } from "../entity/index.js"
 
-export const WOODEN_TRAPDOORS = new Set([
-    MinecraftBlockTypes.acaciaTrapdoor,
-    MinecraftBlockTypes.bambooTrapdoor,
-    MinecraftBlockTypes.birchTrapdoor,
-    MinecraftBlockTypes.cherryTrapdoor,
-    MinecraftBlockTypes.crimsonTrapdoor,
-    MinecraftBlockTypes.darkOakTrapdoor,
-    MinecraftBlockTypes.jungleTrapdoor,
-    MinecraftBlockTypes.mangroveTrapdoor,
-    MinecraftBlockTypes.spruceTrapdoor,
-    MinecraftBlockTypes.trapdoor,
-    MinecraftBlockTypes.warpedTrapdoor
-])
+import { WrappedBlock } from "./WrappedBlock.class.js"
 
-export class WoodenTrapdoorBlock extends WrappedBlocks {
+import { WOODEN_TRAPDOORS } from "./BlockTypeGroups.enumeration.js"
+
+export class WoodenTrapdoorBlock extends WrappedBlock {
     constructor(block) {
         if (!WoodenTrapdoorBlock.isWoodenTrapdoorBlock(block))
-            throw new TypeError(`"${block.typeId}" is not a wooden door.`)
+            throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
         
-        const wrappedBlock = block instanceof BlockWrapperTemplate
-            ? block
-            : new BlockWrapperTemplate(block)
-        
-        super([block])
+        super(block)
     }
     
     static isWoodenTrapdoorBlock(block) {
@@ -39,27 +19,27 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
     }
     
     get opened() {
-        return this.block.getState("open_bit")
+        return this.getState("open_bit")
     }
     get facingDirection() {
-        const direction = this.block.getState("direction")
-        if (direction === 1) return 2
-        else if (direction === 2) return 1
-        else return direction
-        // 0 -> trapdoor is on the >east (x+)< side of a block
-        // 1 -> south (z+)
-        // 2 -> west (x-)
-        // 3 -> north (z-)
+        // trapdoor is on the >direction< side of a block
+        const directionCode = this.getState("direction")
+        switch (directionCode) {
+            case 0: return Directions.East
+            case 2: return Directions.South
+            case 1: return Directions.West
+            case 3: return Directions.North
+        }
     }
     get upsideOrDown() {
-        return this.block.getState("upside_down_bit")
+        return this.getState("upside_down_bit")
     }
     
     open() {
-        this.block.setState("open_bit", true)
+        this.setState("open_bit", true)
     }
     close() {
-        this.block.setState("open_bit", false)
+        this.setState("open_bit", false)
     }
     
     getRelated(player, maxLength = 1) {
@@ -69,8 +49,7 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
         // e.g. 如果一个活板门位于一个方块的东边
         //      那么另一个活板门应该位于东边，即 x+1 的位置
         const facingDirection = this.facingDirection
-        const offset = LocationUtils.getFacingOffset(facingDirection)
-        const relatedBlock = this.block.getOffsetBlock(offset)
+        const relatedBlock = this.getNeighbourBlock(facingDirection)
         
         const output = [this]
         
@@ -82,22 +61,20 @@ export class WoodenTrapdoorBlock extends WrappedBlocks {
                 
                 // 方向相反，上下位置相同
                 if (
-                    Math.abs(relatedTrapdoor.facingDirection - facingDirection) === 2 &&
+                    Math.abs(relatedTrapdoor.facingDirection.code - facingDirection.code) === 2 &&
                     relatedTrapdoor.upsideOrDown === this.upsideOrDown
                 ) output.push(relatedTrapdoor)
                 
                 // 3. 获取扩展活板门
                 //    即能与该活板门延伸联动的另一个活板门
-                const wrappedPlayer = new WrappedPlayer(player)
-                const playerFacing = wrappedPlayer.getFacing()
-                const extensiveOffset = LocationUtils.getFacingOffset(playerFacing)
-                const extensiveBlock = this.block.getOffsetBlock(extensiveOffset)
+                const playerFacing = WrappedPlayer.wrap(player).getFacingDirectionXZ()
+                const extensiveBlock = this.getNeighbourBlock(playerFacing)
                 if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(extensiveBlock)) {
                     const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock)
                     
                     // 方向相同，上下位置相同
                     if (
-                        extensiveTrapdoor.facingDirection === facingDirection &&
+                        extensiveTrapdoor.facingDirection.code === facingDirection.code &&
                         extensiveTrapdoor.upsideOrDown === this.upsideOrDown
                     ) {
                         // 进行递归运算

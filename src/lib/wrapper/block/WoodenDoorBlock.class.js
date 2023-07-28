@@ -1,44 +1,29 @@
-// import { MinecraftBlockTypes } from "@minecraft/vanilla-data"
-import { MinecraftBlockTypes } from "@minecraft/server"
-
-import { BlockLocation } from "../../location/index.js"
+import { BlockLocation, Directions } from "../../location/index.js"
 
 import { WrappedBlocks } from "./WrappedBlocks.class.js"
-import { BlockWrapperTemplate } from "./BlockWrapperTemplate.class.js"
+import { WrappedBlock } from "./WrappedBlock.class.js"
 
-export const WOODEN_DOORS = new Set([
-    MinecraftBlockTypes.acaciaDoor,
-    MinecraftBlockTypes.bambooDoor,
-    MinecraftBlockTypes.birchDoor,
-    MinecraftBlockTypes.cherryDoor,
-    MinecraftBlockTypes.crimsonDoor,
-    MinecraftBlockTypes.darkOakDoor,
-    MinecraftBlockTypes.jungleDoor,
-    MinecraftBlockTypes.mangroveDoor,
-    MinecraftBlockTypes.spruceDoor,
-    MinecraftBlockTypes.warpedDoor,
-    MinecraftBlockTypes.woodenDoor
-])
+import { WOODEN_DOORS } from "./BlockTypeGroups.enumeration.js"
 
 export class WoodenDoorBlock extends WrappedBlocks {
     constructor(block) {
         if (!WoodenDoorBlock.isWoodenDoorBlock(block))
-            throw new TypeError(`"${block.typeId}" is not a wooden door.`)
+            throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
         
-        const wrappedBlock = block instanceof BlockWrapperTemplate
+        const wrappedBlock = block instanceof WrappedBlock
             ? block
-            : new BlockWrapperTemplate(block)
+            : new WrappedBlock(block)
         
         const isUpper = wrappedBlock.getState("upper_block_bit")
         const blocks = [
             // _lower
             isUpper
-                ? wrappedBlock.getOffsetBlock(new BlockLocation(0, -1, 0))
+                ? wrappedBlock.getNeighbourBlock(Directions.Down)
                 : wrappedBlock,
             // _upper
             isUpper
                 ? wrappedBlock
-                : wrappedBlock.getOffsetBlock(new BlockLocation(0, +1, 0))
+                : wrappedBlock.getNeighbourBlock(Directions.Up)
         ]
         
         super(blocks)
@@ -59,12 +44,14 @@ export class WoodenDoorBlock extends WrappedBlocks {
         return this._lower.getState("open_bit")
     }
     get facingDirection() {
-        return this._lower.getState("direction")
         // the direction you are facing when you place the door
-        // 0 -> east (x+)
-        // 1 -> south (z+)
-        // 2 -> west (x-)
-        // 3 -> north (z-)
+        const directionCode = this._lower.getState("direction")
+        switch (directionCode) {
+            case 0: return Directions.East
+            case 1: return Directions.South
+            case 2: return Directions.West
+            case 3: return Directions.North
+        }
     }
     get hingeSide() {
         return this._upper.getState("door_hinge_bit")
@@ -86,60 +73,21 @@ export class WoodenDoorBlock extends WrappedBlocks {
         //    根据门的方向和门轴位置确定
         // e.g. 如果一个门的朝向是东边，门轴在左边（即北边）
         //      那么另一个门应该位于南边，即 z+1 的位置
-        
-        // 于是我们有下面的 switch 语句：
-        // let relatedBlock
-        // switch (this.facingDirection) {
-        //     case 0: {
-        //         relatedBlock = this._lower.getOffsetBlock(
-        //             this.hingeSide
-        //                 ? new BlockLocation(0, 0, -1)  // s -> n
-        //                 : new BlockLocation(0, 0, +1)  // n -> s
-        //         )
-        //         break
-        //     }
-        //     case 1: {
-        //         relatedBlock = this._lower.getOffsetBlock(
-        //             this.hingeSide
-        //                 ? new BlockLocation(+1, 0, 0)  // w -> e
-        //                 : new BlockLocation(-1, 0, 0)  // e -> w
-        //         )
-        //         break
-        //     }
-        //     case 2: {
-        //         relatedBlock = this._lower.getOffsetBlock(
-        //             this.hingeSide
-        //                 ? new BlockLocation(0, 0, +1)  // n -> s
-        //                 : new BlockLocation(0, 0, -1)  // s -> n
-        //         )
-        //         break
-        //     }
-        //     case 3: {
-        //         relatedBlock = this._lower.getOffsetBlock(
-        //             this.hingeSide
-        //                 ? new BlockLocation(-1, 0, 0)  // e -> w
-        //                 : new BlockLocation(+1, 0, 0)  // w -> e
-        //         )
-        //         break
-        //     }
-        // }
-        
-        // 经过压缩，可以得到：
         const facingDirection = this.facingDirection
         const hingeSide = this.hingeSide
         const offset = BlockLocation.create({
             x: Number(
-                facingDirection === 1
+                facingDirection.isSouth()
                     ? hingeSide || -1
-                    : facingDirection === 3
+                    : facingDirection.isNorth()
                         ? !hingeSide || -1
                         : 0
             ),
             y: 0,
             z: Number(
-                facingDirection === 0
+                facingDirection.isEast()
                     ? !hingeSide || -1
-                    : facingDirection === 2
+                    : facingDirection.isWest()
                         ? hingeSide || -1
                         : 0
             )
@@ -154,7 +102,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
             
             // 另一扇门应该方向相同，而门轴相反
             if (
-                relatedDoor.facingDirection === facingDirection &&
+                relatedDoor.facingDirection.code === facingDirection.code &&
                 relatedDoor.hingeSide === !hingeSide
             ) output.push(relatedDoor)
         }

@@ -7,6 +7,10 @@ export function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min
 }
 
+export function withProbability(p) {
+    return Math.random() <= p
+}
+
 export function equals(a, b, epsilon = 0.000001) {
     return Math.abs(a - b) <= epsilon * Math.max(1, Math.abs(a), Math.abs(b))
 }
@@ -20,9 +24,11 @@ export function combination(n, k) {
 }
 
 export function binomial(a, b, n) {
-    return function(k) {
-        return combination(n, k) * a ** (n - k) * b ** k
-    }
+    return k =>  a ** (n - k) * b ** k * combination(n, k)
+}
+
+export function binomialDistribution(n, p) {
+    return binomial(1 - p, p, n)
 }
 
 export function sum(from, to, fn) {

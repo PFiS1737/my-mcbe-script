@@ -24,7 +24,7 @@ export const option = optionManager
     .addItem({
         name: "max_trapdoor_length",
         description: "允许双开活板门的最大距离",
-        values: range(1, 51).map(i => [i]),  // TODO: 因为没有为滑块的专门设置，先暂时这么写
+        values: range(1, 51).map(i => [i, `${i}`]),  // TODO: 因为没有为滑块的专门设置，先暂时这么写
         defaultValue: 3,
         events: {
             changed: (selected, original) => console.warn("better-door:max_trapdoor_length -> from", original, "to", selected)

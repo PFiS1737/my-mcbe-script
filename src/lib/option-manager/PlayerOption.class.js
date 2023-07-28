@@ -102,7 +102,7 @@ export class PlayerOption {
             if (values.size === 2 && values.get(true) && values.get(false)) {
                 form.toggle(description, selected)
             } else {
-                form.dropdown(description, valuesMap.map(e => `${e}`), valuesMap.findIndex(e => e === selected))
+                form.dropdown(description, [...values].map(e => e[1]), valuesMap.findIndex(e => e === selected))
             }
             // TODO 滑块等其他方式
         })

@@ -25,3 +25,17 @@ export function deserialize(str) {
 }
 
 export const AsyncFunction = (async function() {}).constructor
+
+export function arraySample(arr) {
+    return arr[Math.floor(Math.random() * arr.length)]
+}
+
+export function arrayAt(arr, index) {
+    return index >= 0
+        ? arr[index]
+        : arr[arr.length + index]
+}
+
+export function toCamelCase(str) {
+    return str.replace(/(\w)[\. _-](\w)/g, (_, $1, $2) => $1 + $2.toUpperCase())
+}

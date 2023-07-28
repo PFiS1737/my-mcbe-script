@@ -1,3 +1,6 @@
+/src/script/test
+/src/data/**/index.js
+
 # Logs
 logs
 *.log

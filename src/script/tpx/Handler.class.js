@@ -24,7 +24,7 @@ export class Handler {
                 this.playerOption.getItemVal("auto_back_point") &&
                 name !== "__death__"
             ) {
-                await this.SET({
+                await this.set({
                     name: "__back__",
                     option: {
                         disposable: true,

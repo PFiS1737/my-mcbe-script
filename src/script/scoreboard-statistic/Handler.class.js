@@ -59,14 +59,13 @@ export class Handler {
         const objective = getOrAddObjective(objectiveId)
         const [ criteriaType, criteriaName ] = parseCriteria(criteria)
         
-        const wrappedPlayer = new WrappedPlayer(this.player)
         const setupTigger = CRITERIA.get(criteriaType)
         const tigger = setupTigger({
             player: this.player,
             target: criteriaName,
             callback: result => {
                 if (
-                    !wrappedPlayer.testGameMode(GameMode.creative) ||
+                    !WrappedPlayer.wrap(this.player).testGameMode(GameMode.creative) ||
                     this.playerOption.getItemVal("enable_creative")
                 ) {
                     switch (result.type) {

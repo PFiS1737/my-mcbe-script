@@ -3,21 +3,25 @@ import { Player, GameMode } from "@minecraft/server"
 import { Commands } from "../../commands/index.js"
 import { each } from "../../util/index.js"
 
-export class WrappedPlayer {
+import { WrappedEntity } from "./WrappedEntity.class.js"
+
+export class WrappedPlayer extends WrappedEntity {
     constructor(player) {
-        if (!(player instanceof Player)) throw new TypeError("Parameter is not an instance of Player.")
+        if (!(player instanceof Player))
+            throw new TypeError("Parameter is not an instance of Player.")
         
-        this.player = player
-        this.dimension = player.dimension
+        super(player)
     }
     
-    getFacing() {
-        const rotation = this.player.getRotation().y
-        
-        if (rotation > -135 && rotation <= -45) return 0  // east (x+)
-        else if (rotation > -45 && rotation <= 45) return 1  // south (z+)
-        else if (rotation > 45 && rotation <= 135) return 2  // west (x-)
-        else if (rotation > 135 || rotation <= -135) return 3  // north (z-)
+    get player() {
+        return this.entity
+    }
+    
+    get inventory() {
+        return this.components.get("inventory").container
+    }
+    get selectedSlot() {
+        return this.player.selectedSlot
     }
     
     getGameMode() {
@@ -34,5 +38,27 @@ export class WrappedPlayer {
     setGameMode(mode) {
         if (!Object.values(GameMode).includes(mode)) throw new TypeError("Unknown gamemode.")
         Commands.run(`gamemode ${mode}`, this.player)
+    }
+    
+    getMainHand() {
+        return this.inventory.getItem(this.selectedSlot)
+    }
+    setMainHand(item) {
+        this.inventory.setItem(this.selectedSlot, item)
+    }
+    
+    async useItemFromInventory(slot, callback = async () => {}) {
+        let itemStack = this.inventory.getItem(slot)
+        
+        itemStack = await callback(itemStack)
+        
+        this.inventory.setItem(slot, itemStack)
+    }
+    async useMainHandItem(callback = async () => {}) {
+        await this.useItemFromInventory(this.selectedSlot, callback)
+    }
+    
+    addExperience(amount = 0) {
+        this.player.addExperience(amount)
     }
 }

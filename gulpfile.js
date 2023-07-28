@@ -19,6 +19,7 @@ const banner = fileName => `
 const rollupConfig = genRollupConfig(banner, pkg)
 
 function createTask(config) {
+    if (!config) return
     const fn = async function() {
         const result = await rollup({
             input: config.input,
@@ -41,5 +42,6 @@ function createTask(config) {
 export const bundled = createTask(rollupConfig.bundled)
 export const scripts = gulp.parallel(...rollupConfig.scripts.map(createTask))
 export const libraries = gulp.parallel(...rollupConfig.libraries.map(createTask))
+export const test = createTask(rollupConfig.test)
 
 export default gulp.series(bundled, scripts, libraries)

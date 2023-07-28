@@ -1,12 +1,16 @@
-import { BlockWrapperTemplate } from "./BlockWrapperTemplate.class.js"
+import { WrapperTemplate } from "../WrapperTemplate.class.js"
 
-export class WrappedBlocks {
+import { WrappedBlock } from "./WrappedBlock.class.js"
+
+export class WrappedBlocks extends WrapperTemplate {
     constructor(blocks) {
+        super()
+        
         this.blocks = (Array.isArray(blocks) ? blocks : [blocks])
             .map(block => {
-                return block instanceof BlockWrapperTemplate
+                return block instanceof WrappedBlock  // TODO: TypeError
                     ? block
-                    : new BlockWrapperTemplate(block)
+                    : new WrappedBlock(block)
             })
     }
     

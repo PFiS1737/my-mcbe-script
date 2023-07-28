@@ -133,7 +133,7 @@ export class Vector3Utils {
     static normalize(a) {
         const magnitude = this.magnitude(a)
         if (magnitude) return this.scale(a, 1 / magnitude)
-        else return this.zero
+        else return new Vector3(0, 0, 0)
     }
     static angle(a, b) {
         const cosOmega = this.dot(
@@ -160,8 +160,8 @@ export class Vector3Utils {
         )
     }
     static slerp(a, b, t) {
-        if (t <= 0) return Vector3.create(a)
-        if (t >= 1) return Vector3.create(b)
+        if (t <= 0) return this.clone(a)
+        if (t >= 1) return this.clone(b)
         
         const omega = this.angle(a, b)
         const sinOmega = Math.sin(omega)

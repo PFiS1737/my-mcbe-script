@@ -1,5 +1,5 @@
 import fs from "node:fs"
-import { resolvePath } from "./src/lib/util/node.js"
+import { resolvePath, createIndex } from "./src/lib/util/node.js"
 import { each } from "./src/lib/util/index.js"
 
 import commonjs from "@rollup/plugin-commonjs"
@@ -10,13 +10,13 @@ import terser from "@rollup/plugin-terser"
 export default function(banner, pkg) {
     function _({ src, dest, name: _name }) {
         const name = `${pkg.name}${ _name ? `-${_name}` : "" }.js`
-        return {
+        const config = {
             name, 
             input: src.startsWith(".") ? src : `./src/${src}`,
             output: {
                 file: dest.startsWith(".") ? dest : `./dist/${dest}`,
                 strict: true,
-                sourcemap: true,
+                // sourcemap: true,
                 format: "es",
                 banner: banner(name)
             },
@@ -32,6 +32,10 @@ export default function(banner, pkg) {
                             replacement: resolvePath("./src/lib", import.meta) + "/"
                         },
                         {
+                            find: /^\@\/data\//,
+                            replacement: resolvePath("./src/data", import.meta) + "/"
+                        },
+                        {
                             find: /^\@\/util\//,
                             replacement: resolvePath("./src/lib/util", import.meta) + "/"
                         },
@@ -44,16 +48,23 @@ export default function(banner, pkg) {
                 commonjs(),
                 nodeResolve({
                     preferBuiltins: false
-                }),
-                // terser({
-                //     maxWorkers: 4
-                // })
+                })
             ]
         }
+        
+        if (process?.env?.NODE_ENV === "production")
+            config.plugins.push(terser({
+                maxWorkers: 4
+            }))
+        
+        return config
     }
     
-    const output = {}
+    createIndex(resolvePath("./src/data/block", import.meta), {
+        suffixToRead: ".json.js"
+    })
     
+    const output = {}
     
     // bundle.js
     output.bundled = _({
@@ -103,6 +114,14 @@ export default function(banner, pkg) {
             }
         }
     )
+    
+    // test
+    if (process?.env?.NODE_ENV === "development")
+        output.test = _({
+            src: "script/test/index.js",
+            dest: "test.min.js",
+            name: "test"
+        })
     
     return output
 }
