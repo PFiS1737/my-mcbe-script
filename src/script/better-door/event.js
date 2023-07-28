@@ -16,7 +16,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
         playerOption.getItemVal("door")
     ) {
         event.cancel = true
-        const doors = (new WoodenDoorBlock(block)).getRelated()
+        const doors = WoodenDoorBlock.wrap(block).getRelated()
         asyncRun(() => {
             if (doors[0].opened) each(doors, _ => _.close())
             else each(doors, _ => _.open())
@@ -27,7 +27,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
     ) {
         event.cancel = true
         const maxLength = playerOption.getItemVal("max_trapdoor_length")
-        const trapdoors = (new WoodenTrapdoorBlock(block)).getRelated(player, maxLength)
+        const trapdoors = WoodenTrapdoorBlock.wrap(block).getRelated(player, maxLength)
         asyncRun(() => {
             if (trapdoors[0].opened) each(trapdoors, _ => _.close())
             else each(trapdoors, _ => _.open())

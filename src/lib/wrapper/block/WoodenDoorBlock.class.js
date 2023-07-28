@@ -30,7 +30,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
     }
     
     static isWoodenDoorBlock(block) {
-        return WOODEN_DOORS.has(block.type)
+        return WOODEN_DOORS.has(block?.typeId)
     }
     
     get _lower() {
