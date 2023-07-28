@@ -5,7 +5,8 @@ import { each, eachAsync } from "../util/index.js"
 import { Database } from "../database/index.js"
 import { Dialog } from "../dialog/index.js"
 
-import { OptionItem } from "./OptionItem.class.js"
+import { OptionItemSelection } from "./OptionItemSelection.class.js"
+import { OptionItemRange } from "./OptionItemRange.class.js"
 
 export class PlayerOption {
     constructor(player, name) {
@@ -17,7 +18,8 @@ export class PlayerOption {
     items = {}
     
     addItem(opts) {
-        this.items[opts.name] = new OptionItem(opts)
+        if (opts.range) this.items[opts.name] = new OptionItemRange(opts)
+        else if (opts.values) this.items[opts.name] = new OptionItemSelection(opts)
         return this
     }
     async _syncToDB() {
@@ -56,12 +58,6 @@ export class PlayerOption {
         }
         return this
     }
-    toggleItemVal(name, callback = () => {}) {
-        const item = this._getItem(name)
-        item.toggle()
-        callback(item.selected, item.original, this.getItemValMap())
-        return this
-    }
     getItemVal(name) {
         const item = this._getItem(name)
         if (item) return item.selected
@@ -95,16 +91,46 @@ export class PlayerOption {
     async showDialog(parentDialog) {
         const form = new ModalFormData().title(`${this.name} 选项`)
         const nameMap = []
+        
         each(this.items, item => {
-            const { name, description, values, selected } = item
-            const valuesMap = [...values].map(e => e[0])
-            nameMap.push({ name, valuesMap })
-            if (values.size === 2 && values.get(true) && values.get(false)) {
-                form.toggle(description, selected)
-            } else {
-                form.dropdown(description, [...values].map(e => e[1]), valuesMap.findIndex(e => e === selected))
+            if (item instanceof OptionItemSelection) {
+                const { name, description, values, selected } = item
+                
+                if (values.size === 2 && values.get(true) && values.get(false)) {
+                    const valuesMap = new Map()
+                    each(values, ([e]) => valuesMap.set(e, e))
+                    nameMap.push({ name, valuesMap })
+                    
+                    form.toggle(description, selected)
+                } else {
+                    const valueArray = [...values]
+                    
+                    const valuesMap = new Map()
+                    each(valueArray, ([e], i) => valuesMap.set(i, e))
+                    nameMap.push({ name, valuesMap })
+                    
+                    form.dropdown(
+                        description,
+                        valueArray.map(e => e[1]),
+                        valueArray.map(e => e[0])
+                            .findIndex(e => e === selected)
+                    )
+                }
+            } else if (item instanceof OptionItemRange) {
+                const { name, description, range, selected } = item
+                
+                const valuesMap = new Map()
+                each(range, i => valuesMap.set(i, i))
+                nameMap.push({ name, valuesMap })
+                
+                form.slider(
+                    description,
+                    range.min,
+                    range.max,
+                    range.step,
+                    selected
+                )
             }
-            // TODO 滑块等其他方式
         })
         
         const dialog = new Dialog({
@@ -115,9 +141,7 @@ export class PlayerOption {
             onSubmit: async result => {
                 each(result, (valueIndex, nameIndex) => {
                     const { name, valuesMap } = nameMap[nameIndex]
-                    const value = typeof valueIndex === "boolean"
-                        ? valueIndex
-                        : valuesMap[valueIndex]
+                    const value = valuesMap.get(valueIndex)
                     this.setItemVal(name, value)
                 })
                 await this.done(parentDialog)

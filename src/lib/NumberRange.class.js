@@ -9,4 +9,16 @@ export class NumberRange {
     toArray() {
         return range(this.min, this.max + this.step, this.step)
     }
+    
+    get array() {
+        return this.toArray()
+    }
+    
+    includes(n) {
+        return this.array.includes(n)
+    }
+    
+    [Symbol.iterator]() {
+        return this.array.values()
+    }
 }

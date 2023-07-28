@@ -19,8 +19,8 @@ export const option = optionManager
     .addItem({
         name: "max_amount",
         description: "最多检测的方块数量（并非最终挖掘的方块数）",
-        values: range(1, 64).map(i => [i, `${i}`]),
-        defaultValue: 31,
+        range: [8, 128],
+        defaultValue: 64,
         events: {
             changed: (selected, original) => console.warn("vein-mining:enable_edge -> from", original, "to", selected)
         }
