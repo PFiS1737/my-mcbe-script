@@ -27,7 +27,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
     ) {
         event.cancel = true
         const maxLength = playerOption.getItemVal("max_trapdoor_length")
-        const trapdoors = WoodenTrapdoorBlock.wrap(block).getRelated(player, maxLength)
+        const trapdoors = WoodenTrapdoorBlock.wrap(block).getRelated(player, { maxLength })
         asyncRun(() => {
             if (trapdoors[0].opened) each(trapdoors, _ => _.close())
             else each(trapdoors, _ => _.open())

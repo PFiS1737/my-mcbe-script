@@ -42,45 +42,67 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
         this.setState("open_bit", false)
     }
     
-    getRelated(player, maxLength = 1) {
+    getRelated(player, { extensive = true, maxLength = 1 } = {}) {
         // 获取可以与该活板门双开的另外一些活板门和这个活板门组成的列表
-        
-        // 1. 获取另一个活板门的位置
-        // e.g. 如果一个活板门位于一个方块的东边
-        //      那么另一个活板门应该位于东边，即 x+1 的位置
-        const facingDirection = this.facingDirection
-        const relatedBlock = this.getNeighbourBlock(facingDirection)
-        
         const output = [this]
         
-        // 如果 maxLength 大于 0
-        if (maxLength) {
+        if (maxLength > 0) {
+            // 1. 获取另一个活板门的位置
+            // e.g. 如果一个活板门位于一个方块的东边
+            //      那么另一个活板门应该位于东边，即 x+1 的位置
+            const relatedBlock = this.getNeighbourBlock(this.facingDirection)
+            
             // 2. 判断是否为相关活板门
             if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(relatedBlock)) {
                 const relatedTrapdoor = new WoodenTrapdoorBlock(relatedBlock.block)
                 
                 // 方向相反，上下位置相同
                 if (
-                    Math.abs(relatedTrapdoor.facingDirection.code - facingDirection.code) === 2 &&
+                    relatedTrapdoor.facingDirection.isOppositeTo(this.facingDirection) &&
                     relatedTrapdoor.upsideOrDown === this.upsideOrDown
                 ) output.push(relatedTrapdoor)
-                
+            }
+        }
+        
+        if (extensive) {
+            let that = this
+            let needOpposite = false
+            // 仅 maxLength > 1 时才会运行
+            while (--maxLength) {
                 // 3. 获取扩展活板门
                 //    即能与该活板门延伸联动的另一个活板门
                 const playerFacing = WrappedPlayer.wrap(player).getFacingDirectionXZ()
-                const extensiveBlock = this.getNeighbourBlock(playerFacing)
+                const extensiveBlock = needOpposite
+                    ? that.getNeighbourBlock(playerFacing.getOpposite())
+                    : that.getNeighbourBlock(playerFacing)
+                
                 if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(extensiveBlock)) {
                     const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock.block)
                     
                     // 方向相同，上下位置相同
                     if (
-                        extensiveTrapdoor.facingDirection.code === facingDirection.code &&
+                        extensiveTrapdoor.facingDirection.equals(this.facingDirection) &&
                         extensiveTrapdoor.upsideOrDown === this.upsideOrDown
                     ) {
-                        // 进行递归运算
-                        const result = extensiveTrapdoor.getRelated(player, maxLength - 1)
-                        if (result.length > 1) output.push(...result)  // TODO: 如果指定的长度还未达到，就反向运行
+                        const result = extensiveTrapdoor.getRelated(player, { extensive: false, maxLength })
+                        if (result.length > 1) {
+                            output.push(...result)
+                            
+                            that = extensiveTrapdoor
+                            continue
+                        }
                     }
+                }
+                
+                // 当玩家面对的方向可以联动的活板门数量不足时
+                // 反向查找
+                if (!needOpposite) {
+                    needOpposite = true
+                    that = this
+                    // 因为此变向操纵消耗了一次迭代，故补充一次
+                    maxLength++
+                } else {
+                    break
                 }
             }
         }

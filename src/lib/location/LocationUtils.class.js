@@ -1,14 +1,9 @@
 import { Vector3Utils } from "../vector/index.js"
 
 import { Location } from "./Location.class.js"
-import { Direction } from "./Directions.class.js"
 
 export class LocationUtils {
-    static getDirectionOffset(directionCode) {
-        const direction = directionCode instanceof Direction
-            ? directionCode
-            : new Direction(directionCode)
-        
+    static getDirectionOffset(direction) {
         return Location.create({
             x: direction.isEast()
                 ? +1

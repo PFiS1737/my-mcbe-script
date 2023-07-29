@@ -7,9 +7,9 @@ export class Direction {
         switch (this.code) {
             case 0: return "East"
             case 1: return "South"
-            case 2: return "West"
-            case 3: return "North"
-            case 4: return "Up"
+            case 2: return "Up"
+            case 3: return "West"
+            case 4: return "North"
             case 5: return "Down"
         }
     }
@@ -20,25 +20,41 @@ export class Direction {
     isSouth() {
         return this.code === 1
     }
-    isWest() {
+    isUp() {
         return this.code === 2
     }
-    isNorth() {
+    isWest() {
         return this.code === 3
     }
-    isUp() {
+    isNorth() {
         return this.code === 4
     }
     isDown() {
         return this.code === 5
     }
+    
+    equals(direction) {
+        return this.code === direction.code
+    }
+    
+    getOpposite() {
+        const directionCode = this.code + 3
+        return new Direction(
+            directionCode >= 6
+                ? directionCode - 6
+                : directionCode
+        )
+    }
+    isOppositeTo(direction) {
+        return Math.abs(this.code - direction.code) === 3
+    }
 }
 
 export class Directions {
-    static East = new Direction(0)
-    static South = new Direction(1)
-    static West = new Direction(2)
-    static North = new Direction(3)
-    static Up = new Direction(4)
-    static Down = new Direction(5)
+    static East = new Direction(0)  // x+
+    static South = new Direction(1)  // z+
+    static Up = new Direction(2)  // y+
+    static West = new Direction(3)  // x-
+    static North = new Direction(4)  // z-
+    static Down = new Direction(5)  // y-
 }
