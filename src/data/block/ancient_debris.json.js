@@ -7,6 +7,9 @@ export default {
                 .DIAMOND_PICKAXE_OR_UPPER.toArray(),
             
             raw: {
+                item_id: "minecraft:ancient_debris"
+            },
+            refined: {
                 item_id: "minecraft:netherite_scrap"
             }
         }
