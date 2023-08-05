@@ -42,9 +42,9 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
         while (
             blockList.size > 0 &&
             (
-                !playerOption.getItemVal("protect_tools") ||
+                !playerOption.getItemVal("prevent_tool_destruction") ||
                 (
-                    playerOption.getItemVal("protect_tools") &&
+                    playerOption.getItemVal("prevent_tool_destruction") &&
                     totalDamage < ( wrappedItem.durability ?? Infinity )
                 )
             )

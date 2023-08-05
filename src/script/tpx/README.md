@@ -33,7 +33,8 @@
 
 ## Option
 
-- 见 [option.js](./option.js)
+见 [option.js](./option.js)
+
 - `auto_back_point`
     - 允许使用 tpx 传送时自动添加返回点
     - 默认：开启
@@ -52,4 +53,4 @@
 
 ## 多人使用
 
-其他玩家加入游戏后，使用 `/reload` 刷新脚本即可。
+其他玩家加入游戏后，需使用 `/reload` 刷新脚本。

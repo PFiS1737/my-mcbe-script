@@ -35,8 +35,8 @@ export const option = optionManager
         }
     })
     .addItem({
-        name: "protect_tools",
-        description: "保护工具，防止其损坏",
+        name: "prevent_tool_destruction",
+        description: "防止工具耐久耗尽",
         values: [[true], [false]],
         defaultValue: false,
         events: {
@@ -53,15 +53,6 @@ export const option = optionManager
         }
     })
     .addItem({
-        name: "enable_diagonal",
-        description: "是否检测仅角相连的方块",
-        values: [[true], [false]],
-        defaultValue: false,
-        events: {
-            changed: (selected, original) => console.warn("vein-mining:enable_diagonal -> from", original, "to", selected)
-        }
-    })
-    .addItem({
         name: "enable_edge",
         description: "是否检测仅棱相连的方块",
         values: [[true], [false]],
@@ -70,4 +61,12 @@ export const option = optionManager
             changed: (selected, original) => console.warn("vein-mining:enable_edge -> from", original, "to", selected)
         }
     })
-
+    .addItem({
+        name: "enable_diagonal",
+        description: "是否检测仅角相连的方块",
+        values: [[true], [false]],
+        defaultValue: false,
+        events: {
+            changed: (selected, original) => console.warn("vein-mining:enable_diagonal -> from", original, "to", selected)
+        }
+    })

@@ -50,7 +50,8 @@
 
 ## Option
 
-- 见 [option.js](./option.js)
+见 [option.js](./option.js)
+
 - `enable_creative`
     - 允许统计创造模式下的行为
     - 默认：开启
@@ -63,3 +64,7 @@
 - `auto_start`
     - 添加记分板后是否自动将自己添加进去并开始统计
     - 默认：开启
+
+## 多人使用
+
+其他玩家加入游戏后，需使用 `/reload` 刷新脚本。

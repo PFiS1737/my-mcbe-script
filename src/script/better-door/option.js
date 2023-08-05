@@ -14,7 +14,7 @@ export const option = optionManager
     })
     .addItem({
         name: "trapdoor",
-        description: "允许双开活板门",
+        description: "允许多开活板门",
         values: [[true], [false]],
         defaultValue: false,
         events: {
@@ -23,7 +23,7 @@ export const option = optionManager
     })
     .addItem({
         name: "max_trapdoor_length",
-        description: "允许双开活板门的最大距离",
+        description: "允许多开活板门的最大距离",
         range: [1, 32],
         defaultValue: 3,
         events: {
