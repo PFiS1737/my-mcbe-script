@@ -1,31 +1,41 @@
-import { Player, GameMode } from "@minecraft/server"
+import { GameMode } from "@minecraft/server"
 
 import { Commands } from "../../commands/index.js"
 import { each } from "../../util/index.js"
+
+import { EntityContainer } from "../container/index.js"
 
 import { WrappedEntity } from "./WrappedEntity.class.js"
 
 export class WrappedPlayer extends WrappedEntity {
     constructor(player) {
-        if (!(player instanceof Player))
-            throw new TypeError("Parameter is not an instance of Player.")
-        
         super(player)
+        
+        this.name = player.name
     }
     
     static match(entity) {
         return entity.typeId === "minecraft:player"
     }
     
-    get player() {
-        return this.entity
+    get _player() {
+        return this._entity
     }
     
+    get experience() {
+        return this.addExperience(0)
+    }
+    get level() {
+        return this._player.level
+    }
     get inventory() {
-        return this.components.get("inventory").container
+        return new EntityContainer(
+            this,
+            this.components.get("inventory").container
+        )
     }
     get selectedSlot() {
-        return this.player.selectedSlot
+        return this._player.selectedSlot
     }
     
     getGameMode() {
@@ -37,11 +47,11 @@ export class WrappedPlayer extends WrappedEntity {
     }
     testGameMode(mode) {
         const playersUnderMode = this.dimension.getPlayers({ gameMode: mode })
-        return playersUnderMode.some((player => player.id === this.player.id))
+        return playersUnderMode.some((player => player.id === this.id))
     }
     setGameMode(mode) {
         if (!Object.values(GameMode).includes(mode)) throw new TypeError("Unknown gamemode.")
-        Commands.run(`gamemode ${mode}`, this.player)
+        Commands.run(`gamemode ${mode}`, this._player)
     }
     
     getMainHandItem() {
@@ -62,7 +72,17 @@ export class WrappedPlayer extends WrappedEntity {
         await this.useItemFromInventory(this.selectedSlot, callback)
     }
     
-    addExperience(amount = 0) {
-        this.player.addExperience(amount)
+    addExperience(amount = 0, { useXpOrb = false } = {}) {
+        if (useXpOrb && amount >= 0) {
+            while (amount--)
+                this.dimension.spawnEntity("minecraft:xp_orb", this.location)
+            
+            return this.experience
+        } else {
+            return this._player.addExperience(amount)
+        }
+    }
+    addLevels(amount = 0) {
+        return this._player.addLevels(amount)
     }
 }

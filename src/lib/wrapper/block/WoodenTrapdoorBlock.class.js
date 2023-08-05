@@ -54,7 +54,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
             
             // 2. 判断是否为相关活板门
             if (WoodenTrapdoorBlock.match(relatedBlock)) {
-                const relatedTrapdoor = new WoodenTrapdoorBlock(relatedBlock.block)
+                const relatedTrapdoor = new WoodenTrapdoorBlock(relatedBlock._block)
                 
                 // 方向相反，上下位置相同
                 if (
@@ -77,7 +77,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
                     : that.getNeighbourBlock(playerFacing)
                 
                 if (WoodenTrapdoorBlock.match(extensiveBlock)) {
-                    const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock.block)
+                    const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock._block)
                     
                     // 方向相同，上下位置相同
                     if (

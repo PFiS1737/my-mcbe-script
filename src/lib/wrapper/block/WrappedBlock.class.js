@@ -1,4 +1,7 @@
-import { BlockPermutation, ItemStack, Block } from "@minecraft/server"
+import {
+    BlockPermutation,
+    ItemStack as MinecraftItemStack
+} from "@minecraft/server"
 
 import { each } from "../../util/index.js"
 import { BlockLocation, LocationUtils } from "../../location/index.js"
@@ -11,12 +14,10 @@ import { BlockDrops } from "./BlockDrops.class.js"
 
 export class WrappedBlock extends WrapperTemplate {
     constructor(block) {
-        if (!(block instanceof Block))
-            throw new TypeError("Parameter is not an instance of Block.")
-        
         super()
         
-        this.block = block
+        this._block = block
+        
         this.type = block.type
         this.typeId = block.typeId
         this.location = BlockLocation.create(block.location)
@@ -44,7 +45,7 @@ export class WrappedBlock extends WrapperTemplate {
     setState(name, value) {
         const states = this.permutation.getAllStates()
         states[name] = value
-        this.block.setPermutation(
+        this._block.setPermutation(
             BlockPermutation.resolve(this.typeId, states)
         )
     }
@@ -86,7 +87,7 @@ export class WrappedBlock extends WrapperTemplate {
         const spawnDrops = () => {
             each(result, drop => {
                 this.dimension.spawnItem(
-                    new ItemStack(drop.itemId, drop.amount),
+                    new MinecraftItemStack(drop.itemId, drop.amount),
                     this.location
                 )
                 while (drop.xp--) this.dimension.spawnEntity("minecraft:xp_orb", this.location)

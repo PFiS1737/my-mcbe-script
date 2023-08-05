@@ -1,5 +1,3 @@
-import { ItemStack } from "@minecraft/server"
-
 import { each } from "../../util/index.js"
 import { removeMinecraftNamespace } from "../../util/game.js"
 
@@ -7,12 +5,10 @@ import { WrapperTemplate } from "../WrapperTemplate.class.js"
 
 export class WrappedItemStack extends WrapperTemplate {
     constructor(itemStack) {
-        if (!(itemStack instanceof ItemStack))
-            throw new TypeError("Parameter is not an instance of ItemStack.")
-        
         super()
         
-        this.stack = itemStack
+        this._item = itemStack
+        
         this.type = itemStack.type
         this.typeId = itemStack.typeId
         
@@ -23,6 +19,10 @@ export class WrappedItemStack extends WrapperTemplate {
     }
     
     components = new Map()
+    
+    hasComponent(componentId) {
+        return this._item.hasComponent(componentId)
+    }
     
     get enchants() {
         return this.components.get("enchantments").enchantments

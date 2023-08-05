@@ -30,7 +30,6 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
         
         const blockList = getRelatedBlocks(playerOption, basicBlock, blockTypeId)
         
-        const playerLocation = player.location.clone().floor().offset(new BlockLocation(0, -1, 0))
         const wrappedItem = ItemStackWithDurability.tryWrap(mainHandItem)
             ?? new WrappedItemStack(mainHandItem)
         
@@ -50,11 +49,6 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
             )
         ) {
             const block = blockList.shift()
-            
-            if (
-                playerOption.getItemVal("protect_player") &&
-                Vector3Utils.exactEquals(block.location, playerLocation)
-            ) continue
             
             const result = await asyncRun(() => block.breakBy(mainHandItem))
             
@@ -77,7 +71,7 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
         
         if (wrappedItem instanceof ItemStackWithDurability) wrappedItem.applyDamage(totalDamage)
         
-        return wrappedItem.stack
+        return wrappedItem._item
     }).catch(BetterConsole.error)
 })
 

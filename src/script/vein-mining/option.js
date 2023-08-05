@@ -44,15 +44,6 @@ export const option = optionManager
         }
     })
     .addItem({
-        name: "protect_player",
-        description: "是否不挖掘玩家脚下的方块",
-        values: [[true], [false]],
-        defaultValue: false,
-        events: {
-            changed: (selected, original) => console.warn("vein-mining:protect_player -> from", original, "to", selected)
-        }
-    })
-    .addItem({
         name: "enable_edge",
         description: "是否检测仅棱相连的方块",
         values: [[true], [false]],

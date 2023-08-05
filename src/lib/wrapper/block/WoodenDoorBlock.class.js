@@ -34,10 +34,10 @@ export class WoodenDoorBlock extends WrappedBlocks {
     }
     
     get _lower() {
-        return this.blocks[0]
+        return this._blocks[0]
     }
     get _upper() {
-        return this.blocks[1]
+        return this._blocks[1]
     }
     
     get opened() {
