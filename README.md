@@ -8,4 +8,4 @@ I wrote simple documentation for some libraries and scripts that might help.
 
 ## Usage
 
-Turn to the `dist` branch to use the bundled file.
+Turn to the `dist` branch to download bundled files.

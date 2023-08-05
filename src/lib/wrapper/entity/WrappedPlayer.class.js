@@ -13,6 +13,10 @@ export class WrappedPlayer extends WrappedEntity {
         super(player)
     }
     
+    static match(entity) {
+        return entity.typeId === "minecraft:player"
+    }
+    
     get player() {
         return this.entity
     }
@@ -40,10 +44,10 @@ export class WrappedPlayer extends WrappedEntity {
         Commands.run(`gamemode ${mode}`, this.player)
     }
     
-    getMainHand() {
+    getMainHandItem() {
         return this.inventory.getItem(this.selectedSlot)
     }
-    setMainHand(item) {
+    setMainHandItem(item) {
         this.inventory.setItem(this.selectedSlot, item)
     }
     

@@ -7,4 +7,8 @@ export class WrapperTemplate {
            return new this(...args)
        } catch(err) {}
    }
+   
+   static match() {
+       throw new Error("Call without override.")
+   }
 }

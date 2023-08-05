@@ -12,7 +12,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
     const playerOption = option.getPlayer(player)
     
     if (
-        WoodenDoorBlock.isWoodenDoorBlock(block) &&
+        WoodenDoorBlock.match(block) &&
         playerOption.getItemVal("door")
     ) {
         event.cancel = true
@@ -22,7 +22,7 @@ export const setupListener = () => world.beforeEvents.itemUseOn.subscribe(event 
             else each(doors, _ => _.open())
         }).catch(BetterConsole.error)
     } else if (
-        WoodenTrapdoorBlock.isWoodenTrapdoorBlock(block) &&
+        WoodenTrapdoorBlock.match(block) &&
         playerOption.getItemVal("trapdoor")
     ) {
         event.cancel = true

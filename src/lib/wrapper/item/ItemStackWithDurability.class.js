@@ -3,13 +3,13 @@ import { WrappedItemStack } from "./WrappedItemStack.class.js"
 
 export class ItemStackWithDurability extends WrappedItemStack {
     constructor(itemStack) {
-        if (!ItemStackWithDurability.isItemStackWithDurability(itemStack))
+        if (!ItemStackWithDurability.match(itemStack))
             throw new TypeError(`The "${itemStack.typeId}" doesn't have the "minecraft:durability" component.`)
         
         super(itemStack)
     }
     
-    static isItemStackWithDurability(itemStack) {
+    static match(itemStack) {
         return itemStack.hasComponent("minecraft:durability")
     }
     

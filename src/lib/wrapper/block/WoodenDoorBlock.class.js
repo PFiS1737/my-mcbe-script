@@ -7,7 +7,7 @@ import { WOODEN_DOORS } from "./BlockTypeGroups.enumeration.js"
 
 export class WoodenDoorBlock extends WrappedBlocks {
     constructor(block) {
-        if (!WoodenDoorBlock.isWoodenDoorBlock(block))
+        if (!WoodenDoorBlock.match(block))
             throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
         
         const wrappedBlock = block instanceof WrappedBlock
@@ -29,7 +29,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
         super(blocks)
     }
     
-    static isWoodenDoorBlock(block) {
+    static match(block) {
         return WOODEN_DOORS.has(block?.typeId)
     }
     
@@ -97,7 +97,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
         const output = [this]
         
         // 2. 进行判断
-        if (WoodenDoorBlock.isWoodenDoorBlock(relatedBlock)) {
+        if (WoodenDoorBlock.match(relatedBlock)) {
             const relatedDoor = new WoodenDoorBlock(relatedBlock)
             
             // 另一扇门应该方向相同，而门轴相反

@@ -8,13 +8,13 @@ import { WOODEN_TRAPDOORS } from "./BlockTypeGroups.enumeration.js"
 
 export class WoodenTrapdoorBlock extends WrappedBlock {
     constructor(block) {
-        if (!WoodenTrapdoorBlock.isWoodenTrapdoorBlock(block))
+        if (!WoodenTrapdoorBlock.match(block))
             throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
         
         super(block)
     }
     
-    static isWoodenTrapdoorBlock(block) {
+    static match(block) {
         return WOODEN_TRAPDOORS.has(block?.typeId)
     }
     
@@ -53,7 +53,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
             const relatedBlock = this.getNeighbourBlock(this.facingDirection)
             
             // 2. 判断是否为相关活板门
-            if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(relatedBlock)) {
+            if (WoodenTrapdoorBlock.match(relatedBlock)) {
                 const relatedTrapdoor = new WoodenTrapdoorBlock(relatedBlock.block)
                 
                 // 方向相反，上下位置相同
@@ -76,7 +76,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
                     ? that.getNeighbourBlock(playerFacing.getOpposite())
                     : that.getNeighbourBlock(playerFacing)
                 
-                if (WoodenTrapdoorBlock.isWoodenTrapdoorBlock(extensiveBlock)) {
+                if (WoodenTrapdoorBlock.match(extensiveBlock)) {
                     const extensiveTrapdoor = new WoodenTrapdoorBlock(extensiveBlock.block)
                     
                     // 方向相同，上下位置相同

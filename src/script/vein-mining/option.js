@@ -27,7 +27,7 @@ export const option = optionManager
     })
     .addItem({
         name: "auto_collection",
-        description: "自动收集掉落物及经验",
+        description: "自动收集掉落物及经验（绕过经验修补）",
         values: [[true], [false]],
         defaultValue: false,
         events: {
