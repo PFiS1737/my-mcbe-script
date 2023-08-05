@@ -2,7 +2,7 @@ import { world, ItemStack } from "@minecraft/server"
 
 import { BetterConsole } from "@/lib/BetterConsole.class.js"
 import { WrappedItemStack, ItemStackWithDurability } from "@/lib/wrapper/item/index.js"
-import { WrappedBlock, BlockList } from "@/lib/wrapper/block/index.js"
+import { WrappedBlock, BlockList, BlockTypeGroups } from "@/lib/wrapper/block/index.js"
 import { Vector3Utils } from "@/lib/vector/index"
 import { WrappedPlayer } from "@/lib/wrapper/entity/index.js"
 import { BlockLocation } from "@/lib/location/index.js"
@@ -18,6 +18,10 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
     const player = new WrappedPlayer(event.player)
     const playerOption = option.getPlayer(event.player)
     
+    let enableBlocks = ENABLE_BLOCKS
+    if (playerOption.getItemVal("enable_stone"))
+        enableBlocks = ENABLE_BLOCKS.clone().add(...BlockTypeGroups.STONES)
+    
     player.useMainHandItem(async mainHandItem => {
         if (
             !mainHandItem ||
@@ -25,7 +29,10 @@ export const setupListener = () => world.afterEvents.blockBreak.subscribe(event 
             !WrappedBlock.prototype.canBeDugBy
                 .call({ typeId: blockTypeId }, mainHandItem.typeId) ||
             playerOption.getItemVal("condition") === "off" ||
-            (playerOption.getItemVal("condition") === "sneaking" && !player.isSneaking)
+            (
+                playerOption.getItemVal("condition") === "sneaking" &&
+                !player.isSneaking
+            )
         ) return mainHandItem
         
         const blockList = getRelatedBlocks(playerOption, basicBlock, blockTypeId)

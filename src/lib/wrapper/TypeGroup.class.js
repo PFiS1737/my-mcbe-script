@@ -5,8 +5,15 @@ export class TypeGroup {
         this.types = new Set(types)
     }
     
+    add(...types) {
+        each(types, type => this.types.add(type))
+    }
     has(type) {
         return this.types.has(type)
+    }
+    
+    clone() {
+        return new TypeGroup([...this])
     }
     
     toArray() {

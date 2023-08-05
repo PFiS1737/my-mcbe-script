@@ -64,3 +64,8 @@ export const ORES = new TypeGroup([
     "minecraft:quartz_ore",
     "minecraft:redstone_ore"
 ])
+
+export const STONES = new TypeGroup([
+    "minecraft:stone",
+    "minecraft:deepslate"
+])

@@ -26,6 +26,15 @@ export const option = optionManager
         }
     })
     .addItem({
+        name: "enable_stone",
+        description: "允许连锁挖掘岩石类方块（石头、深板岩）",
+        values: [[true], [false]],
+        defaultValue: false,
+        events: {
+            changed: (selected, original) => console.warn("vein-mining:enable_stone -> from", original, "to", selected)
+        }
+    })
+    .addItem({
         name: "auto_collection",
         description: "自动收集掉落物及经验（绕过经验修补）",
         values: [[true], [false]],
@@ -40,7 +49,7 @@ export const option = optionManager
         values: [[true], [false]],
         defaultValue: false,
         events: {
-            changed: (selected, original) => console.warn("vein-mining:protect_tools -> from", original, "to", selected)
+            changed: (selected, original) => console.warn("vein-mining:prevent_tool_destruction -> from", original, "to", selected)
         }
     })
     .addItem({
