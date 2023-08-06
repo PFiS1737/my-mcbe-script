@@ -15,10 +15,10 @@ export class EntityContainer extends Container {
     }
     
     addItem(itemStack) {
-        const success = this.tryAddItem(itemStack)
+        const remain = this.tryAddItem(itemStack)
         
-        if (!success) this.dimension.spawnItem(
-            itemStack, this.location
+        if (remain) this.dimension.spawnItem(
+            remain, this.location
         )
     }
 }

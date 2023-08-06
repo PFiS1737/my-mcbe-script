@@ -21,6 +21,6 @@ export class Container extends WrapperTemplate {
         return this._container.setItem(slot, itemStack)
     }
     tryAddItem(itemStack) {
-        return !this._container.addItem(itemStack)
+        return this._container.addItem(itemStack)
     }
 }
