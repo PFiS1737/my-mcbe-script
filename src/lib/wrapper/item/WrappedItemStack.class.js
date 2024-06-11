@@ -25,6 +25,6 @@ export class WrappedItemStack extends WrapperTemplate {
   }
 
   get enchants() {
-    return this.components.get("enchantments").enchantments
+    return this.components.get("enchantable")
   }
 }
