@@ -34,9 +34,7 @@ jobs:
         run: git clone -b dist https://github.com/${{ github.repository }} dist
 
       - name: Bundle project
-        run: |
-          pnpm link gulp
-          pnpm run build
+        run: pnpm run build
 
       - name: Commit
         run: |
