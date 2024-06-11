@@ -26,7 +26,9 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          run_install: true
+          run_install: |
+            - recursive: false
+            - args: [--global, gulp]
 
       - name: Clone dist branch
         run: git clone -b dist https://github.com/${{ github.repository }} dist
