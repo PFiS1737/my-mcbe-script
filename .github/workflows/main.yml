@@ -8,39 +8,40 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
-    
+
     env:
       NODE_ENV: production
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 17
-        
-      - name: Install dependencies
-        run: npm install --include=dev
-        
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
       - name: Clone dist branch
         run: git clone -b dist https://github.com/${{ github.repository }} dist
-        
+
       - name: Bundle project
-        run: gulp
-        
+        run: pnpm run build
+
       - name: Commit
         run: |
           cd dist
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Auto-push to dist"
-        
+          git commit -m "chore: build"
+
       - name: Push to dist branch
         run: |
           cd dist

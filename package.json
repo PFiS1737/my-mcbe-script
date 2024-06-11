@@ -6,6 +6,9 @@
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/PFiS1737/my-mcbe-script#readme",
+  "scripts": {
+    "build": "gulp"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/PFiS1737/my-mcbe-script.git"
