@@ -1,5 +1,5 @@
-import fs from "node:fs/promises"
 import { readFileSync } from "fs"
+import fs from "node:fs/promises"
 
 import gulp from "gulp"
 
@@ -7,7 +7,8 @@ import { rollup } from "rollup"
 import genRollupConfig from "./rollup.js"
 
 const pkg = JSON.parse(readFileSync("./package.json").toString())
-const banner = fileName => `
+const banner = (fileName) =>
+  `
 /*!
  * ${fileName} v${pkg.version} (${pkg.homepage})
  * Copyright 2022-${new Date().getFullYear()} ${pkg.author}
@@ -19,29 +20,33 @@ const banner = fileName => `
 const rollupConfig = genRollupConfig(banner, pkg)
 
 function createTask(config) {
-    if (!config) return
-    const fn = async function() {
-        const result = await rollup({
-            input: config.input,
-            plugins: config.plugins,
-            onwarn({ loc, frame, message, code }) {
-                if (loc) {
-                    console.warn(`${loc.file} (${loc.line}:${loc.column}) ${message} (${code})`)
-                    if (frame) console.warn("\x1b[2m%s\x1b[0m", frame)
-                }  // else console.warn(message)
-            }
-        })
-        await result.write(config.output)
-    }
-    Object.defineProperty(fn, "name", {
-        value: config.name
+  if (!config) return
+  const fn = async () => {
+    const result = await rollup({
+      input: config.input,
+      plugins: config.plugins,
+      onwarn({ loc, frame, message, code }) {
+        if (loc) {
+          console.warn(
+            `${loc.file} (${loc.line}:${loc.column}) ${message} (${code})`
+          )
+          if (frame) console.warn("\x1b[2m%s\x1b[0m", frame)
+        } // else console.warn(message)
+      },
     })
-    return fn
+    await result.write(config.output)
+  }
+  Object.defineProperty(fn, "name", {
+    value: config.name,
+  })
+  return fn
 }
 
 export const bundled = createTask(rollupConfig.bundled)
 export const scripts = gulp.parallel(...rollupConfig.scripts.map(createTask))
-export const libraries = gulp.parallel(...rollupConfig.libraries.map(createTask))
+export const libraries = gulp.parallel(
+  ...rollupConfig.libraries.map(createTask)
+)
 export const test = createTask(rollupConfig.test)
 
 export default gulp.series(bundled, scripts, libraries)

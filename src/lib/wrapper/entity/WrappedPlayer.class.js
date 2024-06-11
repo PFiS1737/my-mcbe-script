@@ -8,81 +8,78 @@ import { EntityContainer } from "../container/index.js"
 import { WrappedEntity } from "./WrappedEntity.class.js"
 
 export class WrappedPlayer extends WrappedEntity {
-    constructor(player) {
-        super(player)
-        
-        this.name = player.name
+  constructor(player) {
+    super(player)
+
+    this.name = player.name
+  }
+
+  static match(entity) {
+    return entity.typeId === "minecraft:player"
+  }
+
+  get _player() {
+    return this._entity
+  }
+
+  get experience() {
+    return this.addExperience(0)
+  }
+  get level() {
+    return this._player.level
+  }
+  get inventory() {
+    return new EntityContainer(this, this.components.get("inventory").container)
+  }
+  get selectedSlot() {
+    return this._player.selectedSlot
+  }
+
+  getGameMode() {
+    const matches = []
+    each(GameMode, (mode) => {
+      if (this.testGameMode(mode)) matches.push(mode)
+    })
+    return matches[0]
+  }
+  testGameMode(mode) {
+    const playersUnderMode = this.dimension.getPlayers({ gameMode: mode })
+    return playersUnderMode.some((player) => player.id === this.id)
+  }
+  setGameMode(mode) {
+    if (!Object.values(GameMode).includes(mode))
+      throw new TypeError("Unknown gamemode.")
+    Commands.run(`gamemode ${mode}`, this._player)
+  }
+
+  getMainHandItem() {
+    return this.inventory.getItem(this.selectedSlot)
+  }
+  setMainHandItem(item) {
+    this.inventory.setItem(this.selectedSlot, item)
+  }
+
+  async useItemFromInventory(slot, callback = async () => {}) {
+    let itemStack = this.inventory.getItem(slot)
+
+    itemStack = await callback(itemStack)
+
+    this.inventory.setItem(slot, itemStack)
+  }
+  async useMainHandItem(callback = async () => {}) {
+    await this.useItemFromInventory(this.selectedSlot, callback)
+  }
+
+  addExperience(amount = 0, { useXpOrb = false } = {}) {
+    if (useXpOrb && amount >= 0) {
+      while (amount--)
+        this.dimension.spawnEntity("minecraft:xp_orb", this.location)
+
+      return this.experience
     }
-    
-    static match(entity) {
-        return entity.typeId === "minecraft:player"
-    }
-    
-    get _player() {
-        return this._entity
-    }
-    
-    get experience() {
-        return this.addExperience(0)
-    }
-    get level() {
-        return this._player.level
-    }
-    get inventory() {
-        return new EntityContainer(
-            this,
-            this.components.get("inventory").container
-        )
-    }
-    get selectedSlot() {
-        return this._player.selectedSlot
-    }
-    
-    getGameMode() {
-        const matches = []
-        each(GameMode, mode => {
-            if (this.testGameMode(mode)) matches.push(mode)
-        })
-        return matches[0]
-    }
-    testGameMode(mode) {
-        const playersUnderMode = this.dimension.getPlayers({ gameMode: mode })
-        return playersUnderMode.some((player => player.id === this.id))
-    }
-    setGameMode(mode) {
-        if (!Object.values(GameMode).includes(mode)) throw new TypeError("Unknown gamemode.")
-        Commands.run(`gamemode ${mode}`, this._player)
-    }
-    
-    getMainHandItem() {
-        return this.inventory.getItem(this.selectedSlot)
-    }
-    setMainHandItem(item) {
-        this.inventory.setItem(this.selectedSlot, item)
-    }
-    
-    async useItemFromInventory(slot, callback = async () => {}) {
-        let itemStack = this.inventory.getItem(slot)
-        
-        itemStack = await callback(itemStack)
-        
-        this.inventory.setItem(slot, itemStack)
-    }
-    async useMainHandItem(callback = async () => {}) {
-        await this.useItemFromInventory(this.selectedSlot, callback)
-    }
-    
-    addExperience(amount = 0, { useXpOrb = false } = {}) {
-        if (useXpOrb && amount >= 0) {
-            while (amount--)
-                this.dimension.spawnEntity("minecraft:xp_orb", this.location)
-            
-            return this.experience
-        } else {
-            return this._player.addExperience(amount)
-        }
-    }
-    addLevels(amount = 0) {
-        return this._player.addLevels(amount)
-    }
+    return this._player.addExperience(amount)
+  }
+  addLevels(amount = 0) {
+    return this._player.addLevels(amount)
+  }
 }

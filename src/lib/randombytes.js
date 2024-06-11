@@ -3,7 +3,7 @@
 import getRandomValues from "polyfill-crypto.getrandomvalues"
 
 export function randomBytes(size) {
-    return getRandomValues(new Uint8Array(size))
+  return getRandomValues(new Uint8Array(size))
 }
 
 export default randomBytes

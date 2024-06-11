@@ -1,5 +1,5 @@
 export class BetterConsole {
-    static error(err) {
-        console.error(`${err}\n${err.stack}`)
-    }
+  static error(err) {
+    console.error(`${err}\n${err.stack}`)
+  }
 }

@@ -11,13 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/yahoo/serialize-javascript.git"
   },
-  "keywords": [
-    "serialize",
-    "serialization",
-    "javascript",
-    "js",
-    "json"
-  ],
+  "keywords": ["serialize", "serialization", "javascript", "js", "json"],
   "author": "Eric Ferraiuolo <edf@ericf.me>",
   "license": "BSD-3-Clause",
   "bugs": {
