@@ -1,5 +1,3 @@
-import { each } from "@/util/index.js"
-
 import { Database } from "@/lib/database/index.js"
 
 export const globalDB = new Database(
@@ -8,8 +6,6 @@ export const globalDB = new Database(
 )
 
 export const ALL_PLAYER_DATABASES = new Map()
-
-import { serialize } from "serialize-javascript"
 
 export class EventDB {
   constructor(player) {

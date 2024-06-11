@@ -1,5 +1,3 @@
-import { EntityDamageCause } from "@minecraft/server"
-
 export default ({ player, target, callback }) => ({
   events: {
     entityDie: {

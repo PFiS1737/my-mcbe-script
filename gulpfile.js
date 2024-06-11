@@ -1,5 +1,4 @@
 import { readFileSync } from "fs"
-import fs from "node:fs/promises"
 
 import gulp from "gulp"
 

@@ -1,5 +1,4 @@
 import { optionManager } from "@/lib/option-manager/index.js"
-import { range } from "@/util/math.js"
 
 export const option = optionManager
   .registerNamesapace("vein-mining")

@@ -81,13 +81,13 @@ export class Vector3 extends Vector3Template {
     this.z *= n
     return this
   }
-  negate(v) {
+  negate() {
     this.x = -this.x
     this.y = -this.y
     this.z = -this.z
     return this
   }
-  inverse(v) {
+  inverse() {
     this.x = 1 / this.x
     this.y = 1 / this.y
     this.z = 1 / this.z

@@ -1,5 +1,3 @@
-import { Vector3Utils } from "../vector/index.js"
-
 import { Location } from "./Location.class.js"
 
 export class LocationUtils {

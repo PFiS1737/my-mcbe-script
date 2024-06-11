@@ -27,8 +27,8 @@ export class PlayerOption {
     await eachAsync(data, async (value, name) => {
       await this.db.set(name, value)
     })
-    await eachAsync(this.db, async ([name, value]) => {
-      if (!this.hasItem(name)) this.db.delete(name)
+    await eachAsync(this.db, async ([name, _]) => {
+      if (!this.hasItem(name)) await this.db.delete(name)
     })
   }
   async _syncFromDB() {
@@ -66,7 +66,9 @@ export class PlayerOption {
   }
   getItemValMap() {
     const result = {}
-    each(this.items, (_, name) => (result[name] = this.getItemVal(name)))
+    each(this.items, (_, name) => {
+      result[name] = this.getItemVal(name)
+    })
     return result
   }
   async done(parentDialog) {

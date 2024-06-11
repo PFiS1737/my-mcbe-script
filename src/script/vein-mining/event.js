@@ -2,7 +2,6 @@ import { ItemStack, world } from "@minecraft/server"
 
 import { BetterConsole } from "@/lib/BetterConsole.class.js"
 import { BlockLocation } from "@/lib/location/index.js"
-import { Vector3Utils } from "@/lib/vector/index"
 import {
   BlockList,
   BlockTypeGroups,
@@ -34,7 +33,7 @@ export const setupListener = () =>
       .useMainHandItem(async (mainHandItem) => {
         if (
           !mainHandItem ||
-          !ENABLE_BLOCKS.has(blockTypeId) ||
+          !enableBlocks.has(blockTypeId) ||
           !WrappedBlock.prototype.canBeDugBy.call(
             { typeId: blockTypeId },
             mainHandItem.typeId

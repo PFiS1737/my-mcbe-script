@@ -1,9 +1,6 @@
-import { Player, world } from "@minecraft/server"
-
 import md5 from "md5"
 import { serialize } from "serialize-javascript"
 
-import { Commands } from "../commands/index.js"
 import { asyncRun, getOrAddObjective } from "../util/game.js"
 import { deserialize, each, eachAsync } from "../util/index.js"
 

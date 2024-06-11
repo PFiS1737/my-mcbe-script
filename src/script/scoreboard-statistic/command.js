@@ -1,6 +1,5 @@
 import { Dialog } from "@/lib/dialog/index.js"
-import { asyncRun, errorHandler, getOrAddObjective } from "@/util/game.js"
-import { eachAsync } from "@/util/index.js"
+import { asyncRun, errorHandler } from "@/util/game.js"
 
 import { Handler } from "./Handler.class.js"
 import { option } from "./option.js"
@@ -28,11 +27,9 @@ export async function command(argv, sender) {
         switch (result.message) {
           case "DUPLICATE_OBJECTIVE": {
             throw errorHandler(`添加失败：记分板 ${objectiveId} 已存在`, sender)
-            break
           }
           case "UNKNOWN_CRITERIA": {
             throw errorHandler(`添加失败：未知的准则 ${criteria}`, sender)
-            break
           }
         }
       }

@@ -1,4 +1,4 @@
-import { BlockLocation, Directions } from "../../location/index.js"
+import { Directions } from "../../location/index.js"
 
 import { WrappedPlayer } from "../entity/index.js"
 
@@ -33,6 +33,9 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
         return Directions.West
       case 3:
         return Directions.North
+      default:
+        // TODO: error msg
+        throw new Error("error")
     }
   }
   get upsideOrDown() {

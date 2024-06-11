@@ -5,9 +5,8 @@ import {
   world,
 } from "@minecraft/server"
 
-import { Commands } from "@/lib/commands/index.js"
 import { WrappedPlayer } from "@/lib/wrapper/entity/index.js"
-import { asyncRun, errorHandler, getOrAddObjective } from "@/util/game.js"
+import { asyncRun, getOrAddObjective } from "@/util/game.js"
 import { eachAsync } from "@/util/index.js"
 
 import { ALL_PLAYER_DATABASES, globalDB } from "./db.js"

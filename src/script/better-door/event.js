@@ -5,7 +5,7 @@ import {
   WoodenDoorBlock,
   WoodenTrapdoorBlock,
 } from "@/lib/wrapper/block/index.js"
-import { asyncRun, errorHandler } from "@/util/game.js"
+import { asyncRun } from "@/util/game.js"
 import { each } from "@/util/index.js"
 
 import { option } from "./option.js"

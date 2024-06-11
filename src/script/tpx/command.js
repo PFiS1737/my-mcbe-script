@@ -101,7 +101,7 @@ export async function tpxCommand(argv, sender) {
   }
 }
 
-export async function backCommand(argv, sender) {
+export async function backCommand(_, sender) {
   if (option.getPlayer(sender).getItemVal("back_cmd"))
     await Commands.asyncRun("!tpx back", sender)
   else sender.sendMessage("您未启用该命令")

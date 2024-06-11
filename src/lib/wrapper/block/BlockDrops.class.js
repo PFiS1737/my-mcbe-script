@@ -8,7 +8,6 @@ import { each } from "../../util/index.js"
 import { binomialDistribution, range } from "../../util/math.js"
 
 import { LootTable } from "../LootTable.class.js"
-import { ItemTypeGroups } from "../item/index.js"
 
 class DropItem {
   constructor({
@@ -147,8 +146,6 @@ export class BlockDrops {
           rawResource.amount *= lootTable.getResult()
 
           return [rawResource]
-
-          break
         }
         case FORTUNE_RULES.melon: {
           const rawResource = this.rawResource.getResult()[0]
@@ -166,8 +163,6 @@ export class BlockDrops {
           rawResource.amount = lootTable.getResult()
 
           return [rawResource]
-
-          break
         }
         case FORTUNE_RULES.grass: {
           const rawResource = this.rawResource.getResult()[0]
@@ -177,8 +172,6 @@ export class BlockDrops {
           const lootTable = new LootTable(range(1, level * 2 + 2))
           rawResource.amount = lootTable.getResult()
           return [rawResource]
-
-          break
         }
         case FORTUNE_RULES.flower: {
           const rawResource = this.rawResource.getResult()[0]
@@ -187,8 +180,6 @@ export class BlockDrops {
           rawResource.amount = lootTable.getResult()
 
           return [rawResource]
-
-          break
         }
         case FORTUNE_RULES.crop: {
           const rawResource = this.rawResource.getResult()[0]
@@ -209,17 +200,14 @@ export class BlockDrops {
               amount: lootTable.getResult(),
             },
           ]
-
-          break
         }
         case FORTUNE_RULES.custom: {
           const lootTable = new LootTable(this.custumLootTable[level])
           const customItemDrop = new DropItemGroup(lootTable.getResult())
           return customItemDrop.getResult()
-
-          break
         }
       }
+      // biome-ignore lint/style/noUselessElse: <explanation>
     } else {
       return this.rawResource.getResult()
     }

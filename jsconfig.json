@@ -3,6 +3,7 @@
     "lib": ["ES6"],
     "target": "ES6",
     "baseUrl": "src",
+    "moduleResolution": "Bundler",
     "paths": {
       "@/src/*": ["./*"],
       "@/lib/*": ["./lib/*"],
