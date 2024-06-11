@@ -12,9 +12,6 @@ jobs:
     permissions:
       contents: write
 
-    env:
-      NODE_ENV: production
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,7 +25,6 @@ jobs:
         with:
           run_install: |
             - recursive: false
-            - args: [--global, gulp]
 
       - name: Clone dist branch
         run: git clone -b dist https://github.com/${{ github.repository }} dist

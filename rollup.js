@@ -121,12 +121,12 @@ export default function (banner, pkg) {
   )
 
   // test
-  if (process?.env?.NODE_ENV === "development")
-    output.test = _({
-      src: "script/test/index.js",
-      dest: "test.min.js",
-      name: "test",
-    })
+  // if (process?.env?.NODE_ENV === "development")
+  //   output.test = _({
+  //     src: "script/test/index.js",
+  //     dest: "test.min.js",
+  //     name: "test",
+  //   })
 
   return output
 }
