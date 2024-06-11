@@ -36,6 +36,9 @@ export function deserialize(str) {
 }
 
 export const AsyncFunction = (async () => {}).constructor
+export function isAsyncFunc(func) {
+  return func[Symbol.toStringTag] === "AsyncFunction"
+}
 
 export function arraySample(arr) {
   return arr[Math.floor(Math.random() * arr.length)]

@@ -16,11 +16,13 @@ const CUSTOM_COMMAND_SET = new Set()
 
 export class Commands {
   static run(commandString, target = overworld) {
+    // @ts-ignore
     if (target instanceof Dimension || target instanceof Entity)
       return target.runCommand(commandString)
     throw new TypeError("Target must be Entity or Dimension.")
   }
   static async asyncRun(commandString, target = overworld) {
+    // @ts-ignore
     if (target instanceof Dimension || target instanceof Entity) {
       const customCommands = [...CUSTOM_COMMAND_SET]
         .filter(({ regex }) => regex.test(commandString))

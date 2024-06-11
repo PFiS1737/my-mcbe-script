@@ -6,13 +6,13 @@ export class Vector3Template {
   }
 
   static parse(vectorStr) {
-    return new Vector3Template(...vectorStr.split(" ").map(Number))
+    return new this(...vectorStr.split(" ").map(Number))
   }
   static create(vector) {
-    if (Array.isArray(vector)) return new Vector3Template(...vector)
+    if (Array.isArray(vector)) return new this(...vector)
     if (typeof vector === "string") return Vector3Template.parse(vector)
     if (typeof vector === "object")
-      return new Vector3Template(vector.x, vector.y, vector.z)
+      return new this(vector.x, vector.y, vector.z)
 
     throw new TypeError(
       'The argument "vector" must be an array, a vector string or a vector object.'

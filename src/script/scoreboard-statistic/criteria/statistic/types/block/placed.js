@@ -1,6 +1,6 @@
 export default ({ player, target, callback }) => ({
   events: {
-    blockBreak: {
+    playerBreakBlock: {
       listener(event) {
         const blockPermutation = event.brokenBlockPermutation
         const source = event.player
@@ -11,7 +11,7 @@ export default ({ player, target, callback }) => ({
           })
       },
     },
-    blockPlace: {
+    playerPlaceBlock: {
       listener(event) {
         const block = event.block
         const source = event.player

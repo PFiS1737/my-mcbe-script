@@ -1,11 +1,11 @@
-import { AsyncFunction, each, eachAsync } from "./util/index.js"
+import { each, eachAsync, isAsyncFunc } from "./util/index.js"
 
 export class EventEmitter {
   constructor() {
     this._events = {}
   }
   on(eventName, listener) {
-    if (listener instanceof AsyncFunction) {
+    if (isAsyncFunc(listener)) {
       const _eventName = `${eventName}.async`
       if (this._events[_eventName]) this._events[_eventName].push(listener)
       else this._events[_eventName] = [listener]
@@ -16,7 +16,7 @@ export class EventEmitter {
     return this
   }
   once(eventName, listener) {
-    if (listener instanceof AsyncFunction) {
+    if (isAsyncFunc(listener)) {
       const _eventName = `${eventName}.async`
       const _listener = async (...args) => {
         await listener(...args)

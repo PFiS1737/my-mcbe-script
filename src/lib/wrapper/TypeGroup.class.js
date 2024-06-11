@@ -7,6 +7,7 @@ export class TypeGroup {
 
   add(...types) {
     each(types, (type) => this.types.add(type))
+    return this
   }
   has(type) {
     return this.types.has(type)

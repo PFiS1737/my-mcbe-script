@@ -36,10 +36,10 @@ export class Dialog {
   constructor({
     dialog,
     onClose = async () => {},
-    onSubmit = async () => {},
+    onSubmit = async (_) => {},
     onSelectButton1 = async () => {},
     onSelectButton2 = async () => {},
-    onSelect = async () => {},
+    onSelect = async (_) => {},
   }) {
     this.dialog = dialog
     this.onSubmit = onSubmit

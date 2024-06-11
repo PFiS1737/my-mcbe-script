@@ -5,6 +5,7 @@ import health from "./health.js"
 import playerKillCount from "./playerKillCount.js"
 import totalKillCount from "./totalKillCount.js"
 
+// @ts-ignore
 export default new Map([
   ...Object.entries(types),
 

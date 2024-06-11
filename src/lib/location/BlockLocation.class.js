@@ -9,10 +9,12 @@ export class BlockLocation extends Location {
     this.floor()
   }
 
+  // @ts-ignore
   get centerCorrected() {
     throw new Error('Couldn\'t get "centerCorrected" on BlockLocation.')
   }
 
+  // @ts-ignore
   clone() {
     return new BlockLocation(this.x, this.y, this.z)
   }
@@ -21,6 +23,7 @@ export class BlockLocation extends Location {
     super.divide(v)
     return this.floor()
   }
+  // @ts-ignore
   inverse() {
     throw new Error('Couldn\'t call "inverse" on BlockLocation.')
   }

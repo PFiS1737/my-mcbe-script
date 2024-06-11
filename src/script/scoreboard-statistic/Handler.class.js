@@ -69,6 +69,7 @@ export class Handler {
       target: criteriaName,
       callback: (result) => {
         if (
+          // @ts-ignore
           !WrappedPlayer.wrap(this.player).testGameMode(GameMode.creative) ||
           this.playerOption.getItemVal("enable_creative")
         ) {

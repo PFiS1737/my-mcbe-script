@@ -1,6 +1,7 @@
 import { system, world } from "@minecraft/server"
 
 export const sleepAsync = (ms) =>
+  // @ts-ignore
   new Promise((resolve) => system.runTimeout(resolve, ms))
 
 export function asyncRun(fn) {

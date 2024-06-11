@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "lib": ["ES6"],
-    "target": "ES6",
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "module": "ESNext",
     "baseUrl": "src",
     "moduleResolution": "Bundler",
+    "skipLibCheck": true,
+    "checkJs": true,
     "paths": {
       "@/src/*": ["./*"],
       "@/lib/*": ["./lib/*"],
       "@/util/*": ["./lib/util/*"],
       "@/data/*": ["./data*"],
     }
-  }
+  },
 }

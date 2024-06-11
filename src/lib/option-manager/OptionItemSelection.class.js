@@ -1,3 +1,4 @@
+// @ts-ignore
 import { serialize } from "serialize-javascript"
 
 import { each } from "../util/index.js"

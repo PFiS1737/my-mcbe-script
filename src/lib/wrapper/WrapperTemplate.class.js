@@ -1,10 +1,14 @@
 export class WrapperTemplate {
   static wrap(...args) {
-    return new WrapperTemplate(...args)
+    // return the class extending this
+    // @ts-ignore
+    return new this(...args)
   }
   static tryWrap(...args) {
     try {
-      return new WrapperTemplate(...args)
+      // return the class extending this
+      // @ts-ignore
+      return new this(...args)
     } catch (err) {}
   }
 

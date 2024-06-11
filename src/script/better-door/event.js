@@ -17,6 +17,7 @@ export const setupListener = () =>
 
     if (WoodenDoorBlock.match(block) && playerOption.getItemVal("door")) {
       event.cancel = true
+      // @ts-ignore
       const doors = WoodenDoorBlock.wrap(block).getRelated()
       asyncRun(() => {
         if (doors[0].opened) each(doors, (_) => _.close())
@@ -28,6 +29,7 @@ export const setupListener = () =>
     ) {
       event.cancel = true
       const maxLength = playerOption.getItemVal("max_trapdoor_length")
+      // @ts-ignore
       const trapdoors = WoodenTrapdoorBlock.wrap(block).getRelated(player, {
         maxLength,
       })

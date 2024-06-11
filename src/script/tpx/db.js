@@ -31,6 +31,7 @@ export class TpxDB {
       return await Dialog.confirm({
         body: `名称 ${name} 已被占用，是否覆盖？`,
         target: this.player,
+        // @ts-ignore
         onConfirm: async () => await handleSet(),
       })
     }
@@ -47,6 +48,7 @@ export class TpxDB {
     return await Dialog.confirm({
       body: `是否删除 ${name} `,
       target: this.player,
+      // @ts-ignore
       onConfirm: async () => await this.db.delete(name),
     })
   }

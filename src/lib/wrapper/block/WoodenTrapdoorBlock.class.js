@@ -68,6 +68,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
           relatedTrapdoor.facingDirection.isOppositeTo(this.facingDirection) &&
           relatedTrapdoor.upsideOrDown === this.upsideOrDown
         )
+          // @ts-ignore
           output.push(relatedTrapdoor)
       }
     }
@@ -79,6 +80,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
       while (--maxLength) {
         // 3. 获取扩展活板门
         //    即能与该活板门延伸联动的另一个活板门
+        // @ts-ignore
         const playerFacing = WrappedPlayer.wrap(player).getFacingDirectionXZ()
         const extensiveBlock = needOpposite
           ? that.getNeighbourBlock(playerFacing.getOpposite())
@@ -99,8 +101,10 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
               maxLength,
             })
             if (result.length > 1) {
+              // @ts-ignore
               output.push(...result)
 
+              // @ts-ignore
               that = extensiveTrapdoor
               continue
             }

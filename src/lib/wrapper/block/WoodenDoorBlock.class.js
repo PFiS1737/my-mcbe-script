@@ -50,6 +50,9 @@ export class WoodenDoorBlock extends WrappedBlocks {
         return Directions.West
       case 3:
         return Directions.North
+      default:
+        // TODO: error msg
+        throw new Error("erroe")
     }
   }
   get hingeSide() {
@@ -104,6 +107,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
         relatedDoor.facingDirection.code === facingDirection.code &&
         relatedDoor.hingeSide === !hingeSide
       )
+        // @ts-ignore
         output.push(relatedDoor)
     }
 

@@ -27,6 +27,6 @@ export class LootTable {
   }
 
   [Symbol.iterator]() {
-    return this.table
+    return this.table[Symbol.iterator]()
   }
 }

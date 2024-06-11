@@ -1,5 +1,6 @@
 import { BlockPermutation } from "@minecraft/server"
 
+// @ts-ignore
 import BlockDefinition from "@/data/block/index.js"
 
 import { NumberRange } from "../../NumberRange.class.js"
@@ -11,6 +12,7 @@ import { LootTable } from "../LootTable.class.js"
 
 class DropItem {
   constructor({
+    // @ts-ignore
     item_id: itemId,
     default_range: defaultRange = [1, 1],
     max_amount: maxAmount = Number.POSITIVE_INFINITY,
@@ -119,7 +121,7 @@ export class BlockDrops {
     return true
   }
 
-  getDrops({ withFortune, withSilkTouch, immature } = {}) {
+  getDrops({ withFortune = 0, withSilkTouch = false, immature = false } = {}) {
     if (withFortune && withSilkTouch)
       throw new Error("Could not call with both fortune and silk_touch.")
 
@@ -196,7 +198,7 @@ export class BlockDrops {
             rawResource,
             {
               // TODO: use class
-              itemId: this.seendResource.itemTypeId,
+              itemId: this.seendResource.itemId,
               amount: lootTable.getResult(),
             },
           ]

@@ -26,6 +26,7 @@ export class WrappedBlock extends WrapperTemplate {
   }
 
   getOffsetBlock(v) {
+    // @ts-ignore
     const location = this.location.clone().offset(v)
     return new WrappedBlock(this.dimension.getBlock(location))
   }

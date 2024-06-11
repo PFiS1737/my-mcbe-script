@@ -49,7 +49,12 @@ export class PlayerOption {
   hasItem(name) {
     return !!this.items[name]
   }
-  setItemVal(name, value, callback = () => {}, { syncFromDB } = {}) {
+  setItemVal(
+    name,
+    value,
+    callback = (_, __, ___) => {},
+    { syncFromDB = false } = {}
+  ) {
     const item = this._getItem(name)
     if (item) {
       const result = item.select(value)

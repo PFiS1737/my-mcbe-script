@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@minecraft/server':
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: 1.11.0-beta.1.20.80-stable
+        version: 1.11.0-beta.1.20.80-stable
       '@minecraft/server-ui':
         specifier: 1.2.0-beta.1.21.10-preview.22
         version: 1.2.0-beta.1.21.10-preview.22
@@ -42,6 +42,15 @@ importers:
       '@rollup/plugin-terser':
         specifier: ^0.4.4
         version: 0.4.4(rollup@4.18.0)
+      '@types/gulp':
+        specifier: ^4.0.17
+        version: 4.0.17
+      '@types/md5':
+        specifier: ^2.3.5
+        version: 2.3.5
+      '@types/serialize-javascript':
+        specifier: ^5.0.4
+        version: 5.0.4
       gulp:
         specifier: ^5.0.0
         version: 5.0.0
@@ -145,6 +154,9 @@ packages:
 
   '@minecraft/server@1.10.0':
     resolution: {integrity: sha512-liBalm1XKMtf7LPyKZ4VcuwxAbprKcAHnG6b0VUdULezOz/RFj2gqmfyA0qE8azMMa8KVPmnl7hYq4KjoGZmmA==}
+
+  '@minecraft/server@1.11.0-beta.1.20.80-stable':
+    resolution: {integrity: sha512-nedguYKlNHbwe34YlmwF4R1K3ZDW3qzD7xnxODt9PuSwyFfmQzTG0JbN6ulBrMdE60VwQ3qBr46sGO6xtaNJSA==}
 
   '@minecraft/vanilla-data@1.20.80':
     resolution: {integrity: sha512-eQUBaDy1RtZxcu74Gpv4k5uEGzDseB+QruuokXgfcC/dHaZkpD4KCNFSsbDbISBpJ+6BbnidTQLVQai8OCkxpg==}
@@ -281,8 +293,44 @@ packages:
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
+  '@types/expect@1.20.4':
+    resolution: {integrity: sha512-Q5Vn3yjTDyCMV50TB6VRIbQNxSE4OmZR86VSbGaNpfUolm0iePBB4KdEEHmxoY5sT2+2DIvXW0rvMDP2nHZ4Mg==}
+
+  '@types/glob-stream@8.0.2':
+    resolution: {integrity: sha512-kyuRfGE+yiSJWzSO3t74rXxdZNdYfLcllO0IUha4eX1fl40pm9L02Q/TEc3mykTLjoWz4STBNwYnUWdFu3I0DA==}
+
+  '@types/gulp@4.0.17':
+    resolution: {integrity: sha512-+pKQynu2C/HS16kgmDlAicjtFYP8kaa86eE9P0Ae7GB5W29we/E2TIdbOWtEZD5XkpY+jr8fyqfwO6SWZecLpQ==}
+
+  '@types/md5@2.3.5':
+    resolution: {integrity: sha512-/i42wjYNgE6wf0j2bcTX6kuowmdL/6PE4IVitMpm2eYKBUuYCprdcWVK+xEF0gcV6ufMCRhtxmReGfc6hIK7Jw==}
+
+  '@types/node@20.14.2':
+    resolution: {integrity: sha512-xyu6WAMVwv6AKFLB+e/7ySZVr/0zLCzOa7rSpq6jNwpqOrUbcACDWC+53d4n2QHOnDou0fbIsg8wZu/sxrnI4Q==}
+
+  '@types/picomatch@2.3.3':
+    resolution: {integrity: sha512-Yll76ZHikRFCyz/pffKGjrCwe/le2CDwOP5F210KQo27kpRE46U2rDnzikNlVn6/ezH3Mhn46bJMTfeVTtcYMg==}
+
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
+
+  '@types/serialize-javascript@5.0.4':
+    resolution: {integrity: sha512-Z2R7UKFuNWCP8eoa2o9e5rkD3hmWxx/1L0CYz0k2BZzGh0PhEVMp9kfGiqEml/0IglwNERXZ2hwNzIrSz/KHTA==}
+
+  '@types/streamx@2.9.5':
+    resolution: {integrity: sha512-IHYsa6jYrck8VEdSwpY141FTTf6D7boPeMq9jy4qazNrFMA4VbRz/sw5LSsfR7jwdDcx0QKWkUexZvsWBC2eIQ==}
+
+  '@types/undertaker-registry@1.0.4':
+    resolution: {integrity: sha512-tW77pHh2TU4uebWXWeEM5laiw8BuJ7pyJYDh6xenOs75nhny2kVgwYbegJ4BoLMYsIrXaBpKYaPdYO3/udG+hg==}
+
+  '@types/undertaker@1.2.11':
+    resolution: {integrity: sha512-j1Z0V2ByRHr8ZK7eOeGq0LGkkdthNFW0uAZGY22iRkNQNL9/vAV0yFPr1QN3FM/peY5bxs9P+1f0PYJTQVa5iA==}
+
+  '@types/vinyl-fs@3.0.5':
+    resolution: {integrity: sha512-ckYz9giHgV6U10RFuf9WsDQ3X86EFougapxHmmoxLK7e6ICQqO8CE+4V/3lBN148V5N1pb4nQMmMjyScleVsig==}
+
+  '@types/vinyl@2.0.12':
+    resolution: {integrity: sha512-Sr2fYMBUVGYq8kj3UthXFAu5UN6ZW+rYr4NACjZQJvHvj+c8lYv0CahmZ2P/r7iUkN44gGUBwqxZkrKXYPb7cw==}
 
   acorn@8.11.3:
     resolution: {integrity: sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==}
@@ -316,6 +364,10 @@ packages:
   array-slice@1.1.0:
     resolution: {integrity: sha512-B1qMD3RBP7O8o0H2KbrXDyB0IccejMF15+87Lvlor12ONPRHP6gTjXMNkt/d3ZuOGbAe66hFmaCfECI24Ufp6w==}
     engines: {node: '>=0.10.0'}
+
+  async-done@1.3.2:
+    resolution: {integrity: sha512-uYkTP8dw2og1tu1nmza1n1CMW0qb8gWWlwqMmLb7MhBVs4BXrFziT6HXUd+/RlRA/i4H9AkofYloUbs1fwMqlw==}
+    engines: {node: '>= 0.10'}
 
   async-done@2.0.0:
     resolution: {integrity: sha512-j0s3bzYq9yKIVLKGE/tWlCpa3PfFLcrDZLTSVdnnCTGagXuXBJO4SsY9Xdk/fQBirCkH4evW5xOeJXqlAQFdsw==}
@@ -760,6 +812,9 @@ packages:
   polyfill-crypto.getrandomvalues@1.0.0:
     resolution: {integrity: sha512-GIkU6bg4auRnDFOqUNit7eLn9hzznrJU1CGFuivQzDeVp4Ys8cY4OY6GhAdndJwo4jryz5cJyjg9ELhvQjdrtw==}
 
+  process-nextick-args@2.0.1:
+    resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
+
   queue-tick@1.0.1:
     resolution: {integrity: sha512-kJt5qhMxoszgU/62PLP1CJytzd2NKetjSRnyuj31fDd3Rlcz3fzlFdFLD1SItunPwyqEOkca6GbV612BWfaBag==}
 
@@ -931,6 +986,9 @@ packages:
     resolution: {integrity: sha512-tO/bf30wBbTsJ7go80j0RzA2rcwX6o7XPBpeFcb+jzoeb4pfMM2zUeSDIkY1AWqeZabWxaQZ/h8N9t35QKDLPQ==}
     engines: {node: '>=10.13.0'}
 
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -1075,6 +1133,10 @@ snapshots:
     dependencies:
       '@minecraft/common': 1.2.0
 
+  '@minecraft/server@1.11.0-beta.1.20.80-stable':
+    dependencies:
+      '@minecraft/common': 1.2.0
+
   '@minecraft/vanilla-data@1.20.80': {}
 
   '@pkgjs/parseargs@0.11.0':
@@ -1174,7 +1236,55 @@ snapshots:
 
   '@types/estree@1.0.5': {}
 
+  '@types/expect@1.20.4': {}
+
+  '@types/glob-stream@8.0.2':
+    dependencies:
+      '@types/node': 20.14.2
+      '@types/picomatch': 2.3.3
+      '@types/streamx': 2.9.5
+
+  '@types/gulp@4.0.17':
+    dependencies:
+      '@types/node': 20.14.2
+      '@types/undertaker': 1.2.11
+      '@types/vinyl-fs': 3.0.5
+      chokidar: 3.6.0
+
+  '@types/md5@2.3.5': {}
+
+  '@types/node@20.14.2':
+    dependencies:
+      undici-types: 5.26.5
+
+  '@types/picomatch@2.3.3': {}
+
   '@types/resolve@1.20.2': {}
+
+  '@types/serialize-javascript@5.0.4': {}
+
+  '@types/streamx@2.9.5':
+    dependencies:
+      '@types/node': 20.14.2
+
+  '@types/undertaker-registry@1.0.4': {}
+
+  '@types/undertaker@1.2.11':
+    dependencies:
+      '@types/node': 20.14.2
+      '@types/undertaker-registry': 1.0.4
+      async-done: 1.3.2
+
+  '@types/vinyl-fs@3.0.5':
+    dependencies:
+      '@types/glob-stream': 8.0.2
+      '@types/node': 20.14.2
+      '@types/vinyl': 2.0.12
+
+  '@types/vinyl@2.0.12':
+    dependencies:
+      '@types/expect': 1.20.4
+      '@types/node': 20.14.2
 
   acorn@8.11.3: {}
 
@@ -1196,6 +1306,13 @@ snapshots:
   array-each@1.0.1: {}
 
   array-slice@1.1.0: {}
+
+  async-done@1.3.2:
+    dependencies:
+      end-of-stream: 1.4.4
+      once: 1.4.0
+      process-nextick-args: 2.0.1
+      stream-exhaust: 1.0.2
 
   async-done@2.0.0:
     dependencies:
@@ -1640,6 +1757,8 @@ snapshots:
     dependencies:
       mersenne-twister: 1.1.0
 
+  process-nextick-args@2.0.1: {}
+
   queue-tick@1.0.1: {}
 
   randombytes@2.1.0:
@@ -1824,6 +1943,8 @@ snapshots:
       fast-levenshtein: 3.0.0
       last-run: 2.0.0
       undertaker-registry: 2.0.0
+
+  undici-types@5.26.5: {}
 
   util-deprecate@1.0.2: {}
 

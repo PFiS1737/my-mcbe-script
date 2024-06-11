@@ -19,7 +19,7 @@ import { ENABLE_BLOCKS } from "./config.js"
 import { option } from "./option.js"
 
 export const setupListener = () =>
-  world.afterEvents.blockBreak.subscribe((event) => {
+  world.afterEvents.playerBreakBlock.subscribe((event) => {
     const basicBlock = new WrappedBlock(event.block)
     const blockTypeId = event.brokenBlockPermutation.type.id
     const player = new WrappedPlayer(event.player)
@@ -64,6 +64,7 @@ export const setupListener = () =>
           (!playerOption.getItemVal("prevent_tool_destruction") ||
             (playerOption.getItemVal("prevent_tool_destruction") &&
               totalDamage <
+                // @ts-ignore
                 (wrappedItem.durability ?? Number.POSITIVE_INFINITY)))
         ) {
           const block = blockList.shift()
@@ -75,7 +76,7 @@ export const setupListener = () =>
           if (playerOption.getItemVal("auto_collection")) {
             each(result.drops, (drop) => {
               if (drop.xp) totalXp += drop.xp
-              totalItems.push([drop.itemId, drop.amount])
+              totalItems.push(drop.itemId, drop.amount)
             })
           } else {
             result.spawnDrops()
@@ -84,7 +85,7 @@ export const setupListener = () =>
 
         if (playerOption.getItemVal("auto_collection")) {
           each(totalItems, (item) =>
-            player.inventory.addItem(new ItemStack(...item))
+            player.inventory.addItem(new ItemStack(item.itemId, item.amount))
           )
           player.addExperience(totalXp)
         }
@@ -92,6 +93,7 @@ export const setupListener = () =>
         if (wrappedItem instanceof ItemStackWithDurability)
           wrappedItem.applyDamage(totalDamage)
 
+        // @ts-ignore
         return wrappedItem._item
       })
       .catch(BetterConsole.error)
