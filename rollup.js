@@ -55,12 +55,7 @@ export default function (banner, pkg) {
       ],
     }
 
-    if (process?.env?.NODE_ENV === "production")
-      config.plugins.push(
-        terser({
-          maxWorkers: 4,
-        })
-      )
+    if (!process?.env?.DISABLE_MINIFIER) config.plugins.push(terser())
 
     return config
   }
