@@ -76,7 +76,7 @@ export const setupListener = () =>
           if (playerOption.getItemVal("auto_collection")) {
             each(result.drops, (drop) => {
               if (drop.xp) totalXp += drop.xp
-              totalItems.push(drop.itemId, drop.amount)
+              totalItems.push(drop)
             })
           } else {
             result.spawnDrops()
@@ -84,8 +84,8 @@ export const setupListener = () =>
         }
 
         if (playerOption.getItemVal("auto_collection")) {
-          each(totalItems, (item) =>
-            player.inventory.addItem(new ItemStack(item.itemId, item.amount))
+          each(totalItems, ({ itemId, amount }) =>
+            player.inventory.addItem(new ItemStack(itemId, amount))
           )
           player.addExperience(totalXp)
         }

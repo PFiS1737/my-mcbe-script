@@ -72,7 +72,7 @@ export class BlockDrops {
     const identifier = removeMinecraftNamespace(blockTypeId)
     const drops = BlockDefinition[identifier]?.drops
 
-    if (!drops) throw new Error(`Block ${identifier} has not been supportive.`)
+    if (!drops) throw new Error(`Block ${identifier} has not been supported.`)
 
     this.blockTypeId = blockTypeId
     this.drops = drops
@@ -131,7 +131,7 @@ export class BlockDrops {
     if (withSilkTouch) {
       return this.blockItem.getResult()
     }
-    if (withFortune !== undefined && this.fortuneRule) {
+    if (withFortune !== 0 && this.fortuneRule) {
       const level = withFortune
 
       switch (this.fortuneRule) {
