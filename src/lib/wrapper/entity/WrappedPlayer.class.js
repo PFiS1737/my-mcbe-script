@@ -31,8 +31,8 @@ export class WrappedPlayer extends WrappedEntity {
   get inventory() {
     return new EntityContainer(this, this.components.get("inventory").container)
   }
-  get selectedSlot() {
-    return this._player.selectedSlot
+  get selectedSlotIndex() {
+    return this._player.selectedSlotIndex
   }
 
   getGameMode() {
@@ -53,10 +53,10 @@ export class WrappedPlayer extends WrappedEntity {
   }
 
   getMainHandItem() {
-    return this.inventory.getItem(this.selectedSlot)
+    return this.inventory.getItem(this.selectedSlotIndex)
   }
   setMainHandItem(item) {
-    this.inventory.setItem(this.selectedSlot, item)
+    this.inventory.setItem(this.selectedSlotIndex, item)
   }
 
   async useItemFromInventory(slot, callback = async (_) => {}) {
@@ -67,7 +67,7 @@ export class WrappedPlayer extends WrappedEntity {
     this.inventory.setItem(slot, itemStack)
   }
   async useMainHandItem(callback = async () => {}) {
-    await this.useItemFromInventory(this.selectedSlot, callback)
+    await this.useItemFromInventory(this.selectedSlotIndex, callback)
   }
 
   addExperience(amount = 0, { useXpOrb = false } = {}) {
