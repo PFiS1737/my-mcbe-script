@@ -70,7 +70,9 @@ export class WrappedBlock extends WrapperTemplate {
             ? useItemStack
             : new WrappedItemStack(useItemStack)
         return drops.getDrops({
-          withFortune: item.enchants.hasEnchantment("fortune"),
+          withFortune: item.enchants.hasEnchantment("fortune")
+            ? item.enchants.getEnchantment("fortune").level
+            : 0,
           withSilkTouch: item.enchants.hasEnchantment("silk_touch"),
         })
       }
