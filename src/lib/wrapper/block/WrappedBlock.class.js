@@ -1,5 +1,6 @@
 import {
   BlockPermutation,
+  BlockVolume,
   ItemStack as MinecraftItemStack,
 } from "@minecraft/server"
 
@@ -53,8 +54,7 @@ export class WrappedBlock extends WrapperTemplate {
 
   destroy() {
     this.dimension.fillBlocks(
-      this.location,
-      this.location,
+      new BlockVolume(this.location, this.location),
       BlockPermutation.resolve("minecraft:air")
     )
   }
