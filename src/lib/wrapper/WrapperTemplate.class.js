@@ -13,6 +13,9 @@ export class WrapperTemplate {
   }
 
   static match() {
-    throw new Error("Call without override.")
+    throw new Error("Not implemented.")
+  }
+  static assert() {
+    throw new Error("Not implemented.")
   }
 }

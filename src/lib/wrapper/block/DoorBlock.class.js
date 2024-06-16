@@ -3,12 +3,15 @@ import { BlockLocation, Directions } from "../../location/index.js"
 import { WrappedBlock } from "./WrappedBlock.class.js"
 import { WrappedBlocks } from "./WrappedBlocks.class.js"
 
-import { WOODEN_DOORS } from "./BlockTypeGroups.enumeration.js"
+import {
+  COPPER_DOORS,
+  DOORS,
+  WOODEN_DOORS,
+} from "./BlockTypeGroups.enumeration.js"
 
-export class WoodenDoorBlock extends WrappedBlocks {
+export class DoorBlock extends WrappedBlocks {
   constructor(block) {
-    if (!WoodenDoorBlock.match(block))
-      throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
+    DoorBlock.assert(block)
 
     const wrappedBlock =
       block instanceof WrappedBlock ? block : new WrappedBlock(block)
@@ -25,7 +28,12 @@ export class WoodenDoorBlock extends WrappedBlocks {
   }
 
   static match(block) {
-    return WOODEN_DOORS.has(block?.typeId)
+    return DOORS.has(block?.typeId)
+  }
+  static assert(block) {
+    if (DoorBlock.match(block)) return true
+
+    throw new TypeError(`The "${block.typeId}" is not a door.`)
   }
 
   get _lower() {
@@ -51,14 +59,27 @@ export class WoodenDoorBlock extends WrappedBlocks {
       case 3:
         return Directions.North
       default:
-        // TODO: error msg
-        throw new Error("erroe")
+        // this branch can't be reached forever
+        throw new Error("Unkonw error.")
     }
   }
   get hingeSide() {
     return this._upper.getState("door_hinge_bit")
     // true -> right
     // false -> left
+  }
+
+  isWooden() {
+    return WOODEN_DOORS.has(this.typeId)
+  }
+  isCopper() {
+    return COPPER_DOORS.has(this.typeId)
+  }
+  isIron() {
+    return !this.canBeOpenedByHand()
+  }
+  canBeOpenedByHand() {
+    return this.isWooden() || this.isCopper()
   }
 
   open() {
@@ -70,6 +91,7 @@ export class WoodenDoorBlock extends WrappedBlocks {
 
   getRelated() {
     // 获取可以与该门双开的另一个门和这个门组成的列表
+    const output = [this]
 
     // 1. 获取另一个门的位置
     //    根据门的方向和门轴位置确定
@@ -94,16 +116,14 @@ export class WoodenDoorBlock extends WrappedBlocks {
             : 0
       ),
     })
-    const relatedBlock = this._lower.getOffsetBlock(offset)
-
-    const output = [this]
 
     // 2. 进行判断
-    if (WoodenDoorBlock.match(relatedBlock)) {
-      const relatedDoor = new WoodenDoorBlock(relatedBlock)
-
+    const relatedBlock = this._lower.getOffsetBlock(offset)
+    if (DoorBlock.match(relatedBlock)) {
+      const relatedDoor = new DoorBlock(relatedBlock)
       // 另一扇门应该方向相同，而门轴相反
       if (
+        relatedDoor.canBeOpenedByHand() &&
         relatedDoor.facingDirection.code === facingDirection.code &&
         relatedDoor.hingeSide === !hingeSide
       )

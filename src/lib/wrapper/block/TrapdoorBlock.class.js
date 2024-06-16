@@ -4,18 +4,26 @@ import { WrappedPlayer } from "../entity/index.js"
 
 import { WrappedBlock } from "./WrappedBlock.class.js"
 
-import { WOODEN_TRAPDOORS } from "./BlockTypeGroups.enumeration.js"
+import {
+  COPPER_TRAPDOORS,
+  TRAPDOORS,
+  WOODEN_TRAPDOORS,
+} from "./BlockTypeGroups.enumeration.js"
 
-export class WoodenTrapdoorBlock extends WrappedBlock {
+export class TrapdoorBlock extends WrappedBlock {
   constructor(block) {
-    if (!WoodenTrapdoorBlock.match(block))
-      throw new TypeError(`The "${block.typeId}" is not a wooden door.`)
+    TrapdoorBlock.assert(block)
 
     super(block)
   }
 
   static match(block) {
-    return WOODEN_TRAPDOORS.has(block?.typeId)
+    return TRAPDOORS.has(block?.typeId)
+  }
+  static assert(block) {
+    if (TrapdoorBlock.match(block)) return true
+
+    throw new TypeError(`The "${block.typeId}" is not a trapdoor.`)
   }
 
   get opened() {
@@ -34,12 +42,25 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
       case 3:
         return Directions.North
       default:
-        // TODO: error msg
-        throw new Error("error")
+        // this branch can't be reached forever
+        throw new Error("Unkonw error.")
     }
   }
   get upsideOrDown() {
     return this.getState("upside_down_bit")
+  }
+
+  isWooden() {
+    return WOODEN_TRAPDOORS.has(this.typeId)
+  }
+  isCopper() {
+    return COPPER_TRAPDOORS.has(this.typeId)
+  }
+  isIron() {
+    return !this.canBeOpenedByHand()
+  }
+  canBeOpenedByHand() {
+    return this.isWooden() || this.isCopper()
   }
 
   open() {
@@ -59,12 +80,15 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
       //      那么另一个活板门应该位于东边，即 x+1 的位置
       const relatedBlock = this.getNeighbourBlock(this.facingDirection)
 
-      // 2. 判断是否为相关活板门
-      if (WoodenTrapdoorBlock.match(relatedBlock)) {
-        const relatedTrapdoor = new WoodenTrapdoorBlock(relatedBlock._block)
+      // TODO: should_be_the_same_type
 
+      // 2. 判断是否为相关活板门
+      if (TrapdoorBlock.match(relatedBlock)) {
+        // TODO: refactor _bloc6k
+        const relatedTrapdoor = new TrapdoorBlock(relatedBlock._block)
         // 方向相反，上下位置相同
         if (
+          relatedTrapdoor.canBeOpenedByHand() &&
           relatedTrapdoor.facingDirection.isOppositeTo(this.facingDirection) &&
           relatedTrapdoor.upsideOrDown === this.upsideOrDown
         )
@@ -76,6 +100,7 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
     if (extensive) {
       let that = this
       let needOpposite = false
+
       // 仅 maxLength > 1 时才会运行
       while (--maxLength) {
         // 3. 获取扩展活板门
@@ -86,13 +111,12 @@ export class WoodenTrapdoorBlock extends WrappedBlock {
           ? that.getNeighbourBlock(playerFacing.getOpposite())
           : that.getNeighbourBlock(playerFacing)
 
-        if (WoodenTrapdoorBlock.match(extensiveBlock)) {
-          const extensiveTrapdoor = new WoodenTrapdoorBlock(
-            extensiveBlock._block
-          )
+        if (TrapdoorBlock.match(extensiveBlock)) {
+          const extensiveTrapdoor = new TrapdoorBlock(extensiveBlock._block)
 
           // 方向相同，上下位置相同
           if (
+            extensiveTrapdoor.canBeOpenedByHand() &&
             extensiveTrapdoor.facingDirection.equals(this.facingDirection) &&
             extensiveTrapdoor.upsideOrDown === this.upsideOrDown
           ) {
