@@ -15,6 +15,9 @@
 - `max_trapdoor_length`
     - 允许双开活板门的最大距离
     - 默认：3
+- `should_be_the_same_type`
+    - 是否需要是同种门
+    - 默认：是
 
 ## 多人使用
 

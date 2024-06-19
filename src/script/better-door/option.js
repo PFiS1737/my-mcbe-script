@@ -37,3 +37,18 @@ export const option = optionManager
         ),
     },
   })
+  .addItem({
+    name: "should_be_the_same_type",
+    description: "是否需要是同种门",
+    values: [[true], [false]],
+    defaultValue: true,
+    events: {
+      changed: (selected, original) =>
+        console.warn(
+          "better-door:should_be_the_same_type -> from",
+          original,
+          "to",
+          selected
+        ),
+    },
+  })

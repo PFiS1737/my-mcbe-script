@@ -70,7 +70,10 @@ export class TrapdoorBlock extends WrappedBlock {
     this.setState("open_bit", false)
   }
 
-  getRelated(player, { extensive = true, maxLength = 1 } = {}) {
+  getRelated(
+    player,
+    { extensive = true, maxLength = 1, shouldBeTheSameType = true } = {}
+  ) {
     // 获取可以与该活板门双开的另外一些活板门和这个活板门组成的列表
     const output = [this]
 
@@ -80,8 +83,6 @@ export class TrapdoorBlock extends WrappedBlock {
       //      那么另一个活板门应该位于东边，即 x+1 的位置
       const relatedBlock = this.getNeighbourBlock(this.facingDirection)
 
-      // TODO: should_be_the_same_type
-
       // 2. 判断是否为相关活板门
       if (TrapdoorBlock.match(relatedBlock)) {
         // TODO: refactor _bloc6k
@@ -89,6 +90,9 @@ export class TrapdoorBlock extends WrappedBlock {
         // 方向相反，上下位置相同
         if (
           relatedTrapdoor.canBeOpenedByHand() &&
+          (shouldBeTheSameType
+            ? relatedTrapdoor.typeId === this.typeId
+            : true) &&
           relatedTrapdoor.facingDirection.isOppositeTo(this.facingDirection) &&
           relatedTrapdoor.upsideOrDown === this.upsideOrDown
         )
@@ -117,6 +121,9 @@ export class TrapdoorBlock extends WrappedBlock {
           // 方向相同，上下位置相同
           if (
             extensiveTrapdoor.canBeOpenedByHand() &&
+            (shouldBeTheSameType
+              ? extensiveTrapdoor.typeId === this.typeId
+              : true) &&
             extensiveTrapdoor.facingDirection.equals(this.facingDirection) &&
             extensiveTrapdoor.upsideOrDown === this.upsideOrDown
           ) {

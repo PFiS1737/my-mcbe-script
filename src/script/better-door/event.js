@@ -12,10 +12,14 @@ export const setupListener = () =>
     const { block, source: player } = event
     const playerOption = option.getPlayer(player)
 
+    const shouldBeTheSameType = playerOption.getItemVal(
+      "should_be_the_same_type"
+    )
+
     if (DoorBlock.match(block) && playerOption.getItemVal("door")) {
       event.cancel = true
       // @ts-ignore
-      const doors = DoorBlock.wrap(block).getRelated()
+      const doors = DoorBlock.wrap(block).getRelated({ shouldBeTheSameType })
       asyncRun(() => {
         if (doors[0].opened) each(doors, (_) => _.close())
         else each(doors, (_) => _.open())
@@ -29,6 +33,7 @@ export const setupListener = () =>
       // @ts-ignore
       const trapdoors = TrapdoorBlock.wrap(block).getRelated(player, {
         maxLength,
+        shouldBeTheSameType,
       })
       asyncRun(() => {
         if (trapdoors[0].opened) each(trapdoors, (_) => _.close())

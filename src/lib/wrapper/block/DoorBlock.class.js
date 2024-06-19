@@ -89,7 +89,7 @@ export class DoorBlock extends WrappedBlocks {
     this._lower.setState("open_bit", false)
   }
 
-  getRelated() {
+  getRelated({ shouldBeTheSameType = true } = {}) {
     // 获取可以与该门双开的另一个门和这个门组成的列表
     const output = [this]
 
@@ -124,6 +124,7 @@ export class DoorBlock extends WrappedBlocks {
       // 另一扇门应该方向相同，而门轴相反
       if (
         relatedDoor.canBeOpenedByHand() &&
+        (shouldBeTheSameType ? relatedDoor.typeId === this.typeId : true) &&
         relatedDoor.facingDirection.code === facingDirection.code &&
         relatedDoor.hingeSide === !hingeSide
       )
