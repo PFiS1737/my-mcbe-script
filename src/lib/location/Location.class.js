@@ -2,8 +2,9 @@ import { Vector3, Vector3Utils } from "../vector/index.js"
 
 export class Location extends Vector3 {
   get centerCorrected() {
-    return new Location(
-      ...Vector3Utils.add(this.floored, new Vector3(0.5, 0.5, 0.5))
+    return Location.create(
+      // @ts-ignore
+      Vector3Utils.add(this.floored, new Vector3(0.5, 0.5, 0.5))
     )
   }
 
@@ -13,11 +14,11 @@ export class Location extends Vector3 {
   equals(v) {
     return Vector3Utils.exactEquals(this, v)
   }
+  isNearTo(v, distance) {
+    return this.distanceTo(v) <= distance
+  }
 
   offset(v) {
     return this.add(v)
-  }
-  isNear(v, distance) {
-    return this.distance(v) <= distance
   }
 }

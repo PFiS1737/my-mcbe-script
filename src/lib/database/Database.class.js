@@ -61,6 +61,7 @@ export class Database {
   async set(key, value) {
     await this.delete(key)
     const data = serialize({ [key]: value }).replaceAll('"', "'")
+    // FIXME: has ambiguity
     if (data.length > 32767)
       throw new RangeError(
         "Database: Only accepts a string value less than 32767 characters."
