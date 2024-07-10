@@ -1,9 +1,7 @@
 import md5 from "md5"
-// @ts-ignore
-import { serialize } from "serialize-javascript"
 
 import { asyncRun, getOrAddObjective } from "../util/game"
-import { deserialize, each, eachAsync } from "../util/index"
+import { deserialize, each, eachAsync, serialize } from "../util/index"
 
 export const ALL_DATABASES = new Map()
 

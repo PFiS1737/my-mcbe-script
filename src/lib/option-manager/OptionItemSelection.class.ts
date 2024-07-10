@@ -1,6 +1,3 @@
-// @ts-ignore
-import { serialize } from "serialize-javascript"
-
 import { each } from "../util/index"
 
 import { EventEmitter } from "../EventEmitter.class"
@@ -19,8 +16,6 @@ export class OptionItemSelection {
     this.description = description
     this.values = new Map(
       values.map((value) => {
-        if (typeof value[0] === "object" || value[0] === undefined)
-          value[0] = serialize(value[0])
         if (value[0] === true && !value[1]) value[1] = "开启"
         else if (value[0] === false && !value[1]) value[1] = "关闭"
         return value

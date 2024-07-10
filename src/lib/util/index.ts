@@ -26,6 +26,22 @@ export function safeEval(code, context = {}) {
   return fn(...Object.values(context))
 }
 
+export function serialize(obj): string {
+  if (obj instanceof Set) return `new Set(${serialize(Array.from(obj))})`
+
+  if (obj instanceof Map)
+    return `new Map(${serialize(Array.from(obj.entries()))})`
+
+  if (Array.isArray(obj)) return `[${obj.map(serialize).join(",")}]`
+
+  if (typeof obj === "object" && obj !== null) {
+    return `{${Object.entries(obj)
+      .map(([key, value]) => `${serialize(key)}: ${serialize(value)}`)
+      .join(",")}}`
+  }
+  return JSON.stringify(obj)
+}
+
 export function deserialize(str) {
   try {
     return JSON.parse(str)
