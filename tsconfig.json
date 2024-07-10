@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "strict": true,
+
+    "incremental": true,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": ".build/types",
+    "emitDeclarationOnly": true,
+
+    "baseUrl": "src",
+    "paths": {
+      "@/src/*": ["./*"],
+      "@/lib/*": ["./lib/*"],
+      "@/util/*": ["./lib/util/*"],
+      "@/data/*": ["./data/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

@@ -6,6 +6,11 @@
   "license": "MIT",
   "type": "module",
   "homepage": "https://github.com/PFiS1737/my-mcbe-script#readme",
+  "module": "./dist/index.js",
+  "exports": {
+    "import": "./dist/index.js"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "gulp"
   },
@@ -14,24 +19,26 @@
     "url": "https://github.com/PFiS1737/my-mcbe-script.git"
   },
   "dependencies": {
-    "@minecraft/server": "1.11.0-beta.1.20.80-stable",
-    "@minecraft/server-ui": "1.2.0-beta.1.21.10-preview.22",
-    "@minecraft/vanilla-data": "^1.20.80",
+    "@minecraft/server": "1.12.0-beta.1.21.2-stable",
+    "@minecraft/server-ui": "1.2.0-beta.1.21.2-stable",
+    "@minecraft/vanilla-data": "^1.21.2",
     "md5": "^2.3.0",
     "polyfill-crypto.getrandomvalues": "^1.0.0",
     "serialize-javascript": "^6.0.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.1",
+    "@biomejs/biome": "^1.8.3",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-swc": "^0.3.1",
+    "@swc/core": "^1.6.13",
     "@types/gulp": "^4.0.17",
     "@types/md5": "^2.3.5",
     "@types/serialize-javascript": "^5.0.4",
     "gulp": "^5.0.0",
-    "rollup": "^4.18.0"
+    "rollup": "^4.18.1",
+    "typescript": "^5.5.3"
   },
   "packageManager": "pnpm@9.3.0+sha512.ee7b93e0c2bd11409c6424f92b866f31d3ea1bef5fbe47d3c7500cdc3c9668833d2e55681ad66df5b640c61fa9dc25d546efa54d76d7f8bf54b13614ac293631"
 }
