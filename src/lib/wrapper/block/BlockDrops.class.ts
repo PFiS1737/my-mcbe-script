@@ -225,8 +225,7 @@ export class BlockDrops {
         }
         case FortuneRules.Custom: {
           const lootTable = new LootTable<ItemDropConfig[]>(
-            //@ts-ignore
-            this.custumLootTables[level]
+            this.custumLootTables![`${level}` as "0" | "1" | "2" | "3"]
           )
           const customItemDrop = new DropItemGroup(lootTable.getResult())
           return customItemDrop.getResult()

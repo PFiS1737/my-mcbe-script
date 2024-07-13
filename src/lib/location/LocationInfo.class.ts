@@ -22,7 +22,6 @@ export class LocationInfo {
         }
     dimension: string | Dimension
   }) {
-    //@ts-ignore
     this.location =
       location instanceof Location ? location : Location.create(location)
     this.dimension =

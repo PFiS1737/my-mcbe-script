@@ -15,12 +15,12 @@ interface DialogHandlers<T> {
   dialog: ModalFormData | MessageFormData | ActionFormData
   onClose?: () => Promise<T>
   onSubmit?: (
-    submitted?: NonNullable<ModalFormResponse["formValues"]>
+    submitted: NonNullable<ModalFormResponse["formValues"]>
   ) => Promise<T>
   onSelectButton1?: () => Promise<T>
   onSelectButton2?: () => Promise<T>
   onSelect?: (
-    selected?: NonNullable<ActionFormResponse["selection"]>
+    selected: NonNullable<ActionFormResponse["selection"]>
   ) => Promise<T>
 }
 
@@ -92,13 +92,25 @@ export class Dialog<T> implements DialogHandlers<T> {
       response.cancelationReason === FormCancelationReason.UserClosed
     )
       return await this.onClose()
-    if (response instanceof ModalFormResponse)
+
+    if (response instanceof ModalFormResponse) {
+      if (!response.formValues) throw new Error("Unexpected error.")
+
       return await this.onSubmit(response.formValues)
+    }
+
     if (response instanceof MessageFormResponse) {
       if (response.selection === 0) return await this.onSelectButton1()
       if (response.selection === 1) return await this.onSelectButton2()
-    } else if (response instanceof ActionFormResponse)
+
+      throw new Error("Unexpected error.")
+    }
+
+    if (response instanceof ActionFormResponse) {
+      if (!response.selection) throw new Error("Unexpected error.")
+
       return await this.onSelect(response.selection)
+    }
   }
 }
 

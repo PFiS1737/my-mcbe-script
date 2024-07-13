@@ -57,8 +57,7 @@ export class Database<T extends Serializable> {
   }
   async delete(key: string) {
     if (this.has(key)) {
-      //@ts-ignore
-      const { participant } = this.store.get(key)
+      const { participant } = this.store.get(key)!
       await asyncRun(() => this.objective.removeParticipant(participant))
       this.store.delete(key)
       return true

@@ -32,7 +32,6 @@ export class OptionManager {
     const dialog = new Dialog({
       dialog: form,
       onSelect: async (selection) => {
-        //@ts-ignore
         const name = nameMap[selection]
         await this.getNamesapace(name).getPlayer(player).showDialog(dialog)
       },
