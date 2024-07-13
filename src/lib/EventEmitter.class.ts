@@ -1,4 +1,4 @@
-import { each, eachAsync, isAsyncFunc } from "./util/index"
+import { isAsyncFunc } from "./util/index"
 
 export class EventEmitter {
   _events: Record<string, Function[]> = {}
@@ -36,26 +36,23 @@ export class EventEmitter {
   removeListener(eventName: string, listener: Function) {
     if (this._events[eventName]) {
       const newListeners: Function[] = []
-      each(this._events[eventName], (_listener) => {
+      for (const _listener of this._events[eventName]) {
         if (_listener !== listener) newListeners.push(_listener)
-      })
+      }
       this._events[eventName] = newListeners
     }
     return this
   }
   async emit(eventName: string, ...args: any[]) {
     if (this._events[eventName]) {
-      each(this._events[eventName], (listener) => listener(...args))
+      for (const listener of this._events[eventName]) listener(...args)
     }
     await this.asyncEmit(eventName, ...args)
   }
   async asyncEmit(eventName: string, ...args: any[]) {
     const _eventName = `${eventName}.async`
     if (this._events[_eventName]) {
-      await eachAsync(
-        this._events[_eventName],
-        async (listener) => await listener(...args)
-      )
+      for (const listener of this._events[_eventName]) await listener(...args)
     }
   }
   addListener(eventName: string, listener: Function) {

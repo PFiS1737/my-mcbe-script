@@ -2,7 +2,6 @@ import type { Player } from "@minecraft/server"
 
 import { EventEmitter } from "../EventEmitter.class"
 import { NumberRange } from "../NumberRange.class"
-import { each } from "../util/index"
 
 export interface IOptionItemRange {
   name: string
@@ -46,8 +45,10 @@ export class OptionItemRange {
     this.reload = reload
     this._player = _player
 
-    if (events)
-      each(events, (listener, eventName) => this.events.on(eventName, listener))
+    if (events) {
+      for (const [eventName, listener] of Object.entries(events))
+        this.events.on(eventName, listener)
+    }
 
     if (defaultValue !== undefined && this._includes(defaultValue))
       this.selected = defaultValue

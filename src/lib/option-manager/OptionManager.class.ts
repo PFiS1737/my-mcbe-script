@@ -1,7 +1,6 @@
 import type { Player } from "@minecraft/server"
 import { ActionFormData } from "@minecraft/server-ui"
 import { Dialog } from "../dialog/index"
-import { each } from "../util/index"
 import { OptionNamespace } from "./OptionNamespace.class"
 
 export class OptionManager {
@@ -24,10 +23,10 @@ export class OptionManager {
       .title("设置选项")
       .body("选择要设置的模块：")
     const nameMap: string[] = []
-    each(this.namespaces, ([name]) => {
+    for (const [name] of this.namespaces) {
       nameMap.push(name)
       form.button(name) // TODO: name -> desc
-    })
+    }
 
     const dialog = new Dialog({
       dialog: form,

@@ -10,7 +10,6 @@ import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
 import BlockDefinition from "../../../data/block/index"
 import { NumberRange } from "../../NumberRange.class"
 import { removeMinecraftNamespace } from "../../util/game"
-import { each } from "../../util/index"
 import { binomialDistribution, range } from "../../util/math"
 import { LootTable } from "../LootTable.class"
 
@@ -62,7 +61,9 @@ class DropItemGroup {
   }
   getResult() {
     const output: ReturnType<DropItem["getResult"]> = []
-    each(this.items, (item: DropItem) => output.push(...item.getResult()))
+
+    for (const item of this.items) output.push(...item.getResult())
+
     return output
   }
 }
@@ -159,7 +160,10 @@ export class BlockDrops {
           const rawResource = this.rawResource.getResult()[0]
 
           const lootTable = new LootTable([
-            ...range(2, level + 2),
+            ...range(2, level + 2).map((i) => ({
+              weight: 1,
+              value: i,
+            })),
             {
               weight: 2,
               value: 1,

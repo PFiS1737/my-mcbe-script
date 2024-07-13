@@ -15,7 +15,6 @@ import {
   type Location,
   LocationUtils,
 } from "../../location/index"
-import { each } from "../../util/index"
 import { WrapperTemplate } from "../WrapperTemplate.class"
 import { WrappedItemStack } from "../item/index"
 import { BlockDrops } from "./BlockDrops.class"
@@ -94,21 +93,23 @@ export class WrappedBlock extends WrapperTemplate {
     })()
 
     const spawnDrops = () => {
-      each(result, (drop) => {
+      for (const drop of result) {
         this.dimension.spawnItem(
           new ItemStack(drop.itemId, drop.amount),
           this.location
         )
-        while (drop.xp--)
-          this.dimension.spawnEntity("minecraft:xp_orb", this.location)
-      })
+        if (drop.xp) {
+          while (drop.xp--)
+            this.dimension.spawnEntity("minecraft:xp_orb", this.location)
+        }
+      }
     }
 
     const getTotalDamage = () => {
       let damage = 0
-      each(result, (drop) => {
+      for (const drop of result) {
         if (drop.damage) damage += drop.damage
-      })
+      }
       return damage
     }
 

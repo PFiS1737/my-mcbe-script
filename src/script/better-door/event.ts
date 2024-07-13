@@ -3,7 +3,6 @@ import { world } from "@minecraft/server"
 import { BetterConsole } from "@/lib/BetterConsole.class"
 import { DoorBlock, TrapdoorBlock } from "@/lib/wrapper/block/index"
 import { asyncRun } from "@/util/game"
-import { each } from "@/util/index"
 
 import { option } from "./option"
 
@@ -19,10 +18,13 @@ export const setupListener = () =>
     if (DoorBlock.match(block) && playerOption.getItemVal("door")) {
       event.cancel = true
       // @ts-ignore
-      const doors = DoorBlock.wrap(block).getRelated({ shouldBeTheSameType })
+      const doors = new DoorBlock(block).getRelated({ shouldBeTheSameType })
       asyncRun(() => {
-        if (doors[0].opened) each(doors, (_) => _.close())
-        else each(doors, (_) => _.open())
+        if (doors[0].opened) {
+          for (const door of doors) door.close()
+        } else {
+          for (const door of doors) door.open()
+        }
       }).catch(BetterConsole.error)
     } else if (
       TrapdoorBlock.match(block) &&
@@ -36,8 +38,11 @@ export const setupListener = () =>
         shouldBeTheSameType,
       })
       asyncRun(() => {
-        if (trapdoors[0].opened) each(trapdoors, (_) => _.close())
-        else each(trapdoors, (_) => _.open())
+        if (trapdoors[0].opened) {
+          for (const trapdoor of trapdoors) trapdoor.close()
+        } else {
+          for (const trapdoor of trapdoors) trapdoor.open()
+        }
       }).catch(BetterConsole.error)
     }
   })

@@ -1,5 +1,3 @@
-import { each } from "../util/index"
-
 export class TypeGroup<T> {
   types: Set<T>
 
@@ -8,7 +6,7 @@ export class TypeGroup<T> {
   }
 
   add(...types: T[]) {
-    each(types, (type) => this.types.add(type))
+    for (const type of types) this.types.add(type)
     return this
   }
   has(type: T) {

@@ -1,6 +1,5 @@
 import type { Block } from "@minecraft/server"
 
-import { each } from "../../util/index"
 import { type Vector3, Vector3Utils } from "../../vector/index"
 import type { WrappedBlock } from "./WrappedBlock.class"
 
@@ -16,9 +15,9 @@ export class BlockList<T extends Block | WrappedBlock> {
   }
 
   add(...blocks: T[]) {
-    each(blocks, (block) => {
+    for (const block of blocks) {
       if (!this.has(block)) this.blocks.push(block)
-    })
+    }
   }
   has(block: T) {
     return this.blocks.some(({ location }) =>

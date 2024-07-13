@@ -7,26 +7,20 @@ import type {
 import md5 from "md5"
 
 import { asyncRun, getOrAddObjective } from "../util/game"
-import {
-  type Serializable,
-  deserialize,
-  each,
-  eachAsync,
-  serialize,
-} from "../util/index"
+import { type Serializable, deserialize, serialize } from "../util/index"
 import type { WrappedPlayer } from "../wrapper/entity"
 
 export const ALL_DATABASES = new Map<string, Database<any>>()
 
-export class Database<T extends Serializable> {
+export class Database<V extends Serializable> {
   id: string
   objective: ScoreboardObjective
 
-  static open<U extends Serializable>(
+  static open<T extends Serializable>(
     player: Player | WrappedPlayer,
     dbName: string
   ) {
-    return new Database<U>(player, dbName)
+    return new Database<T>(player, dbName)
   }
   constructor(player: Player | WrappedPlayer, dbName: string) {
     const id = md5(`db:${dbName}_${player.id}`).slice(8, 24)
@@ -41,16 +35,16 @@ export class Database<T extends Serializable> {
     ALL_DATABASES.set(id, this)
   }
 
-  store = new Map<string, { value: T; participant: ScoreboardIdentity }>()
+  store = new Map<string, { value: V; participant: ScoreboardIdentity }>()
 
   _syncDataFromScoreboard() {
     this.store.clear()
-    each(this.objective.getParticipants(), (participant) => {
-      const data = deserialize(participant.displayName) as Record<string, T>
+    for (const participant of this.objective.getParticipants()) {
+      const data = deserialize(participant.displayName) as Record<string, V>
       const key = Object.keys(data)[0]
       const value = data[key]
       this.store.set(key, { value, participant })
-    })
+    }
   }
   has(key: string) {
     return this.store.has(key)
@@ -65,17 +59,15 @@ export class Database<T extends Serializable> {
     return false
   }
   async clear() {
-    await eachAsync(
-      this.store,
-      async ([, { participant }]) =>
-        await asyncRun(() => this.objective.removeParticipant(participant))
-    )
+    for (const [, { participant }] of this.store)
+      await asyncRun(() => this.objective.removeParticipant(participant))
+
     this.store.clear()
   }
   get(key: string) {
     return this.store.get(key)?.value
   }
-  async set(key: string, value: T) {
+  async set(key: string, value: V) {
     await this.delete(key)
     const data = serialize({ [key]: value }).replaceAll('"', "'")
     // FIXME: has ambiguity
@@ -88,17 +80,17 @@ export class Database<T extends Serializable> {
     this._syncDataFromScoreboard()
   }
   getAll() {
-    const output: Record<string, T> = {}
+    const output: Record<string, V> = {}
     for (const [key, value] of this) output[key] = value
     return output
   }
-  *entries(): Generator<[string, T]> {
+  *entries(): Generator<[string, V]> {
     for (const [key, { value }] of this.store.entries()) yield [key, value]
   }
   *keys(): Generator<string> {
     for (const key of this.store.keys()) yield key
   }
-  *values(): Generator<T> {
+  *values(): Generator<V> {
     for (const { value } of this.store.values()) yield value
   }
   [Symbol.iterator]() {

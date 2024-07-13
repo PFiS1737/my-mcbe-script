@@ -3,7 +3,6 @@ import { ModalFormData } from "@minecraft/server-ui"
 
 import { Database } from "../database/index"
 import { Dialog } from "../dialog/index"
-import { each, eachAsync } from "../util/index"
 import { type IOptionItemRange, OptionItemRange } from "./OptionItemRange.class"
 import {
   type IOptionItemSelection,
@@ -36,17 +35,16 @@ export class PlayerOption {
   }
   async _syncToDB() {
     const data = this.getItemValMap()
-    await eachAsync(data, async (value, name) => {
+    for (const [name, value] of Object.entries(data))
       await this.db.set(name, value)
-    })
-    await eachAsync(this.db, async ([name, _]) => {
+
+    for (const [name] of this.db) {
       if (!this.hasItem(name)) await this.db.delete(name)
-    })
+    }
   }
   async _syncFromDB() {
-    each(this.db, ([name, value]) =>
+    for (const [name, value] of this.db)
       this.setItemVal(name, value, undefined, { syncFromDB: true })
-    )
     await this._syncToDB()
   }
   async init() {
@@ -55,6 +53,7 @@ export class PlayerOption {
     }
 
     await this._syncFromDB()
+
     return this.getItemValMap()
   }
 
@@ -91,10 +90,9 @@ export class PlayerOption {
   }
   getItemValMap() {
     // TODO: use map
-    const result = {}
-    each(this.items, (_, name) => {
+    const result: Record<string, any> = {}
+    for (const [name] of Object.entries(this.items))
       result[name] = this.getItemVal(name)
-    })
     return result
   }
   async done(parentDialog?: Dialog<any>) {
@@ -128,13 +126,13 @@ export class PlayerOption {
         | Map<number, number>
     }> = []
 
-    each(this.items, (item) => {
+    for (const [, item] of Object.entries(this.items)) {
       if (item instanceof OptionItemSelection) {
         const { name, description, values, selected } = item
 
         if (values.size === 2 && values.get(true) && values.get(false)) {
           const valuesMap = new Map()
-          each(values, ([e]) => valuesMap.set(e, e))
+          for (const [e] of values) valuesMap.set(e, e)
           nameMap.push({ name, valuesMap })
 
           form.toggle(description, selected)
@@ -142,7 +140,10 @@ export class PlayerOption {
           const valueArray = [...values]
 
           const valuesMap = new Map()
-          each(valueArray, ([e], i) => valuesMap.set(i, e))
+          for (let i = 0; i < valueArray.length; i++) {
+            const [e] = valueArray[i]
+            valuesMap.set(i, e)
+          }
           nameMap.push({ name, valuesMap })
 
           form.dropdown(
@@ -155,12 +156,12 @@ export class PlayerOption {
         const { name, description, range, selected } = item
 
         const valuesMap = new Map()
-        each(range, (i) => valuesMap.set(i, i))
+        for (const i of range) valuesMap.set(i, i)
         nameMap.push({ name, valuesMap })
 
         form.slider(description, range.min, range.max, range.step, selected)
       }
-    })
+    }
 
     const dialog = new Dialog<void>({
       dialog: form,
@@ -168,11 +169,14 @@ export class PlayerOption {
         if (parentDialog) await parentDialog.show(this.player)
       },
       onSubmit: async (result) => {
-        each(result, (valueIndex, nameIndex) => {
+        for (let nameIndex = 0; nameIndex < result.length; nameIndex++) {
+          const valueIndex = result[nameIndex] as number
+
           const { name, valuesMap } = nameMap[nameIndex]
-          const value = valuesMap.get(valueIndex)
+          // FIXME: as never?
+          const value = valuesMap.get(valueIndex as never)
           this.setItemVal(name, value)
-        })
+        }
         await this.done(parentDialog)
       },
     })

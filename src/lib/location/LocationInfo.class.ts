@@ -1,6 +1,7 @@
 import { Dimension, world } from "@minecraft/server"
 
 import { removeMinecraftNamespace } from "../util/game"
+import type { Vector3Like } from "../vector/Vector3.class"
 import { Location } from "./Location.class"
 
 export class LocationInfo {
@@ -11,15 +12,7 @@ export class LocationInfo {
     location,
     dimension,
   }: {
-    location:
-      | Location
-      | number[]
-      | string
-      | {
-          x: number
-          y: number
-          z: number
-        }
+    location: Location | Vector3Like
     dimension: string | Dimension
   }) {
     this.location =

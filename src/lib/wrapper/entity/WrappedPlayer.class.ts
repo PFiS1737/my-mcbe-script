@@ -6,7 +6,6 @@ import {
 } from "@minecraft/server"
 
 import { Commands } from "../../commands/index"
-import { each } from "../../util/index"
 import { EntityContainer } from "../container/index"
 import { WrappedEntity } from "./WrappedEntity.class"
 

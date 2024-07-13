@@ -7,13 +7,16 @@ import {
 import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
 
 import { removeMinecraftNamespace } from "../../util/game"
-import { each } from "../../util/index"
 import { WrapperTemplate } from "../WrapperTemplate.class"
 
 export class WrappedItemStack extends WrapperTemplate {
   _item: ItemStack
   type: ItemStack["type"]
   typeId: MinecraftItemTypes
+  components = new Map<
+    keyof ItemComponentTypeMap,
+    ItemComponentTypeMap[keyof ItemComponentTypeMap]
+  >()
 
   constructor(itemStack: ItemStack) {
     super()
@@ -24,20 +27,14 @@ export class WrappedItemStack extends WrapperTemplate {
     this.typeId = itemStack.typeId as MinecraftItemTypes
 
     const components = itemStack.getComponents()
-    each(components, (component) => {
+    for (const component of components)
       this.components.set(
         removeMinecraftNamespace(
           component.typeId
         ) as keyof ItemComponentTypeMap,
-        component
+        component as ItemComponentTypeMap[keyof ItemComponentTypeMap]
       )
-    })
   }
-
-  components = new Map<
-    keyof ItemComponentTypeMap,
-    ItemComponentTypeMap[keyof ItemComponentTypeMap]
-  >()
 
   hasComponent(componentId: string) {
     return this._item.hasComponent(componentId)

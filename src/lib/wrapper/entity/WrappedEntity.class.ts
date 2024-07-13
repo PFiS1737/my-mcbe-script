@@ -1,10 +1,9 @@
 import type { Entity } from "@minecraft/server"
+import type { MinecraftEntityTypes } from "@minecraft/vanilla-data"
 
 import { Directions, Location } from "../../location/index"
 import { removeMinecraftNamespace } from "../../util/game"
-import { each } from "../../util/index"
 
-import type { MinecraftEntityTypes } from "@minecraft/vanilla-data"
 import { WrapperTemplate } from "../WrapperTemplate.class"
 
 export class WrappedEntity extends WrapperTemplate {
@@ -25,9 +24,8 @@ export class WrappedEntity extends WrapperTemplate {
     this.scoreboardIdentity = entity.scoreboardIdentity
 
     const components = entity.getComponents()
-    each(components, (component) => {
+    for (const component of components)
       this.components.set(removeMinecraftNamespace(component.typeId), component)
-    })
   }
 
   get nameTag() {

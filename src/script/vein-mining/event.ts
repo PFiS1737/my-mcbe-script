@@ -19,7 +19,6 @@ import {
   WrappedItemStack,
 } from "@/lib/wrapper/item/index"
 import { asyncRun } from "@/util/game"
-import { each } from "@/util/index"
 
 import { ENABLE_BLOCKS } from "./config"
 import { option } from "./option"
@@ -83,20 +82,20 @@ export const setupListener = () =>
           totalDamage += result.getTotalDamage()
 
           if (playerOption.getItemVal("auto_collection")) {
-            each(result.drops, (drop) => {
+            for (const drop of result.drops) {
               if (drop.xp) totalXp += drop.xp
 
               totalItems.push(drop)
-            })
+            }
           } else {
             result.spawnDrops()
           }
         }
 
         if (playerOption.getItemVal("auto_collection")) {
-          each(totalItems, ({ itemId, amount }) =>
+          for (const { itemId, amount } of totalItems) {
             player.inventory.addItem(new ItemStack(itemId, amount))
-          )
+          }
           player.addExperience(totalXp)
         }
 
@@ -154,10 +153,10 @@ function getNeighbourBlocks(
 
   const list = new BlockList<WrappedBlock>()
 
-  each(offsets, (offset) => {
+  for (const offset of offsets) {
     const block = basicBlock.getOffsetBlock(offset)
     if (block.typeId === blockTypeId) list.add(block)
-  })
+  }
 
   return list
 }

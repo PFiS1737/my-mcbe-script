@@ -3,7 +3,6 @@ import type { Player } from "@minecraft/server"
 import { Database } from "@/lib/database/index"
 import { Dialog } from "@/lib/dialog/index"
 import { LocationInfo } from "@/lib/location/index"
-import { each } from "@/util/index"
 
 export const ALL_PLAYER_DATABASES = new Map<Player, TpxDB>()
 
@@ -76,7 +75,8 @@ export class TpxDB {
       disposable: boolean
       text: string
     }> = []
-    each(this.db, ([name, { info: data, disposable }]) => {
+
+    for (const [name, { info: data, disposable }] of this.db) {
       const info = new LocationInfo(data)
       output.push({
         name,
@@ -84,7 +84,8 @@ export class TpxDB {
         disposable,
         text: `${name} (${info})${disposable ? " [一次性]" : ""}`,
       })
-    })
+    }
+
     return output
   }
 }

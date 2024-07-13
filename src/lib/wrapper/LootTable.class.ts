@@ -1,4 +1,3 @@
-import { each } from "../util/index"
 import { withProbability } from "../util/math"
 
 export interface ILootTableItemConfig<T> {
@@ -7,12 +6,10 @@ export interface ILootTableItemConfig<T> {
 }
 
 export class LootTable<T = number> {
-  constructor(items: Array<number | ILootTableItemConfig<T>>) {
-    if (items)
-      each(items, (item) => {
-        if (typeof item === "number") this.addItem({ weight: 1, value: item })
-        else this.addItem(item)
-      })
+  constructor(items: Array<ILootTableItemConfig<T>>) {
+    if (items) {
+      for (const item of items) this.addItem(item)
+    }
   }
 
   table = new Set<ILootTableItemConfig<T>>()

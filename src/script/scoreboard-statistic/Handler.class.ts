@@ -13,7 +13,6 @@ import {
   asyncRun,
   getOrAddObjective,
 } from "@/util/game"
-import { eachAsync } from "@/util/index"
 
 import CRITERIA from "./criteria/index"
 import { ALL_PLAYER_DATABASES, type EventDB, globalDB } from "./db"
@@ -126,14 +125,14 @@ export class Handler {
       },
     })
 
-    await eachAsync(tigger.events, async ({ options, listener }, eventName) => {
-      if (options)
-        await asyncRun(() =>
-          world.afterEvents[eventName].subscribe(listener, options)
-        )
-      else
-        await asyncRun(() => world.afterEvents[eventName].subscribe(listener)) // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
-    })
+    for (const [eventName, { options, listener }] of Object.entries(
+      tigger.events
+    )) {
+      await asyncRun(() =>
+        //@ts-ignore
+        world.afterEvents[eventName].subscribe(listener, options)
+      )
+    }
 
     await this.playerDB.add(objectiveId, tigger.events)
 
@@ -144,9 +143,15 @@ export class Handler {
     if (!this.playerDB.has(objectiveId)) return false
 
     const events = this.playerDB.getEvents(objectiveId)
-    await eachAsync(events, async ({ listener }, eventName) => {
-      await asyncRun(() => world.afterEvents[eventName].unsubscribe(listener))
-    })
+
+    if (!events) throw new Error("Unexpected error.")
+
+    for (const [eventName, { listener }] of Object.entries(events)) {
+      await asyncRun(() =>
+        //@ts-ignore
+        world.afterEvents[eventName].unsubscribe(listener)
+      )
+    }
     await this.playerDB.delete(objectiveId)
 
     return true

@@ -4,6 +4,7 @@ import {
   type ItemStack,
 } from "@minecraft/server"
 
+import { MinecraftEnchantmentTypes } from "@minecraft/vanilla-data"
 import { withProbability } from "../../util/math"
 import { WrappedItemStack } from "./WrappedItemStack.class"
 
@@ -50,7 +51,9 @@ export class ItemStackWithDurability extends WrappedItemStack {
   }
 
   applyDamage(damage: number) {
-    const unbreakingLevel = this.enchants.getEnchantment("unbreaking")?.level
+    const unbreakingLevel = this.enchants.getEnchantment(
+      MinecraftEnchantmentTypes.Unbreaking
+    )?.level
     const probability =
       (
         this.components.get(

@@ -1,7 +1,6 @@
 import type { Player } from "@minecraft/server"
 
 import { EventEmitter } from "../EventEmitter.class"
-import { each } from "../util/index"
 
 export interface IOptionItemSelection<T extends string | number | boolean> {
   name: string
@@ -50,8 +49,10 @@ export class OptionItemSelection<T extends string | number | boolean> {
     this.reload = reload
     this._player = _player
 
-    if (events)
-      each(events, (listener, eventName) => this.events.on(eventName, listener))
+    if (events) {
+      for (const [eventName, listener] of Object.entries(events))
+        this.events.on(eventName, listener)
+    }
 
     if (defaultValue !== undefined && this.hasVal(defaultValue))
       this.selected = defaultValue

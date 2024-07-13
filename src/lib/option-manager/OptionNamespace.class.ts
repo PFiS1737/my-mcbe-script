@@ -1,7 +1,6 @@
 import type { Player } from "@minecraft/server"
 
 import { waitForFirstPlayerInitialSpawn } from "../util/game"
-import { each, eachAsync } from "../util/index"
 import type { IOptionItemRange } from "./OptionItemRange.class"
 import type { IOptionItemSelection } from "./OptionItemSelection.class"
 import { PlayerOption } from "./PlayerOption.class"
@@ -14,7 +13,7 @@ export class OptionNamespace {
   }
 
   players = new Map<Player, PlayerOption>()
-  _items = new Set()
+  _items = new Set<IOptionItemSelection<any> | IOptionItemRange>()
 
   addItem(opts: IOptionItemSelection<any> | IOptionItemRange) {
     this._items.add(opts)
@@ -23,10 +22,13 @@ export class OptionNamespace {
   applyPlayer(player: Player) {
     if (this.players.has(player)) return this.players.get(player)
     const playerOpt = new PlayerOption(player, this.name)
-    each(this._items, (item) => {
+    for (const item of this._items) {
+      //@ts-ignore
       item._player = player
+      //@ts-ignore
       playerOpt.addItem(item)
-    })
+    }
+
     this.players.set(player, playerOpt)
     return playerOpt
   }
@@ -35,11 +37,11 @@ export class OptionNamespace {
     return this.applyPlayer(player)
   }
   async init() {
-    const valueMap = new Map()
-    await eachAsync(this.players, async ([player, playerOpt]) => {
+    const valueMap = new Map<Player, any>()
+    for (const [player, playerOpt] of this.players) {
       const result = await playerOpt.init()
       valueMap.set(player, result)
-    })
+    }
     this.applyPlayer = () => {
       throw new Error("Can't apply player after initialization.")
     }
