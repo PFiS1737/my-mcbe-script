@@ -401,7 +401,6 @@ class Database {
     }
     async delete(key) {
         if (this.has(key)) {
-            //@ts-ignore
             const { participant } = this.store.get(key);
             await asyncRun(()=>this.objective.removeParticipant(participant));
             this.store.delete(key);
@@ -478,11 +477,19 @@ class Dialog {
             response = await this.dialog.show(target);
         }while (response.cancelationReason === FormCancelationReason.UserBusy)
         if (response.canceled && response.cancelationReason === FormCancelationReason.UserClosed) return await this.onClose();
-        if (response instanceof ModalFormResponse) return await this.onSubmit(response.formValues);
+        if (response instanceof ModalFormResponse) {
+            if (!response.formValues) throw new Error("Unexpected error.");
+            return await this.onSubmit(response.formValues);
+        }
         if (response instanceof MessageFormResponse) {
             if (response.selection === 0) return await this.onSelectButton1();
             if (response.selection === 1) return await this.onSelectButton2();
-        } else if (response instanceof ActionFormResponse) return await this.onSelect(response.selection);
+            throw new Error("Unexpected error.");
+        }
+        if (response instanceof ActionFormResponse) {
+            if (!response.selection) throw new Error("Unexpected error.");
+            return await this.onSelect(response.selection);
+        }
     }
     constructor({ dialog, onClose = async ()=>({}), onSubmit = async ()=>({}), onSelectButton1 = async ()=>({}), onSelectButton2 = async ()=>({}), onSelect = async ()=>({}) }){
         this.dialog = dialog;
@@ -1077,7 +1084,6 @@ class LocationInfo {
         return this;
     }
     constructor({ location, dimension }){
-        //@ts-ignore
         this.location = location instanceof Location ? location : Location.create(location);
         this.dimension = dimension instanceof Dimension ? dimension : world.getDimension(dimension);
     }
@@ -1509,7 +1515,6 @@ class OptionManager {
         const dialog = new Dialog({
             dialog: form,
             onSelect: async (selection)=>{
-                //@ts-ignore
                 const name = nameMap[selection];
                 await this.getNamesapace(name).getPlayer(player).showDialog(dialog);
             }
