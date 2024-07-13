@@ -1,5 +1,4 @@
 import { WrapperTemplate } from "../WrapperTemplate.class"
-
 import type { WrappedBlock } from "./WrappedBlock.class"
 
 export class WrappedBlocks extends WrapperTemplate {

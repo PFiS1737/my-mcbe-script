@@ -6,6 +6,7 @@ import {
 } from "@/data/block/types"
 import { BlockPermutation } from "@minecraft/server"
 import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
+
 import BlockDefinition from "../../../data/block/index"
 import { NumberRange } from "../../NumberRange.class"
 import { removeMinecraftNamespace } from "../../util/game"

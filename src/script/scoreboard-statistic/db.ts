@@ -1,5 +1,7 @@
-import { Database } from "@/lib/database/index"
 import type { Player } from "@minecraft/server"
+
+import { Database } from "@/lib/database/index"
+
 import type { Criteria } from "./criteria/types"
 
 export const globalDB = new Database<string>(

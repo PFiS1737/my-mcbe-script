@@ -8,6 +8,7 @@ import type {
   MinecraftBlockTypes,
   MinecraftItemTypes,
 } from "@minecraft/vanilla-data"
+
 import {
   BlockLocation,
   type Direction,

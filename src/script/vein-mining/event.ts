@@ -1,7 +1,13 @@
 import { ItemStack, world } from "@minecraft/server"
+import type {
+  MinecraftBlockTypes,
+  MinecraftItemTypes,
+} from "@minecraft/vanilla-data"
 
 import { BetterConsole } from "@/lib/BetterConsole.class"
 import { BlockLocation } from "@/lib/location/index"
+import type { PlayerOption } from "@/lib/option-manager/PlayerOption.class"
+import type { BlockDrops } from "@/lib/wrapper/block/BlockDrops.class"
 import {
   BlockList,
   BlockTypeGroups,
@@ -15,12 +21,6 @@ import {
 import { asyncRun } from "@/util/game"
 import { each } from "@/util/index"
 
-import type { PlayerOption } from "@/src/lib/option-manager/PlayerOption.class"
-import type { BlockDrops } from "@/src/lib/wrapper/block/BlockDrops.class"
-import type {
-  MinecraftBlockTypes,
-  MinecraftItemTypes,
-} from "@minecraft/vanilla-data"
 import { ENABLE_BLOCKS } from "./config"
 import { option } from "./option"
 

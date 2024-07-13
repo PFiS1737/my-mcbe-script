@@ -1,3 +1,4 @@
+import type { Player, RawMessage } from "@minecraft/server"
 import {
   type ActionFormData,
   ActionFormResponse,
@@ -8,7 +9,6 @@ import {
   ModalFormResponse,
 } from "@minecraft/server-ui"
 
-import type { Player, RawMessage } from "@minecraft/server"
 import { asyncRun } from "../util/game"
 
 interface DialogHandlers<T> {

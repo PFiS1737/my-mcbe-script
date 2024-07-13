@@ -1,4 +1,5 @@
 import type { Vector3 as IVector3 } from "@minecraft/server"
+
 import { serialize } from "../util"
 
 /**

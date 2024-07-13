@@ -1,10 +1,11 @@
-import md5 from "md5"
-
 import type {
   Player,
   ScoreboardIdentity,
   ScoreboardObjective,
 } from "@minecraft/server"
+
+import md5 from "md5"
+
 import { asyncRun, getOrAddObjective } from "../util/game"
 import {
   type Serializable,

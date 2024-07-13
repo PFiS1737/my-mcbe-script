@@ -1,9 +1,7 @@
 import type { Block, Player } from "@minecraft/server"
 
 import { Directions } from "../../location/index"
-
 import { WrappedPlayer } from "../entity/index"
-
 import { WrappedBlock } from "./WrappedBlock.class"
 
 import {

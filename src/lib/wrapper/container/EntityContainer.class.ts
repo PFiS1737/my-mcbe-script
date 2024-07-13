@@ -1,4 +1,5 @@
 import type { Container, Entity, ItemStack } from "@minecraft/server"
+
 import type { WrappedEntity } from "../entity"
 import { WrappedContainer } from "./WrappedContainer.class"
 

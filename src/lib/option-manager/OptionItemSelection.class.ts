@@ -1,7 +1,7 @@
-import { each } from "../util/index"
-
 import type { Player } from "@minecraft/server"
+
 import { EventEmitter } from "../EventEmitter.class"
+import { each } from "../util/index"
 
 export interface IOptionItemSelection<T extends string | number | boolean> {
   name: string

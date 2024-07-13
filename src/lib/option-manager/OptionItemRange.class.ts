@@ -1,4 +1,5 @@
 import type { Player } from "@minecraft/server"
+
 import { EventEmitter } from "../EventEmitter.class"
 import { NumberRange } from "../NumberRange.class"
 import { each } from "../util/index"

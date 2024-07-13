@@ -1,6 +1,8 @@
+import type { Player } from "@minecraft/server"
+
 import { Commands } from "@/lib/commands/index"
 import { asyncRun, errorHandler } from "@/util/game"
-import type { Player } from "@minecraft/server"
+
 import { Handler } from "./Handler.class"
 import { option } from "./option"
 

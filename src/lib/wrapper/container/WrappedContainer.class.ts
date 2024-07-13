@@ -1,4 +1,5 @@
 import type { Container, ItemStack } from "@minecraft/server"
+
 import { WrapperTemplate } from "../WrapperTemplate.class"
 
 export class WrappedContainer extends WrapperTemplate {

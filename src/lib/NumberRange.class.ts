@@ -1,4 +1,5 @@
 import type { NumberRange as INumberRange } from "@minecraft/common"
+
 import { range } from "./util/math"
 
 export class NumberRange implements INumberRange {

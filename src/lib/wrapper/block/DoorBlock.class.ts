@@ -1,7 +1,6 @@
 import type { Block } from "@minecraft/server"
 
 import { BlockLocation, Directions } from "../../location/index"
-
 import { WrappedBlock } from "./WrappedBlock.class"
 import { WrappedBlocks } from "./WrappedBlocks.class"
 

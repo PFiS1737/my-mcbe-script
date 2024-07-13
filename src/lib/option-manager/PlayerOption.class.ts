@@ -1,5 +1,6 @@
 import type { Player } from "@minecraft/server"
 import { ModalFormData } from "@minecraft/server-ui"
+
 import { Database } from "../database/index"
 import { Dialog } from "../dialog/index"
 import { each, eachAsync } from "../util/index"

@@ -1,4 +1,5 @@
 import type { Player } from "@minecraft/server"
+
 import { waitForFirstPlayerInitialSpawn } from "../util/game"
 import { each, eachAsync } from "../util/index"
 import type { IOptionItemRange } from "./OptionItemRange.class"

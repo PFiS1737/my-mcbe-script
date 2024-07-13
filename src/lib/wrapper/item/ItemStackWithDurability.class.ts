@@ -3,6 +3,7 @@ import {
   type ItemDurabilityComponent,
   type ItemStack,
 } from "@minecraft/server"
+
 import { withProbability } from "../../util/math"
 import { WrappedItemStack } from "./WrappedItemStack.class"
 

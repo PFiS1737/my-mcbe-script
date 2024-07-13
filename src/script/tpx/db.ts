@@ -1,9 +1,9 @@
-import { each } from "@/util/index"
+import type { Player } from "@minecraft/server"
 
 import { Database } from "@/lib/database/index"
 import { Dialog } from "@/lib/dialog/index"
 import { LocationInfo } from "@/lib/location/index"
-import type { Player } from "@minecraft/server"
+import { each } from "@/util/index"
 
 export const ALL_PLAYER_DATABASES = new Map<Player, TpxDB>()
 

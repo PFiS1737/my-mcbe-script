@@ -1,7 +1,8 @@
+import type { Player } from "@minecraft/server"
+
 import { Dialog } from "@/lib/dialog/index"
 import { asyncRun, errorHandler } from "@/util/game"
 
-import type { Player } from "@minecraft/server"
 import { Handler } from "./Handler.class"
 import { option } from "./option"
 

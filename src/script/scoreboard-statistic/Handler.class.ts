@@ -1,3 +1,11 @@
+import {
+  DisplaySlotId,
+  GameMode,
+  ObjectiveSortOrder,
+  type Player,
+  world,
+} from "@minecraft/server"
+
 import type { PlayerOption } from "@/lib/option-manager/PlayerOption.class"
 import { WrappedPlayer } from "@/lib/wrapper/entity/index"
 import {
@@ -6,13 +14,7 @@ import {
   getOrAddObjective,
 } from "@/util/game"
 import { eachAsync } from "@/util/index"
-import {
-  DisplaySlotId,
-  GameMode,
-  ObjectiveSortOrder,
-  type Player,
-  world,
-} from "@minecraft/server"
+
 import CRITERIA from "./criteria/index"
 import { ALL_PLAYER_DATABASES, type EventDB, globalDB } from "./db"
 import { option } from "./option"

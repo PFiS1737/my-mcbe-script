@@ -7,9 +7,7 @@ import {
 
 import { Commands } from "../../commands/index"
 import { each } from "../../util/index"
-
 import { EntityContainer } from "../container/index"
-
 import { WrappedEntity } from "./WrappedEntity.class"
 
 export class WrappedPlayer extends WrappedEntity {

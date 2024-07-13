@@ -1,11 +1,11 @@
 import {
-  type ItemComponent,
   type ItemComponentTypeMap,
   ItemComponentTypes,
   type ItemEnchantableComponent,
   type ItemStack,
 } from "@minecraft/server"
 import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
+
 import { removeMinecraftNamespace } from "../../util/game"
 import { each } from "../../util/index"
 import { WrapperTemplate } from "../WrapperTemplate.class"

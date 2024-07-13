@@ -1,4 +1,5 @@
 import type { Block } from "@minecraft/server"
+
 import { each } from "../../util/index"
 import { type Vector3, Vector3Utils } from "../../vector/index"
 import type { WrappedBlock } from "./WrappedBlock.class"

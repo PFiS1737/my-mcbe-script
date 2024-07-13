@@ -1,4 +1,5 @@
-import type { Entity, ScoreboardIdentity } from "@minecraft/server"
+import type { Entity } from "@minecraft/server"
+
 import { Directions, Location } from "../../location/index"
 import { removeMinecraftNamespace } from "../../util/game"
 import { each } from "../../util/index"

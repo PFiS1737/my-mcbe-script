@@ -1,7 +1,8 @@
+import type { Player } from "@minecraft/server"
+
+import type { PlayerOption } from "@/lib/option-manager/PlayerOption.class"
 import { asyncRun } from "@/util/game"
 
-import type { PlayerOption } from "@/src/lib/option-manager/PlayerOption.class"
-import type { Player } from "@minecraft/server"
 import { ALL_PLAYER_DATABASES, type TpxDB } from "./db"
 import { option } from "./option"
 
