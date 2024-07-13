@@ -46,7 +46,7 @@ function deserialize(str) {
     }
 }
 function isAsyncFunc(func) {
-    return func[Symbol.toStringTag] === "AsyncFunction";
+    return Object.prototype.toString.call(func) === "[object AsyncFunction]";
 }
 
 const overworld = world.getDimension(MinecraftDimensionTypes.overworld);
@@ -67,11 +67,10 @@ class Commands {
             else return await target.runCommandAsync(commandString);
         } else throw new TypeError("Target must be Entity or Dimension.");
     }
-    static register(prefix, command, /* grammar, */ callback) {
+    static register(prefix, command, callback) {
         if (prefix.startsWith("/")) throw new Error("Unable to register slash commands.");
         const regex = new RegExp(`^${prefix}${command}( |$)`);
         const runner = async (commandString, target)=>{
-            // callback(new Parser(commandString, grammar), target)
             const argv = commandString.split(/(".*?"|[^"\s]+)+(?=\s*|\s*$)/g).filter((e)=>e.trim().length > 0);
             await callback(argv, target);
         };
@@ -104,412 +103,6 @@ function range(from, to, step = 1) {
 /**
  * Class representing an N-dimensional vector.
  */ class VectorN {
-    /**
-   * Create a vector.
-   * @param {Array<number>|string} vector - The vector wrote in array or string.
-   * @returns {VectorN} The vector.
-   */ static create(vector) {
-        if (Array.isArray(vector)) return new this(...vector);
-        if (typeof vector === "string") return this.parse(vector);
-    }
-    /**
-   * Parse a string to vector.
-   * @param {string} vectorStr - The string to parse.
-   * @returns {VectorN} The vector.
-   */ static parse(vectorStr) {
-        return this.create(vectorStr.split(" ").map(Number));
-    }
-    /**
-   * Convert the vector to a string.
-   * @returns {string} The string representation of the vector.
-   */ stringify() {
-        // @ts-ignore
-        return this[Symbol.toPrimitive]("string");
-    }
-    /**
-   * Convert the vector to an array.
-   * @returns {Array<number>} The array representation of the vector.
-   */ toArray() {
-        return [
-            ...this
-        ];
-    }
-    /**
-   * Convert the vector to a primitive value.
-   * @param {string} hint - The type hint.
-   * @returns {string|VectorN} The string representation or the vector itself.
-   */ [Symbol.toPrimitive](hint) {
-        if (hint === "string") return this.axes.join(" ");
-        return this;
-    }
-    /**
-   * Iterator for the vector axes.
-   * @returns {Iterator<number>} The iterator for the axes.
-   */ [Symbol.iterator]() {
-        return this.axes[Symbol.iterator]();
-    }
-    /**
-   * Get the number of dimensions of the vector.
-   * @returns {number} The number of dimensions.
-   */ get dimensions() {
-        return this.axes.length;
-    }
-    /**
-   * Get an axis of the vector by index.
-   * @param {number} index - The index of the component.
-   * @returns {number} The component value.
-   */ get(index) {
-        return this.axes[index];
-    }
-    /**
-   * Set an axis of the vector by index.
-   * @param {number} index - The index of the component.
-   * @param {number} value - The value to set.
-   */ set(index, value) {
-        this.axes[index] = value;
-    }
-    /**
-   * Apply a function to each axes of the vector and return a new vector.
-   * @param {function(number, number): number} callbackfn - The function to apply.
-   * @returns {VectorN} The new vector.
-   */ map(callbackfn) {
-        return VectorN.create(this.axes.map(callbackfn));
-    }
-    /**
-   * Create a vector.
-   * @param {...number} axes - The axes of the vector.
-   */ constructor(...axes){
-        this.axes = axes;
-    }
-}
-
-/**
- * Utility class for operations on N-dimensional vectors.
- */ class VectorNUtils {
-    /**
-   * Create a vector.
-   * @param {Array<number>} vector - The vector write in array.
-   * @returns {VectorN} The vector.
-   */ static create(vector) {
-        return VectorN.create(vector);
-    }
-    /**
-   * Clone a vector.
-   * @param {VectorN} a - The vector to clone.
-   * @returns {VectorN} The cloned vector.
-   */ static clone(a) {
-        return this.create(a.toArray());
-    }
-    /**
-   * Assert that two vectors have the same dimensions.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @throws Will throw an error if the vectors do not have the same dimensions.
-   */ static _assertDimensions(a, b) {
-        if (a.dimensions !== b.dimensions) throw new Error("Vectors must have the same dimensions.");
-    }
-    /**
-   * Add two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {VectorN} The resulting vector.
-   */ static add(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.map((val, index)=>val + b.get(index));
-    }
-    /**
-   * Subtract one vector from another.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {VectorN} The resulting vector.
-   */ static subtract(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.map((val, index)=>val - b.get(index));
-    }
-    /**
-   * Multiply two vectors component-wise.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {VectorN} The resulting vector.
-   */ static multiply(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.map((val, index)=>val * b.get(index));
-    }
-    /**
-   * Divide one vector by another component-wise.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {VectorN} The resulting vector.
-   */ static divide(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.map((val, index)=>val / b.get(index));
-    }
-    /**
-   * Scale a vector by a scalar.
-   * @param {VectorN} a - The vector to scale.
-   * @param {number} n - The scalar value.
-   * @returns {VectorN} The resulting vector.
-   */ static scale(a, n) {
-        return a.map((val)=>val * n);
-    }
-    /**
-   * Negate a vector.
-   * @param {VectorN} a - The vector to negate.
-   * @returns {VectorN} The resulting vector.
-   */ static negate(a) {
-        return a.map((val)=>-val);
-    }
-    /**
-   * Invert a vector component-wise.
-   * @param {VectorN} a - The vector to invert.
-   * @returns {VectorN} The resulting vector.
-   */ static inverse(a) {
-        return a.map((val)=>1 / val);
-    }
-    /**
-   * Exchange two axes of a vector.
-   * @param {VectorN} a - The vector to modify.
-   * @param {number} axis1 - The first axis to exchange.
-   * @param {number} axis2 - The second axis to exchange
-   * @returns {VectorN} The resulting vector.
-   * @throws Will throw an error if the length of the axes array is not 2.
-   */ static exchange(a, axis1, axis2) {
-        const output = this.clone(a);
-        const n0 = output.get(axis1);
-        const n1 = output.get(axis2);
-        output.set(axis1, n1);
-        output.set(axis2, n0);
-        return output;
-    }
-    /**
-   * Check if two vectors are exactly equal.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {boolean} True if the vectors are exactly equal, otherwise false.
-   */ static exactEquals(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.axes.every((val, index)=>val === b.get(index));
-    }
-    /**
-   * Check if two vectors are approximately equal.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {boolean} True if the vectors are approximately equal, otherwise false.
-   */ static equals(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.axes.every((val, index)=>equals(val, b.get(index)));
-    }
-    /**
-   * Get the component-wise maximum of multiple vectors.
-   * @param {...VectorN} vectors - The vectors to compare.
-   * @returns {VectorN} The resulting vector.
-   */ static max(...vectors) {
-        const length = vectors[0].dimensions;
-        const maxAxes = vectors.reduce((acc, vector)=>{
-            vector.axes.forEach((val, index)=>{
-                if (val > acc[index]) acc[index] = val;
-            });
-            return acc;
-        }, new Array(length).fill(Number.NEGATIVE_INFINITY));
-        return this.create(maxAxes);
-    }
-    /**
-   * Get the component-wise minimum of multiple vectors.
-   * @param {...VectorN} vectors - The vectors to compare.
-   * @returns {VectorN} The resulting vector.
-   */ static min(...vectors) {
-        const length = vectors[0].dimensions;
-        const minAxes = vectors.reduce((acc, vector)=>{
-            vector.axes.forEach((val, index)=>{
-                if (val < acc[index]) acc[index] = val;
-            });
-            return acc;
-        }, new Array(length).fill(Number.POSITIVE_INFINITY));
-        return this.create(minAxes);
-    }
-    /**
-   * Apply the floor function to each component of a vector.
-   * @param {VectorN} a - The vector to modify.
-   * @returns {VectorN} The resulting vector.
-   */ static floor(a) {
-        return a.map((val)=>Math.floor(val));
-    }
-    /**
-   * Apply the ceil function to each component of a vector.
-   * @param {VectorN} a - The vector to modify.
-   * @returns {VectorN} The resulting vector.
-   */ static ceil(a) {
-        return a.map((val)=>Math.ceil(val));
-    }
-    /**
-   * Apply the round function to each component of a vector.
-   * @param {VectorN} a - The vector to modify.
-   * @returns {VectorN} The resulting vector.
-   */ static round(a) {
-        return a.map((val)=>round(val));
-    }
-    /**
-   * Apply the absolute value function to each component of a vector.
-   * @param {VectorN} a - The vector to modify.
-   * @returns {VectorN} The resulting vector.
-   */ static abs(a) {
-        return a.map((val)=>Math.abs(val));
-    }
-    /**
-   * Get the vector with the maximum magnitude from a list of vectors.
-   * @param {...VectorN} vectors - The vectors to compare.
-   * @returns {VectorN} The vector with the maximum magnitude.
-   */ static maxMagnitude(...vectors) {
-        return vectors.reduce((prev, curr)=>VectorNUtils.magnitude(curr) > VectorNUtils.magnitude(prev) ? curr : prev);
-    }
-    /**
-   * Get the vector with the minimum magnitude from a list of vectors.
-   * @param {...VectorN} vectors - The vectors to compare.
-   * @returns {VectorN} The vector with the minimum magnitude.
-   */ static minMagnitude(...vectors) {
-        return vectors.reduce((prev, curr)=>VectorNUtils.magnitude(curr) < VectorNUtils.magnitude(prev) ? curr : prev);
-    }
-    /**
-   * Calculate the magnitude of a vector.
-   * @param {VectorN} a - The vector to calculate the magnitude of.
-   * @returns {number} The magnitude of the vector.
-   */ static magnitude(a) {
-        return Math.sqrt(VectorNUtils.squaredMagnitude(a));
-    }
-    /**
-   * Calculate the squared magnitude of a vector.
-   * @param {VectorN} a - The vector to calculate the squared magnitude of.
-   * @returns {number} The squared magnitude of the vector.
-   */ static squaredMagnitude(a) {
-        return a.axes.reduce((sum, val)=>sum + val ** 2, 0);
-    }
-    /**
-   * Calculate the distance between two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {number} The distance between the vectors.
-   */ static distance(a, b) {
-        return Math.sqrt(VectorNUtils.squaredDistance(a, b));
-    }
-    /**
-   * Calculate the squared distance between two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {number} The squared distance between the vectors.
-   */ static squaredDistance(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.axes.reduce((sum, val, index)=>{
-            const diff = val - b.get(index);
-            return sum + diff ** 2;
-        }, 0);
-    }
-    /**
-   * Calculate the dot product of two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {number} The dot product of the vectors.
-   */ static dot(a, b) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.axes.reduce((sum, val, index)=>sum + val * b.get(index), 0);
-    }
-    /**
-   * Normalize a vector.
-   * @param {VectorN} a - The vector to normalize.
-   * @returns {VectorN} The normalized vector.
-   */ static normalize(a) {
-        const magnitude = this.magnitude(a);
-        if (magnitude) return this.scale(a, 1 / magnitude);
-        return this.create(new Array(a.dimensions).fill(0));
-    }
-    /**
-   * Calculate the angle between two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @returns {number} The angle between the vectors in radians.
-   */ static angle(a, b) {
-        const cosOmega = this.dot(this.normalize(a), this.normalize(b));
-        return Math.acos(cosOmega);
-    }
-    /**
-   * Generate a random vector.
-   * @param {number} dimensions - The number of dimensions.
-   * @param {number} [scale=1] - The scale of the random components.
-   * @returns {VectorN} The random vector.
-   */ static random(dimensions, scale = 1) {
-        const axes = Array.from({
-            length: dimensions
-        }, ()=>Math.random() * 2 - 1);
-        return this.scale(this.create(axes), scale);
-    }
-    /**
-   * Perform linear interpolation between two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @param {number} t - The interpolation parameter.
-   * @returns {VectorN} The interpolated vector.
-   */ static lerp(a, b, t) {
-        VectorNUtils._assertDimensions(a, b);
-        return a.map((val, index)=>val * (1 - t) + b.get(index) * t);
-    }
-    /**
-   * Perform spherical linear interpolation between two vectors.
-   * @param {VectorN} a - The first vector.
-   * @param {VectorN} b - The second vector.
-   * @param {number} t - The interpolation parameter.
-   * @returns {VectorN} The interpolated vector.
-   */ static slerp(a, b, t) {
-        if (t <= 0) return this.clone(a);
-        if (t >= 1) return this.clone(b);
-        const omega = this.angle(a, b);
-        const sinOmega = Math.sin(omega);
-        if (sinOmega <= Number.EPSILON) return this.lerp(a, b, t);
-        const ratioA = Math.sin(omega * (1 - t)) / sinOmega;
-        const ratioB = Math.sin(omega * t) / sinOmega;
-        return a.map((val, index)=>val * ratioA + b.get(index) * ratioB);
-    }
-    /**
-   * Perform Bezier interpolation between vectors.
-   * @param {VectorN[]} points - The control points.
-   * @param {number} t - The interpolation parameter.
-   * @returns {VectorN} The interpolated vector.
-   */ static bezier(points, t) {
-        const n = points.length - 1;
-        if (!n) return points[0];
-        const newPoints = [];
-        for(let i = 0; i < n; i++){
-            newPoints.push(this.lerp(points[i], points[i + 1], t));
-        }
-        return this.bezier(newPoints, t);
-    }
-}
-
-/**
- * Utility class for operations on 3D vectors.
- */ class Vector3Utils extends VectorNUtils {
-    /**
-   * @param {Array<number>|string|{x:number,y:number,z:number}} vector - The vector write in array.
-   * @returns {Vector3} The vector.
-   */ static create(vector) {
-        return Vector3.create(vector);
-    }
-    /**
-   * Calculate the cross product of two 3D vectors.
-   * @param {Vector3} a - The first vector.
-   * @param {Vector3} b - The second vector.
-   * @returns {Vector3} The cross product of the vectors.
-   */ static cross(a, b) {
-        return this.create([
-            a.y * b.z - a.z * b.y,
-            a.z * b.x - a.x * b.z,
-            a.x * b.y - a.y * b.x
-        ]);
-    }
-}
-
-/**
- * Class representing a 3-dimensional vector.
- * @extends VectorN
- */ class Vector3 extends VectorN {
     get x() {
         return this.get(0);
     }
@@ -528,14 +121,428 @@ function range(from, to, step = 1) {
     set z(value) {
         this.set(2, value);
     }
+    get w() {
+        return this.get(3);
+    }
+    set w(value) {
+        this.set(3, value);
+    }
     /**
-   * @param {Array<number>|string|{x:number,y:number,z:number}} vector - The vector write in array.
-   * @returns {Vector3} The vector.
+   * Create a vector.
+   * @param vector - The vector wrote in array or string.
+   * @returns The vector.
+   */ static create(vector) {
+        if (Array.isArray(vector)) return new this(...vector);
+        if (typeof vector === "string") return this.parse(vector);
+        throw new Error(`Can't create vector for ${serialize(vector)}`);
+    }
+    /**
+   * Parse a string to vector.
+   * @param vectorStr - The string to parse.
+   * @returns The vector.
+   */ static parse(vectorStr) {
+        return this.create(vectorStr.split(" ").map(Number));
+    }
+    /**
+   * Convert the vector to a string.
+   * @returns The string representation of the vector.
+   */ stringify() {
+        // @ts-ignore
+        return this[Symbol.toPrimitive]("string");
+    }
+    /**
+   * Convert the vector to an array.
+   * @returns The array representation of the vector.
+   */ toArray() {
+        return [
+            ...this
+        ];
+    }
+    /**
+   * Convert the vector to a primitive value.
+   * @param hint - The type hint.
+   * @returns The string representation or the vector itself.
+   */ [Symbol.toPrimitive](hint) {
+        if (hint === "string") return this.axes.join(" ");
+        return this;
+    }
+    /**
+   * Iterator for the vector axes.
+   * @returns The iterator for the axes.
+   */ [Symbol.iterator]() {
+        return this.axes[Symbol.iterator]();
+    }
+    /**
+   * Get the number of dimensions of the vector.
+   * @returns The number of dimensions.
+   */ get dimensions() {
+        return this.axes.length;
+    }
+    /**
+   * Get an axis of the vector by index.
+   * @param index - The index of the component.
+   * @returns The component value.
+   */ get(index) {
+        return this.axes[index];
+    }
+    /**
+   * Set an axis of the vector by index.
+   * @param index - The index of the component.
+   * @param value - The value to set.
+   */ set(index, value) {
+        this.axes[index] = value;
+    }
+    /**
+   * Apply a function to each axes of the vector and return a new vector.
+   * @param callbackfn - The function to apply.
+   * @returns The new vector.
+   */ map(callbackfn) {
+        return VectorN.create(this.axes.map(callbackfn));
+    }
+    /**
+   * Create a vector.
+   * @param axes - The axes of the vector.
+   */ constructor(...axes){
+        this.axes = axes;
+    }
+}
+
+/**
+ * Utility class for operations on N-dimensional vectors.
+ */ class VectorNUtils {
+    /**
+   * Create a vector.
+   * @param vector - The vector write in array.
+   * @returns The vector.
+   */ static create(vector) {
+        return VectorN.create(vector);
+    }
+    /**
+   * Clone a vector.
+   * @param a - The vector to clone.
+   * @returns The cloned vector.
+   */ static clone(a) {
+        return this.create(a.toArray());
+    }
+    /**
+   * Assert that two vectors have the same dimensions.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @throws Will throw an error if the vectors do not have the same dimensions.
+   */ static _assertDimensions(a, b) {
+        if (a.dimensions !== b.dimensions) throw new Error("Vectors must have the same dimensions.");
+    }
+    /**
+   * Add two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The resulting vector.
+   */ static add(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.map((val, index)=>val + b.get(index));
+    }
+    /**
+   * Subtract one vector from another.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The resulting vector.
+   */ static subtract(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.map((val, index)=>val - b.get(index));
+    }
+    /**
+   * Multiply two vectors component-wise.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The resulting vector.
+   */ static multiply(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.map((val, index)=>val * b.get(index));
+    }
+    /**
+   * Divide one vector by another component-wise.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The resulting vector.
+   */ static divide(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.map((val, index)=>val / b.get(index));
+    }
+    /**
+   * Scale a vector by a scalar.
+   * @param a - The vector to scale.
+   * @param n - The scalar value.
+   * @returns The resulting vector.
+   */ static scale(a, n) {
+        return a.map((val)=>val * n);
+    }
+    /**
+   * Negate a vector.
+   * @param a - The vector to negate.
+   * @returns The resulting vector.
+   */ static negate(a) {
+        return a.map((val)=>-val);
+    }
+    /**
+   * Invert a vector component-wise.
+   * @param a - The vector to invert.
+   * @returns The resulting vector.
+   */ static inverse(a) {
+        return a.map((val)=>1 / val);
+    }
+    /**
+   * Exchange two axes of a vector.
+   * @param a - The vector to modify.
+   * @param axis1 - The first axis to exchange.
+   * @param axis2 - The second axis to exchange
+   * @returns The resulting vector.
+   * @throws Will throw an error if the length of the axes array is not 2.
+   */ static exchange(a, axis1, axis2) {
+        const output = this.clone(a);
+        const n0 = output.get(axis1);
+        const n1 = output.get(axis2);
+        output.set(axis1, n1);
+        output.set(axis2, n0);
+        return output;
+    }
+    /**
+   * Check if two vectors are exactly equal.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns True if the vectors are exactly equal, otherwise false.
+   */ static exactEquals(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.axes.every((val, index)=>val === b.get(index));
+    }
+    /**
+   * Check if two vectors are approximately equal.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns True if the vectors are approximately equal, otherwise false.
+   */ static equals(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.axes.every((val, index)=>equals(val, b.get(index)));
+    }
+    /**
+   * Get the component-wise maximum of multiple vectors.
+   * @param vectors - The vectors to compare.
+   * @returns The resulting vector.
+   */ static max(...vectors) {
+        const length = vectors[0].dimensions;
+        const maxAxes = vectors.reduce((acc, vector)=>{
+            vector.axes.forEach((val, index)=>{
+                if (val > acc[index]) acc[index] = val;
+            });
+            return acc;
+        }, new Array(length).fill(Number.NEGATIVE_INFINITY));
+        return this.create(maxAxes);
+    }
+    /**
+   * Get the component-wise minimum of multiple vectors.
+   * @param vectors - The vectors to compare.
+   * @returns The resulting vector.
+   */ static min(...vectors) {
+        const length = vectors[0].dimensions;
+        const minAxes = vectors.reduce((acc, vector)=>{
+            vector.axes.forEach((val, index)=>{
+                if (val < acc[index]) acc[index] = val;
+            });
+            return acc;
+        }, new Array(length).fill(Number.POSITIVE_INFINITY));
+        return this.create(minAxes);
+    }
+    /**
+   * Apply the floor function to each component of a vector.
+   * @param a - The vector to modify.
+   * @returns The resulting vector.
+   */ static floor(a) {
+        return a.map((val)=>Math.floor(val));
+    }
+    /**
+   * Apply the ceil function to each component of a vector.
+   * @param a - The vector to modify.
+   * @returns The resulting vector.
+   */ static ceil(a) {
+        return a.map((val)=>Math.ceil(val));
+    }
+    /**
+   * Apply the round function to each component of a vector.
+   * @param a - The vector to modify.
+   * @returns The resulting vector.
+   */ static round(a) {
+        return a.map((val)=>round(val));
+    }
+    /**
+   * Apply the absolute value function to each component of a vector.
+   * @param a - The vector to modify.
+   * @returns The resulting vector.
+   */ static abs(a) {
+        return a.map((val)=>Math.abs(val));
+    }
+    /**
+   * Get the vector with the maximum magnitude from a list of vectors.
+   * @param vectors - The vectors to compare.
+   * @returns The vector with the maximum magnitude.
+   */ static maxMagnitude(...vectors) {
+        return vectors.reduce((prev, curr)=>VectorNUtils.magnitude(curr) > VectorNUtils.magnitude(prev) ? curr : prev);
+    }
+    /**
+   * Get the vector with the minimum magnitude from a list of vectors.
+   * @param vectors - The vectors to compare.
+   * @returns The vector with the minimum magnitude.
+   */ static minMagnitude(...vectors) {
+        return vectors.reduce((prev, curr)=>VectorNUtils.magnitude(curr) < VectorNUtils.magnitude(prev) ? curr : prev);
+    }
+    /**
+   * Calculate the magnitude of a vector.
+   * @param a - The vector to calculate the magnitude of.
+   * @returns The magnitude of the vector.
+   */ static magnitude(a) {
+        return Math.sqrt(VectorNUtils.squaredMagnitude(a));
+    }
+    /**
+   * Calculate the squared magnitude of a vector.
+   * @param a - The vector to calculate the squared magnitude of.
+   * @returns The squared magnitude of the vector.
+   */ static squaredMagnitude(a) {
+        return a.axes.reduce((sum, val)=>sum + val ** 2, 0);
+    }
+    /**
+   * Calculate the distance between two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The distance between the vectors.
+   */ static distance(a, b) {
+        return Math.sqrt(VectorNUtils.squaredDistance(a, b));
+    }
+    /**
+   * Calculate the squared distance between two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The squared distance between the vectors.
+   */ static squaredDistance(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.axes.reduce((sum, val, index)=>{
+            const diff = val - b.get(index);
+            return sum + diff ** 2;
+        }, 0);
+    }
+    /**
+   * Calculate the dot product of two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The dot product of the vectors.
+   */ static dot(a, b) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.axes.reduce((sum, val, index)=>sum + val * b.get(index), 0);
+    }
+    /**
+   * Normalize a vector.
+   * @param a - The vector to normalize.
+   * @returns The normalized vector.
+   */ static normalize(a) {
+        const magnitude = this.magnitude(a);
+        if (magnitude) return this.scale(a, 1 / magnitude);
+        return this.create(new Array(a.dimensions).fill(0));
+    }
+    /**
+   * Calculate the angle between two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The angle between the vectors in radians.
+   */ static angle(a, b) {
+        const cosOmega = this.dot(this.normalize(a), this.normalize(b));
+        return Math.acos(cosOmega);
+    }
+    /**
+   * Generate a random vector.
+   * @param dimensions - The number of dimensions.
+   * @param scale - The scale of the random components.
+   * @returns The random vector.
+   */ static random(dimensions, scale = 1) {
+        const axes = Array.from({
+            length: dimensions
+        }, ()=>Math.random() * 2 - 1);
+        return this.scale(this.create(axes), scale);
+    }
+    /**
+   * Perform linear interpolation between two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @param t - The interpolation parameter.
+   * @returns The interpolated vector.
+   */ static lerp(a, b, t) {
+        VectorNUtils._assertDimensions(a, b);
+        return a.map((val, index)=>val * (1 - t) + b.get(index) * t);
+    }
+    /**
+   * Perform spherical linear interpolation between two vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @param t - The interpolation parameter.
+   * @returns The interpolated vector.
+   */ static slerp(a, b, t) {
+        if (t <= 0) return this.clone(a);
+        if (t >= 1) return this.clone(b);
+        const omega = this.angle(a, b);
+        const sinOmega = Math.sin(omega);
+        if (sinOmega <= Number.EPSILON) return this.lerp(a, b, t);
+        const ratioA = Math.sin(omega * (1 - t)) / sinOmega;
+        const ratioB = Math.sin(omega * t) / sinOmega;
+        return a.map((val, index)=>val * ratioA + b.get(index) * ratioB);
+    }
+    /**
+   * Perform Bezier interpolation between vectors.
+   * @param points - The control points.
+   * @param t - The interpolation parameter.
+   * @returns The interpolated vector.
+   */ static bezier(points, t) {
+        const n = points.length - 1;
+        if (!n) return points[0];
+        const newPoints = [];
+        for(let i = 0; i < n; i++){
+            newPoints.push(this.lerp(points[i], points[i + 1], t));
+        }
+        return this.bezier(newPoints, t);
+    }
+}
+
+/**
+ * Utility class for operations on 3D vectors.
+ */ class Vector3Utils extends VectorNUtils {
+    /**
+   * @param vector - The vector write in array.
+   * @returns The vector.
+   */ static create(vector) {
+        return Vector3.create(vector);
+    }
+    /**
+   * Calculate the cross product of two 3D vectors.
+   * @param a - The first vector.
+   * @param b - The second vector.
+   * @returns The cross product of the vectors.
+   */ static cross(a, b) {
+        return this.create([
+            a.y * b.z - a.z * b.y,
+            a.z * b.x - a.x * b.z,
+            a.x * b.y - a.y * b.x
+        ]);
+    }
+}
+
+/**
+ * Class representing a 3-dimensional vector.
+ * @extends VectorN
+ */ class Vector3 extends VectorN {
+    /**
+   * @param vector - The vector write in array.
+   * @returns The vector.
    */ static create(vector) {
         if (Array.isArray(vector)) return new this(...vector);
         // @ts-ignore
         if (typeof vector === "string") return this.parse(vector);
         if (typeof vector === "object") return new this(vector.x, vector.y, vector.z);
+        throw new Error(`Can't create 3d vector for ${serialize(vector)}`);
     }
     get magnitude() {
         return Vector3Utils.magnitude(this);
@@ -560,8 +567,8 @@ function range(from, to, step = 1) {
     }
     /**
    * Apply a function to each axes of the vector and return a new vector.
-   * @param {function(number, number): number} callbackfn - The function to apply.
-   * @returns {Vector3} The new vector.
+   * @param callbackfn - The function to apply.
+   * @returns The new vector.
    */ map(callbackfn) {
         return Vector3.create(this.axes.map(callbackfn));
     }
@@ -621,9 +628,9 @@ function range(from, to, step = 1) {
     }
     /**
    * Create a 3D vector.
-   * @param {number} x - The x axis.
-   * @param {number} y - The y axis.
-   * @param {number} z - The z axis.
+   * @param x - The x axis.
+   * @param y - The y axis.
+   * @param z - The z axis.
    */ constructor(x = 0, y = 0, z = 0){
         super(x, y, z);
     }
@@ -633,6 +640,9 @@ class Location extends Vector3 {
     get centerCorrected() {
         return Location.create(// @ts-ignore
         Vector3Utils.add(this.floored, new Vector3(0.5, 0.5, 0.5)));
+    }
+    static create(vector) {
+        return Vector3.create(vector);
     }
     clone() {
         return new Location(this.x, this.y, this.z);
@@ -683,6 +693,9 @@ function getOrAddObjective(id, name) {
 function removeMinecraftNamespace(identifier) {
     return identifier.replace(/^minecraft\:/, "");
 }
+function addMinecraftNamespaceIfNeed(identifier) {
+    return /^(.+)\:/.test(identifier) ? identifier : `minecraft:${identifier}`;
+}
 
 class Direction {
     get name() {
@@ -699,6 +712,8 @@ class Direction {
                 return "North";
             case 5:
                 return "Down";
+            default:
+                throw new Error("Unexpected error.");
         }
     }
     isEast() {
@@ -791,6 +806,7 @@ class WrappedEntity extends WrapperTemplate {
         if (rotation > -45 && rotation <= 45) return Directions.South;
         if (rotation > 45 && rotation <= 135) return Directions.West;
         if (rotation > 135 || rotation <= -135) return Directions.North;
+        throw new Error("Unexpected error.");
     }
     constructor(entity){
         super();
@@ -806,7 +822,7 @@ class WrappedEntity extends WrapperTemplate {
     }
 }
 
-class Container extends WrapperTemplate {
+class WrappedContainer extends WrapperTemplate {
     get size() {
         return this._container.size;
     }
@@ -828,7 +844,7 @@ class Container extends WrapperTemplate {
     }
 }
 
-class EntityContainer extends Container {
+class EntityContainer extends WrappedContainer {
     get location() {
         return this._entity.location;
     }
@@ -887,17 +903,18 @@ class WrappedPlayer extends WrappedEntity {
     setMainHandItem(item) {
         this.inventory.setItem(this.selectedSlotIndex, item);
     }
-    async useItemFromInventory(slot, callback = async (_)=>{}) {
+    async useItemFromInventory(slot, callback) {
         let itemStack = this.inventory.getItem(slot);
         itemStack = await callback(itemStack);
         this.inventory.setItem(slot, itemStack);
     }
-    async useMainHandItem(callback = async ()=>{}) {
+    async useMainHandItem(callback) {
         await this.useItemFromInventory(this.selectedSlotIndex, callback);
     }
     addExperience(amount = 0, { useXpOrb = false } = {}) {
+        let xpAmount = amount;
         if (useXpOrb && amount >= 0) {
-            while(amount--)this.dimension.spawnEntity("minecraft:xp_orb", this.location);
+            while(xpAmount--)this.dimension.spawnEntity("minecraft:xp_orb", this.location);
             return this.experience;
         }
         return this._player.addExperience(amount);
@@ -910,6 +927,214 @@ class WrappedPlayer extends WrappedEntity {
         this.name = player.name;
     }
 }
+
+var killed = (({ player, target, callback })=>({
+        events: {
+            entityDie: {
+                options: {
+                    entityTypes: [
+                        target
+                    ]
+                },
+                listener (event) {
+                    const cause = event.damageSource.cause;
+                    const source = event.damageSource.damagingEntity;
+                    if (cause === EntityDamageCause.entityAttack && source?.id === player.id) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var killed_by = (({ player, target, callback })=>({
+        events: {
+            entityDie: {
+                options: {
+                    entities: [
+                        player
+                    ]
+                },
+                listener (event) {
+                    const cause = event.damageSource.cause;
+                    const source = event.damageSource.damagingEntity;
+                    if (cause === EntityDamageCause.entityAttack && source?.typeId === target) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var killed_for = (({ player, target, callback })=>({
+        events: {
+            entityDie: {
+                options: {
+                    entities: [
+                        player
+                    ]
+                },
+                listener (event) {
+                    const cause = `minecraft:${event.damageSource.cause}`;
+                    if (cause === target) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var mined = (({ player, target, callback })=>({
+        events: {
+            playerBreakBlock: {
+                listener (event) {
+                    const blockPermutation = event.brokenBlockPermutation;
+                    const source = event.player;
+                    if (source.id === player.id && blockPermutation.type.id === target) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            },
+            playerPlaceBlock: {
+                listener (event) {
+                    const block = event.block;
+                    const source = event.player;
+                    if (source.id === player.id && block.typeId === target) callback({
+                        type: "decrease",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var placed = (({ player, target, callback })=>({
+        events: {
+            playerBreakBlock: {
+                listener (event) {
+                    const blockPermutation = event.brokenBlockPermutation;
+                    const source = event.player;
+                    if (source.id === player.id && blockPermutation.type.id === target) callback({
+                        type: "decrease",
+                        value: 1
+                    });
+                }
+            },
+            playerPlaceBlock: {
+                listener (event) {
+                    const block = event.block;
+                    const source = event.player;
+                    if (source.id === player.id && block.typeId === target) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+// import custom from "./custom/index"
+const types = {
+    // custom
+    // TODO:
+    // "minecraft:custom": custom, custom,
+    // mob
+    "minecraft:killed": killed,
+    "minecraft:killed_by": killed_by,
+    "minecraft:killed_for": killed_for,
+    // block
+    "minecraft:mined": mined,
+    "minecraft:placed": placed
+};
+
+var deathCount = (({ player, callback })=>({
+        events: {
+            entityDie: {
+                options: {
+                    entities: [
+                        player
+                    ]
+                },
+                listener (_) {
+                    callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var health = (({ player, callback })=>({
+        events: {
+            entityHealthChanged: {
+                options: {
+                    entities: [
+                        player
+                    ]
+                },
+                listener (event) {
+                    callback({
+                        type: "reset",
+                        value: event.newValue
+                    });
+                }
+            },
+            playerSpawn: {
+                listener (_) {
+                    callback({
+                        type: "reset",
+                        value: 20
+                    });
+                }
+            }
+        }
+    }));
+
+var playerKillCount = (({ player, callback })=>killed({
+        player,
+        target: "minecraft:player",
+        callback
+    }));
+
+var totalKillCount = (({ player, callback })=>({
+        events: {
+            entityDie: {
+                listener (event) {
+                    const cause = event.damageSource.cause;
+                    const source = event.damageSource.damagingEntity;
+                    if (cause === EntityDamageCause.entityAttack && source?.id === player.id) callback({
+                        type: "increase",
+                        value: 1
+                    });
+                }
+            }
+        }
+    }));
+
+var CRITERIA = new Map([
+    ...Object.entries(types),
+    [
+        "deathCount",
+        deathCount
+    ],
+    [
+        "playerKillCount",
+        playerKillCount
+    ],
+    [
+        "totalKillCount",
+        totalKillCount
+    ],
+    [
+        "health",
+        health
+    ]
+]);
 
 function getDefaultExportFromCjs (x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -1189,6 +1414,7 @@ class Database {
     }
     async delete(key) {
         if (this.has(key)) {
+            //@ts-ignore
             const { participant } = this.store.get(key);
             await asyncRun(()=>this.objective.removeParticipant(participant));
             this.store.delete(key);
@@ -1201,7 +1427,7 @@ class Database {
         this.store.clear();
     }
     get(key) {
-        if (this.has(key)) return this.store.get(key).value;
+        return this.store.get(key)?.value;
     }
     async set(key, value) {
         await this.delete(key);
@@ -1294,13 +1520,13 @@ class EventDB {
     }
     constructor(player){
         this.events = new Map();
-        this.db = new Database(player, "scoreboard-statistic-player");
         this.player = player;
+        this.db = Database.open(player, "scoreboard-statistic-player");
     }
 }
 
 class Dialog {
-    static async confirm({ title = "确认", body, target, onCancel = async ()=>{}, onConfirm = async ()=>{} }) {
+    static async confirm({ title = "确认", body, target, onCancel = async ()=>({}), onConfirm = async ()=>({}) }) {
         if (!body || !target) throw new Error();
         const form = await asyncRun(()=>{
             return new Dialog({
@@ -1324,9 +1550,8 @@ class Dialog {
             if (response.selection === 0) return await this.onSelectButton1();
             if (response.selection === 1) return await this.onSelectButton2();
         } else if (response instanceof ActionFormResponse) return await this.onSelect(response.selection);
-        return response;
     }
-    constructor({ dialog, onClose = async ()=>{}, onSubmit = async (_)=>{}, onSelectButton1 = async ()=>{}, onSelectButton2 = async ()=>{}, onSelect = async (_)=>{} }){
+    constructor({ dialog, onClose = async ()=>({}), onSubmit = async ()=>({}), onSelectButton1 = async ()=>({}), onSelectButton2 = async ()=>({}), onSelect = async ()=>({}) }){
         this.dialog = dialog;
         this.onSubmit = onSubmit;
         this.onSelectButton1 = onSelectButton1;
@@ -1439,8 +1664,8 @@ class OptionItemRange {
         }
         return false;
     }
-    _includes(n) {
-        return this.range.includes(n);
+    _includes(value) {
+        return this.range.includes(value);
     }
     constructor({ name, description, range = [
         0,
@@ -1452,7 +1677,6 @@ class OptionItemRange {
         this.range = new NumberRange(...range);
         this.events = new EventEmitter();
         this.reload = reload;
-        this._defaultValue = defaultValue;
         this._player = _player;
         if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
         if (defaultValue !== undefined && this._includes(defaultValue)) this.selected = defaultValue;
@@ -1473,20 +1697,20 @@ class OptionItemSelection {
         }
         return false;
     }
-    hasVal(name) {
-        return this.values.has(name) || !this.values.size;
+    hasVal(value) {
+        return this.values.has(value) || !this.values.size;
     }
     constructor({ name, description, values = [], defaultValue, events, reload, _player }){
         this.name = name;
         this.description = description;
-        this.values = new Map(values.map((value)=>{
+        this.values = new Map(//@ts-ignore
+        values.map((value)=>{
             if (value[0] === true && !value[1]) value[1] = "开启";
             else if (value[0] === false && !value[1]) value[1] = "关闭";
             return value;
         }));
         this.events = new EventEmitter();
         this.reload = reload;
-        this._defaultValue = defaultValue;
         this._player = _player;
         if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
         if (defaultValue !== undefined && this.hasVal(defaultValue)) this.selected = defaultValue;
@@ -1498,6 +1722,7 @@ class OptionItemSelection {
 
 class PlayerOption {
     addItem(opts) {
+        //@ts-ignore
         if (opts.range) this.items[opts.name] = new OptionItemRange(opts);
         else if (opts.values) this.items[opts.name] = new OptionItemSelection(opts);
         return this;
@@ -1518,7 +1743,9 @@ class PlayerOption {
         await this._syncToDB();
     }
     async init() {
-        this.addItem = undefined;
+        this.addItem = ()=>{
+            throw new Error("Can't add item after initialization.");
+        };
         await this._syncFromDB();
         return this.getItemValMap();
     }
@@ -1528,9 +1755,10 @@ class PlayerOption {
     hasItem(name) {
         return !!this.items[name];
     }
-    setItemVal(name, value, callback = (_, __, ___)=>{}, { syncFromDB = false } = {}) {
+    setItemVal(name, value, callback = ()=>{}, { syncFromDB = false } = {}) {
         const item = this._getItem(name);
         if (item) {
+            //@ts-ignore
             const result = item.select(value);
             if (result) {
                 if (!syncFromDB && item.reload) this.reload = true;
@@ -1544,6 +1772,7 @@ class PlayerOption {
         if (item) return item.selected;
     }
     getItemValMap() {
+        // TODO: use map
         const result = {};
         each(this.items, (_, name)=>{
             result[name] = this.getItemVal(name);
@@ -1628,6 +1857,7 @@ class PlayerOption {
     }
     constructor(player, name){
         this.items = {};
+        this.reload = false;
         this.name = name;
         this.db = Database.open(player, `option-manager:${name}`);
         this.player = player;
@@ -1659,11 +1889,15 @@ class OptionNamespace {
             const result = await playerOpt.init();
             valueMap.set(player, result);
         });
-        this.applyPlayer = undefined;
+        this.applyPlayer = ()=>{
+            throw new Error("Can't apply player after initialization.");
+        };
         return valueMap;
     }
     getPlayer(player) {
-        return this.players.get(player);
+        const playerOption = this.players.get(player);
+        if (!playerOption) throw new Error("Can't get player  options.");
+        return playerOption;
     }
     constructor(name){
         this.players = new Map();
@@ -1679,19 +1913,22 @@ class OptionManager {
         return namespaces;
     }
     getNamesapace(name) {
-        return this.namespaces.get(name);
+        const namespace = this.namespaces.get(name);
+        if (!namespace) throw new Error("Can't get namespace.");
+        return namespace;
     }
     async showDialog(player) {
         const form = new ActionFormData().title("设置选项").body("选择要设置的模块：");
         const nameMap = [];
         each(this.namespaces, ([name])=>{
             nameMap.push(name);
-            form.button(name) // TODO name -> desc
+            form.button(name) // TODO: name -> desc
             ;
         });
         const dialog = new Dialog({
             dialog: form,
             onSelect: async (selection)=>{
+                //@ts-ignore
                 const name = nameMap[selection];
                 await this.getNamesapace(name).getPlayer(player).showDialog(dialog);
             }
@@ -1784,220 +2021,6 @@ const option = optionManager.registerNamesapace("scoreboard-statistic").addItem(
     }
 });
 
-var killed = (({ player, target, callback })=>({
-        events: {
-            entityDie: {
-                option: {
-                    entityTypes: [
-                        target
-                    ]
-                },
-                listener (event) {
-                    const cause = event.damageSource.cause;
-                    const source = event.damageSource.damagingEntity;
-                    if (cause === EntityDamageCause.entityAttack && source.id === player.id) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-var killed_by = (({ player, target, callback })=>({
-        events: {
-            entityDie: {
-                option: {
-                    entities: [
-                        player
-                    ]
-                },
-                listener (event) {
-                    const cause = event.damageSource.cause;
-                    const source = event.damageSource.damagingEntity;
-                    if (cause === EntityDamageCause.entityAttack && source.typeId === target) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-var killed_for = (({ player, target, callback })=>({
-        events: {
-            entityDie: {
-                option: {
-                    entities: [
-                        player
-                    ]
-                },
-                listener (event) {
-                    const cause = `minecraft:${event.damageSource.cause}`;
-                    if (cause === target) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-var mined = (({ player, target, callback })=>({
-        events: {
-            playerBreakBlock: {
-                listener (event) {
-                    const blockPermutation = event.brokenBlockPermutation;
-                    const source = event.player;
-                    if (source.id === player.id && blockPermutation.type.id === target) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            },
-            playerPlaceBlock: {
-                listener (event) {
-                    const block = event.block;
-                    const source = event.player;
-                    if (source.id === player.id && block.typeId === target) callback({
-                        type: "decrease",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-var placed = (({ player, target, callback })=>({
-        events: {
-            playerBreakBlock: {
-                listener (event) {
-                    const blockPermutation = event.brokenBlockPermutation;
-                    const source = event.player;
-                    if (source.id === player.id && blockPermutation.type.id === target) callback({
-                        type: "decrease",
-                        value: 1
-                    });
-                }
-            },
-            playerPlaceBlock: {
-                listener (event) {
-                    const block = event.block;
-                    const source = event.player;
-                    if (source.id === player.id && block.typeId === target) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-// import custom from "./custom/index"
-const types = {
-    // custom
-    // TODO
-    // "minecraft:custom": custom, custom,
-    // mob
-    "minecraft:killed": killed,
-    killed,
-    "minecraft:killed_by": killed_by,
-    killed_by,
-    "minecraft:killed_for": killed_for,
-    killed_for,
-    // block
-    "minecraft:mined": mined,
-    mined,
-    "minecraft:placed": placed,
-    placed
-};
-
-var deathCount = (({ player, callback })=>({
-        events: {
-            entityDie: {
-                option: {
-                    entities: [
-                        player
-                    ]
-                },
-                listener () {
-                    callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-var health = (({ player, callback })=>({
-        events: {
-            entityHealthChanged: {
-                option: {
-                    entities: [
-                        player
-                    ]
-                },
-                listener (event) {
-                    callback({
-                        type: "reset",
-                        value: event.newValue
-                    });
-                }
-            },
-            playerSpawn: {
-                listener () {
-                    callback({
-                        type: "reset",
-                        value: 20
-                    });
-                }
-            }
-        }
-    }));
-
-var playerKillCount = (({ player, callback })=>killed({
-        player,
-        target: "minecraft:player",
-        callback
-    }));
-
-var totalKillCount = (({ player, callback })=>({
-        events: {
-            entityDie: {
-                listener (event) {
-                    const cause = event.damageSource.cause;
-                    const source = event.damageSource.damagingEntity;
-                    if (cause === EntityDamageCause.entityAttack && source.id === player.id) callback({
-                        type: "increase",
-                        value: 1
-                    });
-                }
-            }
-        }
-    }));
-
-// @ts-ignore
-var CRITERIA = new Map([
-    ...Object.entries(types),
-    [
-        "deathCount",
-        deathCount
-    ],
-    [
-        "playerKillCount",
-        playerKillCount
-    ],
-    [
-        "totalKillCount",
-        totalKillCount
-    ],
-    [
-        "health",
-        health
-    ]
-]);
-
 class Handler {
     async add({ objectiveId, criteria, displayName = objectiveId }) {
         if (world.scoreboard.getObjective(objectiveId)) return {
@@ -2039,16 +2062,16 @@ class Handler {
         const objective = getOrAddObjective(objectiveId);
         const [criteriaType, criteriaName] = parseCriteria(criteria);
         const setupTigger = CRITERIA.get(criteriaType);
+        if (!setupTigger) throw new Error("Unknown criteria.");
         const tigger = setupTigger({
             player: this.player,
             target: criteriaName,
             callback: (result)=>{
-                if (// @ts-ignore
-                !WrappedPlayer.wrap(this.player).testGameMode(GameMode.creative) || this.playerOption.getItemVal("enable_creative")) {
+                if (!new WrappedPlayer(this.player).testGameMode(GameMode.creative) || this.playerOption.getItemVal("enable_creative")) {
                     switch(result.type){
                         case "decrease":
                             {
-                                if (this.playerOption.getItemVal("enable_cancel_out")) objective.setScore(this.player, objective.getScore(this.player) - result.value);
+                                if (this.playerOption.getItemVal("enable_cancel_out")) objective.setScore(this.player, (objective.getScore(this.player) ?? 0) - result.value);
                                 break;
                             }
                         case "reset":
@@ -2058,15 +2081,14 @@ class Handler {
                             }
                         default:
                             {
-                                // TODO: scoreboard wrapper #addScore()
-                                objective.setScore(this.player, objective.getScore(this.player) + result.value);
+                                objective.addScore(this.player, result.value);
                             }
                     }
                 }
             }
         });
-        await eachAsync(tigger.events, async ({ option: subscribeOption, listener }, eventName)=>{
-            if (subscribeOption) await asyncRun(()=>world.afterEvents[eventName].subscribe(listener, subscribeOption));
+        await eachAsync(tigger.events, async ({ options, listener }, eventName)=>{
+            if (options) await asyncRun(()=>world.afterEvents[eventName].subscribe(listener, options));
             else await asyncRun(()=>world.afterEvents[eventName].subscribe(listener)) // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
             ;
         });
@@ -2085,14 +2107,13 @@ class Handler {
     constructor(player){
         this.player = player;
         this.playerOption = option.getPlayer(player);
-        this.playerDB = ALL_PLAYER_DATABASES.get(player);
+        const playerDB = ALL_PLAYER_DATABASES.get(player);
+        if (!playerDB) throw new Error("Can't get player database.");
+        this.playerDB = playerDB;
     }
 }
 function parseCriteria(criteria) {
-    return criteria.split(":").map((e)=>e.replace(".", ":")).map((e, i)=>{
-        if (i === 0) return e;
-        return e.match(/^(.+)\:/) ? e : `minecraft:${e}`;
-    });
+    return criteria.split(":").map((e)=>addMinecraftNamespaceIfNeed(e.replace(".", ":")));
 }
 
 async function command(argv, sender) {
