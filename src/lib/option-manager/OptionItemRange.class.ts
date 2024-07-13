@@ -1,9 +1,32 @@
-import { each } from "../util/index"
-
+import type { Player } from "@minecraft/server"
 import { EventEmitter } from "../EventEmitter.class"
 import { NumberRange } from "../NumberRange.class"
+import { each } from "../util/index"
+
+export interface IOptionItemRange {
+  name: string
+  description: string
+  range?: [number, number, number?]
+  defaultValue?: number
+  reload?: boolean
+  events?: {
+    inited?: (selected: number, player: Player) => void
+    changed?: (selected: number, original: number, player: Player) => void
+    selected?: (selected: number, original: number, player: Player) => void
+  }
+}
 
 export class OptionItemRange {
+  name: string
+  description: string
+  range: NumberRange
+  reload?: boolean
+  events: EventEmitter
+  _player: Player
+
+  original: number | undefined
+  selected: number | undefined
+
   constructor({
     name,
     description,
@@ -12,13 +35,14 @@ export class OptionItemRange {
     events,
     reload,
     _player,
-  }) {
+  }: {
+    _player: Player
+  } & IOptionItemRange) {
     this.name = name
     this.description = description
     this.range = new NumberRange(...range)
     this.events = new EventEmitter()
     this.reload = reload
-    this._defaultValue = defaultValue
     this._player = _player
 
     if (events)
@@ -31,7 +55,7 @@ export class OptionItemRange {
     this.events.emit("inited", this.selected, _player)
     this.events.emit("changed", this.selected, undefined, _player)
   }
-  select(value) {
+  select(value: number) {
     if (this.selected !== value && this._includes(value)) {
       this.original = this.selected
       this.selected = value
@@ -41,7 +65,7 @@ export class OptionItemRange {
     }
     return false
   }
-  _includes(n) {
-    return this.range.includes(n)
+  _includes(value: number) {
+    return this.range.includes(value)
   }
 }

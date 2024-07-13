@@ -1,15 +1,17 @@
 import { each } from "../util/index"
 
-export class TypeGroup {
-  constructor(types) {
+export class TypeGroup<T> {
+  types: Set<T>
+
+  constructor(types: T[]) {
     this.types = new Set(types)
   }
 
-  add(...types) {
+  add(...types: T[]) {
     each(types, (type) => this.types.add(type))
     return this
   }
-  has(type) {
+  has(type: T) {
     return this.types.has(type)
   }
 

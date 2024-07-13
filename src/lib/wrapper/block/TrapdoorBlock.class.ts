@@ -1,3 +1,5 @@
+import type { Block, Player } from "@minecraft/server"
+
 import { Directions } from "../../location/index"
 
 import { WrappedPlayer } from "../entity/index"
@@ -11,7 +13,7 @@ import {
 } from "./BlockTypeGroups.enumeration"
 
 export class TrapdoorBlock extends WrappedBlock {
-  constructor(block) {
+  constructor(block: Block) {
     TrapdoorBlock.assert(block)
 
     super(block)
@@ -71,11 +73,11 @@ export class TrapdoorBlock extends WrappedBlock {
   }
 
   getRelated(
-    player,
+    player: Player,
     { extensive = true, maxLength = 1, shouldBeTheSameType = true } = {}
   ) {
     // 获取可以与该活板门双开的另外一些活板门和这个活板门组成的列表
-    const output = [this]
+    const output: TrapdoorBlock[] = [this]
 
     if (maxLength > 0) {
       // 1. 获取另一个活板门的位置
@@ -96,13 +98,12 @@ export class TrapdoorBlock extends WrappedBlock {
           relatedTrapdoor.facingDirection.isOppositeTo(this.facingDirection) &&
           relatedTrapdoor.upsideOrDown === this.upsideOrDown
         )
-          // @ts-ignore
           output.push(relatedTrapdoor)
       }
     }
 
     if (extensive) {
-      let that = this
+      let that: TrapdoorBlock = this
       let needOpposite = false
 
       // 仅 maxLength > 1 时才会运行
@@ -110,7 +111,7 @@ export class TrapdoorBlock extends WrappedBlock {
         // 3. 获取扩展活板门
         //    即能与该活板门延伸联动的另一个活板门
         // @ts-ignore
-        const playerFacing = WrappedPlayer.wrap(player).getFacingDirectionXZ()
+        const playerFacing = new WrappedPlayer(player).getFacingDirectionXZ()
         const extensiveBlock = needOpposite
           ? that.getNeighbourBlock(playerFacing.getOpposite())
           : that.getNeighbourBlock(playerFacing)
@@ -132,10 +133,8 @@ export class TrapdoorBlock extends WrappedBlock {
               maxLength,
             })
             if (result.length > 1) {
-              // @ts-ignore
               output.push(...result)
 
-              // @ts-ignore
               that = extensiveTrapdoor
               continue
             }

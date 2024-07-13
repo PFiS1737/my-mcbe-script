@@ -1,24 +1,46 @@
 import {
+  type ActionFormData,
   ActionFormResponse,
   FormCancelationReason,
   MessageFormData,
   MessageFormResponse,
+  type ModalFormData,
   ModalFormResponse,
 } from "@minecraft/server-ui"
 
+import type { Player, RawMessage } from "@minecraft/server"
 import { asyncRun } from "../util/game"
 
-export class Dialog {
-  static async confirm({
+interface DialogHandlers<T> {
+  dialog: ModalFormData | MessageFormData | ActionFormData
+  onClose?: () => Promise<T>
+  onSubmit?: (
+    submitted?: NonNullable<ModalFormResponse["formValues"]>
+  ) => Promise<T>
+  onSelectButton1?: () => Promise<T>
+  onSelectButton2?: () => Promise<T>
+  onSelect?: (
+    selected?: NonNullable<ActionFormResponse["selection"]>
+  ) => Promise<T>
+}
+
+export class Dialog<T> implements DialogHandlers<T> {
+  static async confirm<U>({
     title = "确认",
     body,
     target,
-    onCancel = async () => {},
-    onConfirm = async () => {},
-  }) {
+    onCancel = async () => ({}) as U,
+    onConfirm = async () => ({}) as U,
+  }: {
+    title?: string
+    body: RawMessage | string
+    target: Player
+    onCancel?: () => Promise<U>
+    onConfirm?: () => Promise<U>
+  }): Promise<U | undefined> {
     if (!body || !target) throw new Error()
     const form = await asyncRun(() => {
-      return new Dialog({
+      return new Dialog<U>({
         dialog: new MessageFormData()
           .title(title)
           .body(body)
@@ -33,14 +55,21 @@ export class Dialog {
     return await form.show(target)
   }
 
+  dialog
+  onClose
+  onSubmit
+  onSelectButton1
+  onSelectButton2
+  onSelect
+
   constructor({
     dialog,
-    onClose = async () => {},
-    onSubmit = async (_) => {},
-    onSelectButton1 = async () => {},
-    onSelectButton2 = async () => {},
-    onSelect = async (_) => {},
-  }) {
+    onClose = async () => ({}) as T,
+    onSubmit = async () => ({}) as T,
+    onSelectButton1 = async () => ({}) as T,
+    onSelectButton2 = async () => ({}) as T,
+    onSelect = async () => ({}) as T,
+  }: DialogHandlers<T>) {
     this.dialog = dialog
     this.onSubmit = onSubmit
     this.onSelectButton1 = onSelectButton1
@@ -48,9 +77,12 @@ export class Dialog {
     this.onSelect = onSelect
     this.onClose = onClose
   }
-  async show(target) {
-    let response
+
+  async show(target: Player): Promise<T | undefined> {
+    let response: ModalFormResponse | MessageFormResponse | ActionFormResponse
+
     target.sendMessage("[!] 新对话框已发送，请关闭命令输入栏或其他对话框")
+
     do {
       response = await this.dialog.show(target)
     } while (response.cancelationReason === FormCancelationReason.UserBusy)
@@ -67,8 +99,6 @@ export class Dialog {
       if (response.selection === 1) return await this.onSelectButton2()
     } else if (response instanceof ActionFormResponse)
       return await this.onSelect(response.selection)
-
-    return response
   }
 }
 

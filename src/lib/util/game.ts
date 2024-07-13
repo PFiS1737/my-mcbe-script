@@ -1,10 +1,9 @@
-import { system, world } from "@minecraft/server"
+import { type Player, system, world } from "@minecraft/server"
 
-export const sleepAsync = (ms) =>
-  // @ts-ignore
+export const sleepAsync = (ms: number): Promise<void> =>
   new Promise((resolve) => system.runTimeout(resolve, ms))
 
-export function asyncRun(fn) {
+export function asyncRun<T>(fn: () => T): Promise<T> {
   return new Promise((resolve, reject) => {
     system.run(() => {
       try {
@@ -16,13 +15,13 @@ export function asyncRun(fn) {
   })
 }
 
-export function errorHandler(errText, target) {
+export function errorHandler(errText: string, target: Player) {
   const err = new Error(errText)
   target.sendMessage(err.toString())
   return err
 }
 
-export function waitForFirstPlayerInitialSpawn() {
+export function waitForFirstPlayerInitialSpawn(): Promise<Player> {
   const players = world.getAllPlayers()
   if (players.length) return Promise.resolve(players[0])
 
@@ -34,17 +33,19 @@ export function waitForFirstPlayerInitialSpawn() {
   })
 }
 
-export function getOrAddObjective(id, name) {
+export function getOrAddObjective(id: string, name?: string) {
   const objective = world.scoreboard.getObjective(id)
+
   if (!objective && !name) throw new Error(`Couldn't find objective "${id}".`)
   if (!objective) return world.scoreboard.addObjective(id, name)
+
   return objective
 }
 
-export function removeMinecraftNamespace(identifier) {
+export function removeMinecraftNamespace(identifier: string) {
   return identifier.replace(/^minecraft\:/, "")
 }
 
-export function addMinecraftNamespaceIfNeed(identifier) {
+export function addMinecraftNamespaceIfNeed(identifier: string) {
   return /^(.+)\:/.test(identifier) ? identifier : `minecraft:${identifier}`
 }

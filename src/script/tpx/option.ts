@@ -1,11 +1,11 @@
-import { world } from "@minecraft/server"
+import { type EntityDieAfterEvent, type Player, world } from "@minecraft/server"
 
 import { optionManager } from "@/lib/option-manager/index"
 
 import { Handler } from "./Handler.class"
 
-async function afterEntityDieCallback(event) {
-  const player = event.deadEntity
+async function afterEntityDieCallback(event: EntityDieAfterEvent) {
+  const player = event.deadEntity as Player
   const handler = new Handler(player)
 
   await handler.set({

@@ -1,24 +1,33 @@
+import {
+  type BlockDropsConfig,
+  type BlockDropsConfigOption,
+  FortuneRules,
+  type ItemDropConfig,
+} from "@/data/block/types"
 import { BlockPermutation } from "@minecraft/server"
-
-// @ts-ignore
-import BlockDefinition from "@/data/block/index"
-
+import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
+import BlockDefinition from "../../../data/block/index"
 import { NumberRange } from "../../NumberRange.class"
 import { removeMinecraftNamespace } from "../../util/game"
 import { each } from "../../util/index"
 import { binomialDistribution, range } from "../../util/math"
-
 import { LootTable } from "../LootTable.class"
 
 class DropItem {
+  itemId: MinecraftItemTypes
+  range: NumberRange
+  amountLootTable: LootTable
+  maxAmount: number
+  xpRange: NumberRange
+  damage: number
+
   constructor({
-    // @ts-ignore
     item_id: itemId,
     default_range: defaultRange = [1, 1],
     max_amount: maxAmount = Number.POSITIVE_INFINITY,
     xp_range: xpRange = [0, 0],
     damage = 1,
-  } = {}) {
+  }: ItemDropConfig) {
     this.itemId = itemId
     this.range = new NumberRange(...defaultRange)
     this.amountLootTable = new LootTable(this.range.toArray())
@@ -27,7 +36,12 @@ class DropItem {
     this.damage = damage
   }
 
-  getResult() {
+  getResult(): Array<{
+    itemId: MinecraftItemTypes
+    amount: number
+    xp?: number
+    damage?: number
+  }> {
     return [
       {
         itemId: this.itemId,
@@ -40,35 +54,36 @@ class DropItem {
 }
 
 class DropItemGroup {
-  constructor(group) {
+  items: DropItem[]
+
+  constructor(group: ItemDropConfig[]) {
     this.items = group.map((e) => new DropItem(e))
   }
   getResult() {
-    const output = []
-    each(this.items, (item) => output.push(...item.getResult()))
+    const output: ReturnType<DropItem["getResult"]> = []
+    each(this.items, (item: DropItem) => output.push(...item.getResult()))
     return output
   }
 }
 
-export const FORTUNE_RULES = {
-  // 掉落一个权重为 2，每级增加一个掉落上限，权重为 1
-  ore: "ore",
-  // 掉落一个权重为 1，每级增加一个掉落上限，权重为 1，但不超过某上限
-  melon: "melon",
-  // 是否掉落有一固定概率
-  // 如果判定掉落，每级增加两个掉落上限，权重为 1
-  grass: "grass",
-  // 掉落一个权重为 1，每级增加两个掉落上限，权重为 1
-  flower: "flower",
-  // 固定掉落一个
-  // 额外掉落上限初始为 3，每级增加一个额外掉落上限，额外掉落服从 B(n, 4 / 7)
-  crop: "crop",
-  // 使用自定义的战利品表
-  custom: "custom",
-}
-
 export class BlockDrops {
-  constructor(blockTypeId, useItem) {
+  blockTypeId: string
+  drops: BlockDropsConfig
+
+  blockItem: DropItem
+  rawResource: DropItem
+  refinedResource: DropItem | undefined
+  seedResource: DropItem
+  immatureResource: DropItem
+
+  fortuneRule: BlockDropsConfig[number]["fortune_rule"]
+
+  custumLootTables: BlockDropsConfigOption["custom"]
+
+  constructor(
+    blockTypeId: string,
+    useItem: MinecraftItemTypes | "<empty>" = "<empty>"
+  ) {
     const identifier = removeMinecraftNamespace(blockTypeId)
     const drops = BlockDefinition[identifier]?.drops
 
@@ -77,48 +92,52 @@ export class BlockDrops {
     this.blockTypeId = blockTypeId
     this.drops = drops
 
-    if (useItem) this.setItemUse(useItem)
+    const dropConfig = this.getDropConfig(useItem)
+    if (!dropConfig) {
+      throw new Error(`Couldn't find drop config when dig with ${useItem}`)
+    }
+
+    this.blockItem = new DropItem({
+      item_id: BlockPermutation.resolve(this.blockTypeId).getItemStack()
+        ?.typeId as MinecraftItemTypes,
+    })
+    this.rawResource = dropConfig.raw
+      ? new DropItem(dropConfig.raw)
+      : this.blockItem
+
+    // for ore like
+    this.refinedResource =
+      dropConfig.refined && new DropItem(dropConfig.refined)
+
+    // for crop like
+    this.seedResource = dropConfig.seed
+      ? new DropItem(dropConfig.seed)
+      : this.rawResource
+    this.immatureResource = dropConfig.immature
+      ? new DropItem(dropConfig.immature)
+      : this.seedResource
+
+    this.fortuneRule = dropConfig.fortune_rule
+
+    // only work with custom rule
+    if (this.fortuneRule === FortuneRules.Custom) {
+      if (!dropConfig.option?.custom)
+        throw new Error(
+          "You must provide a custom loot table for the custom fortune rule."
+        )
+
+      this.custumLootTables = dropConfig.option.custom
+    }
   }
 
-  setItemUse(useItem = "<empty>") {
-    const dropConfig =
+  getDropConfig(useItem: MinecraftItemTypes | "<empty>") {
+    return (
       this.drops.find((e) => {
         const digBy = e.dig_by
         if (Array.isArray(digBy)) return digBy.includes(useItem)
         if (typeof digBy === "string") return digBy === useItem
       }) ?? this.drops.find((e) => e.dig_by === "<default>")
-
-    if (!dropConfig) {
-      // throw new Error(`Couldn't find drop config when dig with ${useItem}`)
-      return false
-    }
-
-    this.blockItem = new DropItem({
-      item_id: BlockPermutation.resolve(this.blockTypeId).getItemStack()
-        ?.typeId,
-    })
-    this.rawResource = new DropItem(dropConfig.raw) ?? this.blockItem
-
-    // for ore like
-    this.refinedResource = new DropItem(dropConfig.refined)
-
-    // for crop like
-    this.seendResource = new DropItem(dropConfig.seed) ?? this.rawResource
-    this.immatureResource =
-      new DropItem(dropConfig.immature) ?? this.seendResource
-
-    this.fortuneRule = dropConfig.fortune_rule
-
-    // only work with custom rule
-    if (this.fortuneRule === FORTUNE_RULES.custom) {
-      this.custumLootTable = dropConfig.option?.custom
-      if (!this.custumLootTable)
-        throw new Error(
-          "You must provide a custom loot table for the custom fortune rule."
-        )
-    }
-
-    return true
+    )
   }
 
   getDrops({ withFortune = 0, withSilkTouch = false, immature = false } = {}) {
@@ -131,11 +150,11 @@ export class BlockDrops {
     if (withSilkTouch) {
       return this.blockItem.getResult()
     }
-    if (withFortune !== 0 && this.fortuneRule) {
+    if (withFortune !== 0 && this.fortuneRule !== undefined) {
       const level = withFortune
 
       switch (this.fortuneRule) {
-        case FORTUNE_RULES.ore: {
+        case FortuneRules.Ore: {
           const rawResource = this.rawResource.getResult()[0]
 
           const lootTable = new LootTable([
@@ -149,7 +168,7 @@ export class BlockDrops {
 
           return [rawResource]
         }
-        case FORTUNE_RULES.melon: {
+        case FortuneRules.Melon: {
           const rawResource = this.rawResource.getResult()[0]
 
           const lootTable = new LootTable([
@@ -166,7 +185,7 @@ export class BlockDrops {
 
           return [rawResource]
         }
-        case FORTUNE_RULES.grass: {
+        case FortuneRules.Grass: {
           const rawResource = this.rawResource.getResult()[0]
 
           if (rawResource.amount === 0) return [rawResource]
@@ -175,7 +194,7 @@ export class BlockDrops {
           rawResource.amount = lootTable.getResult()
           return [rawResource]
         }
-        case FORTUNE_RULES.flower: {
+        case FortuneRules.Flower: {
           const rawResource = this.rawResource.getResult()[0]
 
           const lootTable = new LootTable(range(1, level * 2 + 2))
@@ -183,7 +202,7 @@ export class BlockDrops {
 
           return [rawResource]
         }
-        case FORTUNE_RULES.crop: {
+        case FortuneRules.Crop: {
           const rawResource = this.rawResource.getResult()[0]
 
           const distribution = binomialDistribution(level + 3, 4 / 7)
@@ -198,20 +217,22 @@ export class BlockDrops {
             rawResource,
             {
               // TODO: use class
-              itemId: this.seendResource.itemId,
+              itemId: this.seedResource.itemId,
               amount: lootTable.getResult(),
             },
           ]
         }
-        case FORTUNE_RULES.custom: {
-          const lootTable = new LootTable(this.custumLootTable[level])
+        case FortuneRules.Custom: {
+          const lootTable = new LootTable<ItemDropConfig[]>(
+            //@ts-ignore
+            this.custumLootTables[level]
+          )
           const customItemDrop = new DropItemGroup(lootTable.getResult())
           return customItemDrop.getResult()
         }
       }
-      // biome-ignore lint/style/noUselessElse: <explanation>
-    } else {
-      return this.rawResource.getResult()
     }
+
+    return this.rawResource.getResult()
   }
 }

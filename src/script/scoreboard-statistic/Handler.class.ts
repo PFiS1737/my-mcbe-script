@@ -1,27 +1,47 @@
+import type { PlayerOption } from "@/lib/option-manager/PlayerOption.class"
+import { WrappedPlayer } from "@/lib/wrapper/entity/index"
+import {
+  addMinecraftNamespaceIfNeed,
+  asyncRun,
+  getOrAddObjective,
+} from "@/util/game"
+import { eachAsync } from "@/util/index"
 import {
   DisplaySlotId,
   GameMode,
   ObjectiveSortOrder,
+  type Player,
   world,
 } from "@minecraft/server"
-
-import { WrappedPlayer } from "@/lib/wrapper/entity/index"
-import { asyncRun, getOrAddObjective } from "@/util/game"
-import { eachAsync } from "@/util/index"
-
-import { ALL_PLAYER_DATABASES, globalDB } from "./db"
+import CRITERIA from "./criteria/index"
+import { ALL_PLAYER_DATABASES, type EventDB, globalDB } from "./db"
 import { option } from "./option"
 
-import CRITERIA from "./criteria/index"
-
 export class Handler {
-  constructor(player) {
+  player: Player
+  playerOption: PlayerOption
+  playerDB: EventDB
+
+  constructor(player: Player) {
     this.player = player
     this.playerOption = option.getPlayer(player)
-    this.playerDB = ALL_PLAYER_DATABASES.get(player)
+
+    const playerDB = ALL_PLAYER_DATABASES.get(player)
+
+    if (!playerDB) throw new Error("Can't get player database.")
+
+    this.playerDB = playerDB
   }
 
-  async add({ objectiveId, criteria, displayName = objectiveId }) {
+  async add({
+    objectiveId,
+    criteria,
+    displayName = objectiveId,
+  }: {
+    objectiveId: string
+    criteria: string
+    displayName?: string
+  }) {
     if (world.scoreboard.getObjective(objectiveId))
       return { code: 0, message: "DUPLICATE_OBJECTIVE" }
 
@@ -49,7 +69,8 @@ export class Handler {
 
     return { code: 1 }
   }
-  async remove({ objectiveId }) {
+
+  async remove({ objectiveId }: { objectiveId: string }) {
     if (!globalDB.get(objectiveId)) return false
 
     await asyncRun(() => world.scoreboard.removeObjective(objectiveId))
@@ -57,20 +78,29 @@ export class Handler {
 
     return true
   }
-  async start({ objectiveId, criteria = globalDB.get(objectiveId) }) {
+
+  async start({
+    objectiveId,
+    criteria = globalDB.get(objectiveId) as string,
+  }: {
+    objectiveId: string
+    criteria?: string
+  }) {
     if (this.playerDB.has(objectiveId)) return false
 
     const objective = getOrAddObjective(objectiveId)
     const [criteriaType, criteriaName] = parseCriteria(criteria)
 
     const setupTigger = CRITERIA.get(criteriaType)
+
+    if (!setupTigger) throw new Error("Unknown criteria.")
+
     const tigger = setupTigger({
       player: this.player,
       target: criteriaName,
       callback: (result) => {
         if (
-          // @ts-ignore
-          !WrappedPlayer.wrap(this.player).testGameMode(GameMode.creative) ||
+          !new WrappedPlayer(this.player).testGameMode(GameMode.creative) ||
           this.playerOption.getItemVal("enable_creative")
         ) {
           switch (result.type) {
@@ -78,7 +108,7 @@ export class Handler {
               if (this.playerOption.getItemVal("enable_cancel_out"))
                 objective.setScore(
                   this.player,
-                  objective.getScore(this.player) - result.value
+                  (objective.getScore(this.player) ?? 0) - result.value
                 )
               break
             }
@@ -87,34 +117,28 @@ export class Handler {
               break
             }
             default: {
-              // TODO: scoreboard wrapper #addScore()
-              objective.setScore(
-                this.player,
-                objective.getScore(this.player) + result.value
-              )
+              objective.addScore(this.player, result.value)
             }
           }
         }
       },
     })
 
-    await eachAsync(
-      tigger.events,
-      async ({ option: subscribeOption, listener }, eventName) => {
-        if (subscribeOption)
-          await asyncRun(() =>
-            world.afterEvents[eventName].subscribe(listener, subscribeOption)
-          )
-        else
-          await asyncRun(() => world.afterEvents[eventName].subscribe(listener)) // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
-      }
-    )
+    await eachAsync(tigger.events, async ({ options, listener }, eventName) => {
+      if (options)
+        await asyncRun(() =>
+          world.afterEvents[eventName].subscribe(listener, options)
+        )
+      else
+        await asyncRun(() => world.afterEvents[eventName].subscribe(listener)) // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
+    })
 
     await this.playerDB.add(objectiveId, tigger.events)
 
     return true
   }
-  async stop({ objectiveId }) {
+
+  async stop({ objectiveId }: { objectiveId: string }) {
     if (!this.playerDB.has(objectiveId)) return false
 
     const events = this.playerDB.getEvents(objectiveId)
@@ -127,12 +151,8 @@ export class Handler {
   }
 }
 
-function parseCriteria(criteria) {
+function parseCriteria(criteria: string) {
   return criteria
     .split(":")
-    .map((e) => e.replace(".", ":"))
-    .map((e, i) => {
-      if (i === 0) return e
-      return e.match(/^(.+)\:/) ? e : `minecraft:${e}`
-    })
+    .map((e) => addMinecraftNamespaceIfNeed(e.replace(".", ":")))
 }

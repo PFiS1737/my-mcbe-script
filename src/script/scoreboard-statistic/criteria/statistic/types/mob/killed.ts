@@ -1,15 +1,19 @@
 import { EntityDamageCause } from "@minecraft/server"
+import type { Criteria } from "../../../types"
 
-export default ({ player, target, callback }) => ({
+export default (({ player, target, callback }) => ({
   events: {
     entityDie: {
-      option: {
+      options: {
         entityTypes: [target],
       },
       listener(event) {
         const cause = event.damageSource.cause
         const source = event.damageSource.damagingEntity
-        if (cause === EntityDamageCause.entityAttack && source.id === player.id)
+        if (
+          cause === EntityDamageCause.entityAttack &&
+          source?.id === player.id
+        )
           callback({
             type: "increase",
             value: 1,
@@ -17,4 +21,4 @@ export default ({ player, target, callback }) => ({
       },
     },
   },
-})
+})) as Criteria

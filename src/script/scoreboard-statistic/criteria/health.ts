@@ -1,8 +1,11 @@
-export default ({ player, callback }) => ({
+import type { Entity } from "@minecraft/server"
+import type { Criteria } from "./types"
+
+export default (({ player, callback }) => ({
   events: {
     entityHealthChanged: {
-      option: {
-        entities: [player],
+      options: {
+        entities: [player as Entity],
       },
       listener(event) {
         callback({
@@ -12,7 +15,7 @@ export default ({ player, callback }) => ({
       },
     },
     playerSpawn: {
-      listener() {
+      listener(_) {
         callback({
           type: "reset",
           value: 20,
@@ -20,4 +23,4 @@ export default ({ player, callback }) => ({
       },
     },
   },
-})
+})) as Criteria

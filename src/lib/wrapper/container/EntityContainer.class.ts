@@ -1,7 +1,11 @@
-import { Container } from "./Container.class"
+import type { Container, Entity, ItemStack } from "@minecraft/server"
+import type { WrappedEntity } from "../entity"
+import { WrappedContainer } from "./WrappedContainer.class"
 
-export class EntityContainer extends Container {
-  constructor(entity, container) {
+export class EntityContainer extends WrappedContainer {
+  _entity: Entity
+
+  constructor(entity: Entity | WrappedEntity, container: Container) {
     super(container)
 
     this._entity = entity
@@ -14,7 +18,7 @@ export class EntityContainer extends Container {
     return this._entity.dimension
   }
 
-  addItem(itemStack) {
+  addItem(itemStack: ItemStack) {
     const remain = this.tryAddItem(itemStack)
 
     if (remain) this.dimension.spawnItem(remain, this.location)

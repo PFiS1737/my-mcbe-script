@@ -1,5 +1,7 @@
 export class Direction {
-  constructor(directionCode) {
+  code: number
+
+  constructor(directionCode: number) {
     this.code = directionCode
   }
 
@@ -17,6 +19,8 @@ export class Direction {
         return "North"
       case 5:
         return "Down"
+      default:
+        throw new Error("Unexpected error.")
     }
   }
 
@@ -39,7 +43,7 @@ export class Direction {
     return this.code === 5
   }
 
-  equals(direction) {
+  equals(direction: Direction) {
     return this.code === direction.code
   }
 
@@ -47,7 +51,7 @@ export class Direction {
     const directionCode = this.code + 3
     return new Direction(directionCode >= 6 ? directionCode - 6 : directionCode)
   }
-  isOppositeTo(direction) {
+  isOppositeTo(direction: Direction) {
     return Math.abs(this.code - direction.code) === 3
   }
 }

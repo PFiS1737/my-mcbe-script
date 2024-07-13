@@ -1,4 +1,6 @@
+import type { Vector3Like } from "../vector/Vector3.class"
 import { Vector3, Vector3Utils } from "../vector/index"
+import type { BlockLocation } from "./BlockLocation.class"
 
 export class Location extends Vector3 {
   get centerCorrected() {
@@ -8,17 +10,21 @@ export class Location extends Vector3 {
     )
   }
 
+  static create(vector: Vector3Like) {
+    return Vector3.create(vector) as Location
+  }
+
   clone() {
     return new Location(this.x, this.y, this.z)
   }
-  equals(v) {
+  equals(v: Location) {
     return Vector3Utils.exactEquals(this, v)
   }
-  isNearTo(v, distance) {
+  isNearTo(v: Location | BlockLocation, distance: number) {
     return this.distanceTo(v) <= distance
   }
 
-  offset(v) {
+  offset(v: Location | BlockLocation) {
     return this.add(v)
   }
 }

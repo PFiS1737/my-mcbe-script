@@ -15,13 +15,20 @@ import {
 import { asyncRun } from "@/util/game"
 import { each } from "@/util/index"
 
+import type { PlayerOption } from "@/src/lib/option-manager/PlayerOption.class"
+import type { BlockDrops } from "@/src/lib/wrapper/block/BlockDrops.class"
+import type {
+  MinecraftBlockTypes,
+  MinecraftItemTypes,
+} from "@minecraft/vanilla-data"
 import { ENABLE_BLOCKS } from "./config"
 import { option } from "./option"
 
 export const setupListener = () =>
   world.afterEvents.playerBreakBlock.subscribe((event) => {
     const basicBlock = new WrappedBlock(event.block)
-    const blockTypeId = event.brokenBlockPermutation.type.id
+    const blockTypeId = event.brokenBlockPermutation.type
+      .id as MinecraftBlockTypes
     const player = new WrappedPlayer(event.player)
     const playerOption = option.getPlayer(event.player)
 
@@ -36,7 +43,7 @@ export const setupListener = () =>
           !enableBlocks.has(blockTypeId) ||
           !WrappedBlock.prototype.canBeDugBy.call(
             { typeId: blockTypeId },
-            mainHandItem.typeId
+            mainHandItem.typeId as MinecraftItemTypes
           ) ||
           playerOption.getItemVal("condition") === "off" ||
           (playerOption.getItemVal("condition") === "sneaking" &&
@@ -56,7 +63,7 @@ export const setupListener = () =>
 
         let totalDamage = 0
 
-        const totalItems = []
+        const totalItems: ReturnType<BlockDrops["getDrops"]> = []
         let totalXp = 0
 
         while (
@@ -69,6 +76,8 @@ export const setupListener = () =>
         ) {
           const block = blockList.shift()
 
+          if (!block) throw new Error("Unexpected error.")
+
           const result = await asyncRun(() => block.breakBy(mainHandItem))
 
           totalDamage += result.getTotalDamage()
@@ -76,6 +85,7 @@ export const setupListener = () =>
           if (playerOption.getItemVal("auto_collection")) {
             each(result.drops, (drop) => {
               if (drop.xp) totalXp += drop.xp
+
               totalItems.push(drop)
             })
           } else {
@@ -93,13 +103,16 @@ export const setupListener = () =>
         if (wrappedItem instanceof ItemStackWithDurability)
           wrappedItem.applyDamage(totalDamage)
 
-        // @ts-ignore
         return wrappedItem._item
       })
       .catch(BetterConsole.error)
   })
 
-function getNeighbourBlocks(playerOption, basicBlock, blockTypeId) {
+function getNeighbourBlocks(
+  playerOption: PlayerOption,
+  basicBlock: WrappedBlock,
+  blockTypeId: MinecraftBlockTypes
+) {
   const offsets = [
     new BlockLocation(1, 0, 0),
     new BlockLocation(-1, 0, 0),
@@ -139,7 +152,7 @@ function getNeighbourBlocks(playerOption, basicBlock, blockTypeId) {
     )
   }
 
-  const list = new BlockList()
+  const list = new BlockList<WrappedBlock>()
 
   each(offsets, (offset) => {
     const block = basicBlock.getOffsetBlock(offset)
@@ -149,10 +162,14 @@ function getNeighbourBlocks(playerOption, basicBlock, blockTypeId) {
   return list
 }
 
-function getRelatedBlocks(playerOption, basicBlock, blockTypeId) {
+function getRelatedBlocks(
+  playerOption: PlayerOption,
+  basicBlock: WrappedBlock,
+  blockTypeId: MinecraftBlockTypes
+) {
   const maxAmount = playerOption.getItemVal("max_amount")
 
-  const list = new BlockList()
+  const list = new BlockList<WrappedBlock>()
   list.add(...getNeighbourBlocks(playerOption, basicBlock, blockTypeId))
 
   let previousSize = 0

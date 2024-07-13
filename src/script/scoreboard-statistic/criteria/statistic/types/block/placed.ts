@@ -1,4 +1,6 @@
-export default ({ player, target, callback }) => ({
+import type { Criteria } from "../../../types"
+
+export default (({ player, target, callback }) => ({
   events: {
     playerBreakBlock: {
       listener(event) {
@@ -23,4 +25,4 @@ export default ({ player, target, callback }) => ({
       },
     },
   },
-})
+})) as Criteria

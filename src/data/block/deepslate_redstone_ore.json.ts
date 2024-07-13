@@ -1,4 +1,5 @@
 import { ItemTypeGroups } from "@/lib/wrapper/item/index"
+import { type BlockConfig, FortuneRules } from "./types"
 
 export default {
   drops: [
@@ -11,7 +12,7 @@ export default {
         xp_range: [1, 5],
       },
 
-      fortune_rule: "melon",
+      fortune_rule: FortuneRules.Melon,
     },
   ],
-}
+} as BlockConfig

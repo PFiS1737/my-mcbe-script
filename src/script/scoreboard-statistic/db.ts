@@ -1,30 +1,35 @@
 import { Database } from "@/lib/database/index"
+import type { Player } from "@minecraft/server"
+import type { Criteria } from "./criteria/types"
 
-export const globalDB = new Database(
-  { id: "global" },
+export const globalDB = new Database<string>(
+  { id: "global" } as Player,
   "scoreboard-statistic-global"
 )
 
-export const ALL_PLAYER_DATABASES = new Map()
+export const ALL_PLAYER_DATABASES = new Map<Player, EventDB>()
 
 export class EventDB {
-  constructor(player) {
-    this.db = new Database(player, "scoreboard-statistic-player")
+  player: Player
+  db: Database<Set<string>>
+
+  constructor(player: Player) {
     this.player = player
+    this.db = Database.open(player, "scoreboard-statistic-player")
   }
 
-  events = new Map()
+  events = new Map<string, ReturnType<Criteria>["events"]>()
 
   // 此次因为有 events 这个运行时存储项，
   // 而不能多次 construct，
   // 故使用此方法将实例储存到 ALL_PLAYER_DATABASES 中
-  static init(player) {
+  static init(player: Player) {
     const db = new EventDB(player)
     ALL_PLAYER_DATABASES.set(player, db)
     return db
   }
 
-  async addParticipated(objectiveId) {
+  async addParticipated(objectiveId: string) {
     const participated = this.getParticipated()
     participated.add(objectiveId)
     await this.db.set("__participated__", participated)
@@ -33,23 +38,23 @@ export class EventDB {
     return new Set(this.db.get("__participated__") ?? [])
   }
 
-  setEvents(objectiveId, events) {
+  setEvents(objectiveId: string, events: ReturnType<Criteria>["events"]) {
     this.events.set(objectiveId, events)
   }
-  getEvents(objectiveId) {
+  getEvents(objectiveId: string) {
     return this.events.get(objectiveId)
   }
 
-  async add(objectiveId, events) {
+  async add(objectiveId: string, events: ReturnType<Criteria>["events"]) {
     await this.addParticipated(objectiveId)
     this.setEvents(objectiveId, events)
   }
-  has(objectiveId) {
+  has(objectiveId: string) {
     return (
       this.events.has(objectiveId) && this.getParticipated().has(objectiveId)
     )
   }
-  async delete(objectiveId) {
+  async delete(objectiveId: string) {
     const participated = this.getParticipated()
     if (participated.has(objectiveId)) {
       participated.delete(objectiveId)

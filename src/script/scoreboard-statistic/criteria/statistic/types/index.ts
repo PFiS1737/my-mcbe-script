@@ -9,23 +9,18 @@ import placed from "./block/placed"
 
 export const types = {
   // custom
-  // TODO
+  // TODO:
   // "minecraft:custom": custom, custom,
 
   // mob
   "minecraft:killed": killed,
-  killed,
   "minecraft:killed_by": killed_by,
-  killed_by,
-  "minecraft:killed_for": killed_for,
-  killed_for, // not in vanilla
+  "minecraft:killed_for": killed_for, // not in vanilla
 
   // block
   "minecraft:mined": mined,
-  mined,
-  "minecraft:placed": placed,
-  placed, // not in vanilla
+  "minecraft:placed": placed, // not in vanilla
 
   // item
-  // TODO
+  // TODO:
 }

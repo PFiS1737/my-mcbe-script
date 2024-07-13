@@ -1,5 +1,11 @@
+import { serialize } from "../util"
 import { Vector3Utils } from "./Vector3Utils.class"
 import { VectorN } from "./VectorN.class"
+
+export type Vector3Like =
+  | string
+  | number[]
+  | { x: number; y: number; z: number }
 
 /**
  * Class representing a 3-dimensional vector.
@@ -8,43 +14,26 @@ import { VectorN } from "./VectorN.class"
 export class Vector3 extends VectorN {
   /**
    * Create a 3D vector.
-   * @param {number} x - The x axis.
-   * @param {number} y - The y axis.
-   * @param {number} z - The z axis.
+   * @param x - The x axis.
+   * @param y - The y axis.
+   * @param z - The z axis.
    */
   constructor(x = 0, y = 0, z = 0) {
     super(x, y, z)
   }
 
-  get x() {
-    return this.get(0)
-  }
-  set x(value) {
-    this.set(0, value)
-  }
-  get y() {
-    return this.get(1)
-  }
-  set y(value) {
-    this.set(1, value)
-  }
-  get z() {
-    return this.get(2)
-  }
-  set z(value) {
-    this.set(2, value)
-  }
-
   /**
-   * @param {Array<number>|string|{x:number,y:number,z:number}} vector - The vector write in array.
-   * @returns {Vector3} The vector.
+   * @param vector - The vector write in array.
+   * @returns The vector.
    */
-  static create(vector) {
+  static create(vector: Vector3Like): Vector3 {
     if (Array.isArray(vector)) return new this(...vector)
     // @ts-ignore
     if (typeof vector === "string") return this.parse(vector)
     if (typeof vector === "object")
       return new this(vector.x, vector.y, vector.z)
+
+    throw new Error(`Can't create 3d vector for ${serialize(vector)}`)
   }
 
   get magnitude() {
@@ -72,14 +61,16 @@ export class Vector3 extends VectorN {
 
   /**
    * Apply a function to each axes of the vector and return a new vector.
-   * @param {function(number, number): number} callbackfn - The function to apply.
-   * @returns {Vector3} The new vector.
+   * @param callbackfn - The function to apply.
+   * @returns The new vector.
    */
-  map(callbackfn) {
+  map(
+    callbackfn: (vale: number, index: number, array: number[]) => number
+  ): Vector3 {
     return Vector3.create(this.axes.map(callbackfn))
   }
 
-  copy(v) {
+  copy(v: Vector3 | VectorN) {
     this.x = v.x
     this.y = v.y
     this.z = v.z
@@ -88,30 +79,30 @@ export class Vector3 extends VectorN {
   clone() {
     return new Vector3(this.x, this.y, this.z)
   }
-  equals(v) {
+  equals(v: Vector3) {
     return Vector3Utils.equals(this, v)
   }
 
-  distanceTo(v) {
+  distanceTo(v: Vector3) {
     return Vector3Utils.distance(this, v)
   }
-  squaredDistanceTo(v) {
+  squaredDistanceTo(v: Vector3) {
     return Vector3Utils.squaredDistance(this, v)
   }
 
-  add(v) {
+  add(v: Vector3) {
     return this.copy(Vector3Utils.add(this, v))
   }
-  subtract(v) {
+  subtract(v: Vector3) {
     return this.copy(Vector3Utils.subtract(this, v))
   }
-  multiply(v) {
+  multiply(v: Vector3) {
     return this.copy(Vector3Utils.multiply(this, v))
   }
-  divide(v) {
+  divide(v: Vector3) {
     return this.copy(Vector3Utils.divide(this, v))
   }
-  scale(n) {
+  scale(n: number) {
     return this.copy(Vector3Utils.scale(this, n))
   }
   negate() {

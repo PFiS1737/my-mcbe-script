@@ -1,55 +1,67 @@
 import {
+  type Block,
   BlockPermutation,
   BlockVolume,
-  ItemStack as MinecraftItemStack,
+  ItemStack,
 } from "@minecraft/server"
-
-import { BlockLocation, LocationUtils } from "../../location/index"
+import type {
+  MinecraftBlockTypes,
+  MinecraftItemTypes,
+} from "@minecraft/vanilla-data"
+import {
+  BlockLocation,
+  type Direction,
+  type Location,
+  LocationUtils,
+} from "../../location/index"
 import { each } from "../../util/index"
-
 import { WrapperTemplate } from "../WrapperTemplate.class"
-
 import { WrappedItemStack } from "../item/index"
-
 import { BlockDrops } from "./BlockDrops.class"
 
 export class WrappedBlock extends WrapperTemplate {
-  constructor(block) {
+  _block: Block
+  type: Block["type"]
+  typeId: MinecraftBlockTypes
+  location: BlockLocation
+  dimension: Block["dimension"]
+  permutation: Block["permutation"]
+
+  constructor(block: Block) {
     super()
 
     this._block = block
 
     this.type = block.type
-    this.typeId = block.typeId
+    this.typeId = block.typeId as MinecraftBlockTypes
     this.location = BlockLocation.create(block.location)
     this.dimension = block.dimension
     this.permutation = block.permutation
   }
 
-  getOffsetBlock(v) {
-    // @ts-ignore
+  getOffsetBlock(v: Location | BlockLocation) {
     const location = this.location.clone().offset(v)
     return new WrappedBlock(this.dimension.getBlock(location))
   }
-  getNeighbourBlock(direction) {
+  getNeighbourBlock(direction: Direction) {
     const offset = LocationUtils.getDirectionOffset(direction)
     return this.getOffsetBlock(offset)
   }
 
-  getState(name) {
+  getState(name: string) {
     return this.permutation.getState(name)
   }
-  hasState(name) {
+  hasState(name: string) {
     return !!this.getState(name)
   }
-  setState(name, value) {
+  setState(name: string, value: string | number | boolean) {
     const states = this.permutation.getAllStates()
     states[name] = value
     this._block.setPermutation(BlockPermutation.resolve(this.typeId, states))
   }
 
-  canBeDugBy(itemTypeId = "<empty>") {
-    return new BlockDrops(this.typeId).setItemUse(itemTypeId)
+  canBeDugBy(itemTypeId: MinecraftItemTypes | "<empty>" = "<empty>") {
+    return !!new BlockDrops(this.typeId).getDropConfig(itemTypeId)
   }
 
   destroy() {
@@ -58,8 +70,11 @@ export class WrappedBlock extends WrapperTemplate {
       BlockPermutation.resolve("minecraft:air")
     )
   }
-  breakBy(useItemStack) {
-    const drops = new BlockDrops(this.typeId, useItemStack?.typeId ?? "<empty>")
+  breakBy(useItemStack: ItemStack | WrappedItemStack) {
+    const drops = new BlockDrops(
+      this.typeId,
+      (useItemStack.typeId as MinecraftItemTypes) ?? "<empty>"
+    )
 
     this.destroy()
 
@@ -70,9 +85,7 @@ export class WrappedBlock extends WrapperTemplate {
             ? useItemStack
             : new WrappedItemStack(useItemStack)
         return drops.getDrops({
-          withFortune: item.enchants.hasEnchantment("fortune")
-            ? item.enchants.getEnchantment("fortune").level
-            : 0,
+          withFortune: item.enchants.getEnchantment("fortune")?.level ?? 0,
           withSilkTouch: item.enchants.hasEnchantment("silk_touch"),
         })
       }
@@ -82,7 +95,7 @@ export class WrappedBlock extends WrapperTemplate {
     const spawnDrops = () => {
       each(result, (drop) => {
         this.dimension.spawnItem(
-          new MinecraftItemStack(drop.itemId, drop.amount),
+          new ItemStack(drop.itemId, drop.amount),
           this.location
         )
         while (drop.xp--)

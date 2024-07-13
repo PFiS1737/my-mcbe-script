@@ -1,6 +1,5 @@
 import { Commands } from "../commands/index"
 import { asyncRun, errorHandler } from "../util/game"
-
 import { optionManager } from "./manager"
 
 Commands.register("!", "option", async (argv, sender) => {

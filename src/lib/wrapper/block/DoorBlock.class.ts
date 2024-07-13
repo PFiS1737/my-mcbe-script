@@ -1,3 +1,5 @@
+import type { Block } from "@minecraft/server"
+
 import { BlockLocation, Directions } from "../../location/index"
 
 import { WrappedBlock } from "./WrappedBlock.class"
@@ -10,7 +12,7 @@ import {
 } from "./BlockTypeGroups.enumeration"
 
 export class DoorBlock extends WrappedBlocks {
-  constructor(block) {
+  constructor(block: Block) {
     DoorBlock.assert(block)
 
     const wrappedBlock =
@@ -91,7 +93,7 @@ export class DoorBlock extends WrappedBlocks {
 
   getRelated({ shouldBeTheSameType = true } = {}) {
     // 获取可以与该门双开的另一个门和这个门组成的列表
-    const output = [this]
+    const output: DoorBlock[] = [this]
 
     // 1. 获取另一个门的位置
     //    根据门的方向和门轴位置确定
@@ -120,7 +122,7 @@ export class DoorBlock extends WrappedBlocks {
     // 2. 进行判断
     const relatedBlock = this._lower.getOffsetBlock(offset)
     if (DoorBlock.match(relatedBlock)) {
-      const relatedDoor = new DoorBlock(relatedBlock)
+      const relatedDoor = new DoorBlock(relatedBlock._block)
       // 另一扇门应该方向相同，而门轴相反
       if (
         relatedDoor.canBeOpenedByHand() &&
@@ -128,7 +130,6 @@ export class DoorBlock extends WrappedBlocks {
         relatedDoor.facingDirection.code === facingDirection.code &&
         relatedDoor.hingeSide === !hingeSide
       )
-        // @ts-ignore
         output.push(relatedDoor)
     }
 

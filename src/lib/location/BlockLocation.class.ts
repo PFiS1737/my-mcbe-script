@@ -1,34 +1,33 @@
-import { LocationUtils } from "./LocationUtils.class"
+import { Vector3Utils } from "../vector"
+import { Vector3, type Vector3Like } from "../vector/Vector3.class"
 
-import { Location } from "./Location.class"
-
-export class BlockLocation extends Location {
-  constructor(x, y, z) {
+export class BlockLocation extends Vector3 {
+  constructor(x: number, y: number, z: number) {
     super(x, y, z)
 
     this.floor()
   }
 
-  // @ts-ignore
-  get centerCorrected() {
-    throw new Error('Couldn\'t get "centerCorrected" on BlockLocation.')
+  static create(vector: Vector3Like) {
+    return Vector3.create(vector) as BlockLocation
   }
 
-  // @ts-ignore
   clone() {
     return new BlockLocation(this.x, this.y, this.z)
   }
+  equals(v: BlockLocation) {
+    return Vector3Utils.exactEquals(this, v)
+  }
+  isNearTo(v: BlockLocation, distance: number) {
+    return this.distanceTo(v) <= distance
+  }
 
-  divide(v) {
+  offset(v: BlockLocation) {
+    return this.add(v)
+  }
+
+  divide(v: BlockLocation) {
     super.divide(v)
     return this.floor()
-  }
-  // @ts-ignore
-  inverse() {
-    throw new Error('Couldn\'t call "inverse" on BlockLocation.')
-  }
-
-  between(v) {
-    return LocationUtils.between(this, v)
   }
 }

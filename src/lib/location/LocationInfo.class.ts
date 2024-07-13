@@ -4,7 +4,25 @@ import { removeMinecraftNamespace } from "../util/game"
 import { Location } from "./Location.class"
 
 export class LocationInfo {
-  constructor({ location, dimension }) {
+  location: Location
+  dimension: Dimension
+
+  constructor({
+    location,
+    dimension,
+  }: {
+    location:
+      | Location
+      | number[]
+      | string
+      | {
+          x: number
+          y: number
+          z: number
+        }
+    dimension: string | Dimension
+  }) {
+    //@ts-ignore
     this.location =
       location instanceof Location ? location : Location.create(location)
     this.dimension =
@@ -17,7 +35,7 @@ export class LocationInfo {
     }
   }
 
-  [Symbol.toPrimitive](hint) {
+  [Symbol.toPrimitive](hint: string) {
     if (hint === "string")
       return `${removeMinecraftNamespace(this.dimension.id)}: ${this.location}`
     return this

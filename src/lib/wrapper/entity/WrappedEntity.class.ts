@@ -1,19 +1,25 @@
+import type { Entity, ScoreboardIdentity } from "@minecraft/server"
 import { Directions, Location } from "../../location/index"
 import { removeMinecraftNamespace } from "../../util/game"
 import { each } from "../../util/index"
 
+import type { MinecraftEntityTypes } from "@minecraft/vanilla-data"
 import { WrapperTemplate } from "../WrapperTemplate.class"
 
 export class WrappedEntity extends WrapperTemplate {
+  _entity: Entity
+  id: Entity["id"]
+  typeId: MinecraftEntityTypes
+  scoreboardIdentity: Entity["scoreboardIdentity"]
   components = new Map()
 
-  constructor(entity) {
+  constructor(entity: Entity) {
     super()
 
     this._entity = entity
 
     this.id = entity.id
-    this.typeId = entity.typeId
+    this.typeId = entity.typeId as MinecraftEntityTypes
 
     this.scoreboardIdentity = entity.scoreboardIdentity
 
@@ -48,5 +54,7 @@ export class WrappedEntity extends WrapperTemplate {
     if (rotation > -45 && rotation <= 45) return Directions.South
     if (rotation > 45 && rotation <= 135) return Directions.West
     if (rotation > 135 || rotation <= -135) return Directions.North
+
+    throw new Error("Unexpected error.")
   }
 }

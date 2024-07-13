@@ -1,10 +1,9 @@
 import { each, eachAsync, isAsyncFunc } from "./util/index"
 
 export class EventEmitter {
-  constructor() {
-    this._events = {}
-  }
-  on(eventName, listener) {
+  _events: Record<string, Function[]> = {}
+
+  on(eventName: string, listener: Function) {
     if (isAsyncFunc(listener)) {
       const _eventName = `${eventName}.async`
       if (this._events[_eventName]) this._events[_eventName].push(listener)
@@ -15,17 +14,17 @@ export class EventEmitter {
     }
     return this
   }
-  once(eventName, listener) {
+  once(eventName: string, listener: Function) {
     if (isAsyncFunc(listener)) {
       const _eventName = `${eventName}.async`
-      const _listener = async (...args) => {
+      const _listener = async (...args: any[]) => {
         await listener(...args)
         this.removeListener(_eventName, _listener)
       }
       if (this._events[_eventName]) this._events[_eventName].push(_listener)
       else this._events[_eventName] = [_listener]
     } else {
-      const _listener = (...args) => {
+      const _listener = (...args: any[]) => {
         listener(...args)
         this.removeListener(eventName, _listener)
       }
@@ -34,9 +33,9 @@ export class EventEmitter {
     }
     return this
   }
-  removeListener(eventName, listener) {
+  removeListener(eventName: string, listener: Function) {
     if (this._events[eventName]) {
-      const newListeners = []
+      const newListeners: Function[] = []
       each(this._events[eventName], (_listener) => {
         if (_listener !== listener) newListeners.push(_listener)
       })
@@ -44,13 +43,13 @@ export class EventEmitter {
     }
     return this
   }
-  async emit(eventName, ...args) {
+  async emit(eventName: string, ...args: any[]) {
     if (this._events[eventName]) {
       each(this._events[eventName], (listener) => listener(...args))
     }
     await this.asyncEmit(eventName, ...args)
   }
-  async asyncEmit(eventName, ...args) {
+  async asyncEmit(eventName: string, ...args: any[]) {
     const _eventName = `${eventName}.async`
     if (this._events[_eventName]) {
       await eachAsync(
@@ -59,10 +58,10 @@ export class EventEmitter {
       )
     }
   }
-  addListener(eventName, listener) {
+  addListener(eventName: string, listener: Function) {
     return this.on(eventName, listener)
   }
-  off(eventName, listener) {
+  off(eventName: string, listener: Function) {
     return this.removeListener(eventName, listener)
   }
 }

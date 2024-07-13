@@ -1,7 +1,10 @@
+import type { Container, ItemStack } from "@minecraft/server"
 import { WrapperTemplate } from "../WrapperTemplate.class"
 
-export class Container extends WrapperTemplate {
-  constructor(container) {
+export class WrappedContainer extends WrapperTemplate {
+  _container: Container
+
+  constructor(container: Container) {
     super()
 
     this._container = container
@@ -14,13 +17,13 @@ export class Container extends WrapperTemplate {
     return this._container.emptySlotsCount
   }
 
-  getItem(slot) {
+  getItem(slot: number) {
     return this._container.getItem(slot)
   }
-  setItem(slot, itemStack) {
+  setItem(slot: number, itemStack: ItemStack) {
     return this._container.setItem(slot, itemStack)
   }
-  tryAddItem(itemStack) {
+  tryAddItem(itemStack: ItemStack) {
     return this._container.addItem(itemStack)
   }
 }

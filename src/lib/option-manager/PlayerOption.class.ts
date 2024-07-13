@@ -1,25 +1,36 @@
+import type { Player } from "@minecraft/server"
 import { ModalFormData } from "@minecraft/server-ui"
-
-import { each, eachAsync } from "../util/index"
-
 import { Database } from "../database/index"
 import { Dialog } from "../dialog/index"
-
-import { OptionItemRange } from "./OptionItemRange.class"
-import { OptionItemSelection } from "./OptionItemSelection.class"
+import { each, eachAsync } from "../util/index"
+import { type IOptionItemRange, OptionItemRange } from "./OptionItemRange.class"
+import {
+  type IOptionItemSelection,
+  OptionItemSelection,
+} from "./OptionItemSelection.class"
 
 export class PlayerOption {
-  constructor(player, name) {
+  name: string
+  db: Database<string | number | boolean>
+  player: Player
+
+  constructor(player: Player, name: string) {
     this.name = name
     this.db = Database.open(player, `option-manager:${name}`)
     this.player = player
   }
 
-  items = {}
+  items: Record<string, OptionItemSelection<any> | OptionItemRange> = {}
+  reload = false
 
-  addItem(opts) {
+  addItem(
+    opts: { _player: Player } & (IOptionItemRange | IOptionItemSelection<any>)
+  ) {
+    //@ts-ignore
     if (opts.range) this.items[opts.name] = new OptionItemRange(opts)
+    //@ts-ignore
     else if (opts.values) this.items[opts.name] = new OptionItemSelection(opts)
+
     return this
   }
   async _syncToDB() {
@@ -38,25 +49,33 @@ export class PlayerOption {
     await this._syncToDB()
   }
   async init() {
-    this.addItem = undefined
+    this.addItem = () => {
+      throw new Error("Can't add item after initialization.")
+    }
+
     await this._syncFromDB()
     return this.getItemValMap()
   }
 
-  _getItem(name) {
+  _getItem(name: string) {
     return this.items[name]
   }
-  hasItem(name) {
+  hasItem(name: string) {
     return !!this.items[name]
   }
-  setItemVal(
-    name,
-    value,
-    callback = (_, __, ___) => {},
+  setItemVal<T>(
+    name: string,
+    value: T,
+    callback: (
+      selected: T,
+      original: T,
+      map: Record<string, any>
+    ) => void = () => {},
     { syncFromDB = false } = {}
   ) {
     const item = this._getItem(name)
     if (item) {
+      //@ts-ignore
       const result = item.select(value)
       if (result) {
         if (!syncFromDB && item.reload) this.reload = true
@@ -65,18 +84,19 @@ export class PlayerOption {
     }
     return this
   }
-  getItemVal(name) {
+  getItemVal(name: string) {
     const item = this._getItem(name)
     if (item) return item.selected
   }
   getItemValMap() {
+    // TODO: use map
     const result = {}
     each(this.items, (_, name) => {
       result[name] = this.getItemVal(name)
     })
     return result
   }
-  async done(parentDialog) {
+  async done(parentDialog?: Dialog<any>) {
     const handleDone = async ({ reply = true } = {}) => {
       await this._syncToDB()
       if (reply) this.player.sendMessage("设置选项修改成功")
@@ -97,9 +117,15 @@ export class PlayerOption {
       })
     } else await handleDone()
   }
-  async showDialog(parentDialog) {
+  async showDialog(parentDialog?: Dialog<any>) {
     const form = new ModalFormData().title(`${this.name} 选项`)
-    const nameMap = []
+    const nameMap: Array<{
+      name: string
+      valuesMap:
+        | Map<boolean, boolean>
+        | Map<number, string | number | boolean>
+        | Map<number, number>
+    }> = []
 
     each(this.items, (item) => {
       if (item instanceof OptionItemSelection) {
@@ -135,7 +161,7 @@ export class PlayerOption {
       }
     })
 
-    const dialog = new Dialog({
+    const dialog = new Dialog<void>({
       dialog: form,
       onClose: async () => {
         if (parentDialog) await parentDialog.show(this.player)

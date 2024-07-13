@@ -1,8 +1,13 @@
 import { each } from "../util/index"
 import { withProbability } from "../util/math"
 
-export class LootTable {
-  constructor(items) {
+export interface ILootTableItemConfig<T> {
+  weight: number
+  value: T
+}
+
+export class LootTable<T = number> {
+  constructor(items: Array<number | ILootTableItemConfig<T>>) {
     if (items)
       each(items, (item) => {
         if (typeof item === "number") this.addItem({ weight: 1, value: item })
@@ -10,10 +15,10 @@ export class LootTable {
       })
   }
 
-  table = new Set()
+  table = new Set<ILootTableItemConfig<T>>()
   totalWeight = 0
 
-  addItem(item) {
+  addItem(item: ILootTableItemConfig<T>) {
     this.table.add(item)
     this.totalWeight += item.weight
   }
@@ -24,6 +29,8 @@ export class LootTable {
       if (withProbability(weight / (this.totalWeight - total))) return value
       total += weight
     }
+
+    throw new Error("Unexpected error.")
   }
 
   [Symbol.iterator]() {

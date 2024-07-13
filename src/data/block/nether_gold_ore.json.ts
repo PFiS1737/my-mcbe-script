@@ -1,4 +1,5 @@
 import { ItemTypeGroups } from "@/lib/wrapper/item/index"
+import { type BlockConfig, FortuneRules } from "./types"
 
 export default {
   drops: [
@@ -14,7 +15,7 @@ export default {
         item_id: "minecraft:gold_ingot",
       },
 
-      fortune_rule: "ore",
+      fortune_rule: FortuneRules.Ore,
     },
   ],
-}
+} as BlockConfig

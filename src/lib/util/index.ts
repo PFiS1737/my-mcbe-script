@@ -21,12 +21,21 @@ export async function eachAsync(target, asyncfn, thisArg) {
     )
 }
 
-export function safeEval(code, context = {}) {
+export function safeEval(code: string, context = {}) {
   const fn = new Function(...Object.keys(context), `return ${code}`)
   return fn(...Object.values(context))
 }
 
-export function serialize(obj): string {
+export type Serializable =
+  | Set<Serializable>
+  | Map<Serializable, Serializable>
+  | { [key: string]: Serializable }
+  | Array<Serializable>
+  | string
+  | number
+  | boolean
+
+export function serialize(obj: Serializable): string {
   if (obj instanceof Set) return `new Set(${serialize(Array.from(obj))})`
 
   if (obj instanceof Map)
@@ -42,7 +51,7 @@ export function serialize(obj): string {
   return JSON.stringify(obj)
 }
 
-export function deserialize(str) {
+export function deserialize(str: string): Serializable {
   try {
     return JSON.parse(str)
   } catch (err) {
@@ -51,19 +60,14 @@ export function deserialize(str) {
   }
 }
 
-export const AsyncFunction = (async () => {}).constructor
-export function isAsyncFunc(func) {
-  return func[Symbol.toStringTag] === "AsyncFunction"
+export function isAsyncFunc(func: Function): boolean {
+  return Object.prototype.toString.call(func) === "[object AsyncFunction]"
 }
 
-export function arraySample(arr) {
+export function arraySample<T>(arr: Array<T>): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-export function arrayAt(arr, index) {
-  return index >= 0 ? arr[index] : arr[arr.length + index]
-}
-
-export function toCamelCase(str) {
+export function toCamelCase(str: string) {
   return str.replace(/(\w)[\. _-](\w)/g, (_, $1, $2) => $1 + $2.toUpperCase())
 }

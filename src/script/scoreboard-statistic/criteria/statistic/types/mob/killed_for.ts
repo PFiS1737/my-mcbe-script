@@ -1,8 +1,11 @@
-export default ({ player, target, callback }) => ({
+import type { Entity } from "@minecraft/server"
+import type { Criteria } from "../../../types"
+
+export default (({ player, target, callback }) => ({
   events: {
     entityDie: {
-      option: {
-        entities: [player],
+      options: {
+        entities: [player as Entity],
       },
       listener(event) {
         const cause = `minecraft:${event.damageSource.cause}`
@@ -14,4 +17,4 @@ export default ({ player, target, callback }) => ({
       },
     },
   },
-})
+})) as Criteria

@@ -1,10 +1,13 @@
-export default ({ player, callback }) => ({
+import type { Entity } from "@minecraft/server"
+import type { Criteria } from "./types"
+
+export default (({ player, callback }) => ({
   events: {
     entityDie: {
-      option: {
-        entities: [player],
+      options: {
+        entities: [player as Entity],
       },
-      listener() {
+      listener(_) {
         callback({
           type: "increase",
           value: 1,
@@ -12,4 +15,4 @@ export default ({ player, callback }) => ({
       },
     },
   },
-})
+})) as Criteria

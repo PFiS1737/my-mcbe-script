@@ -1,6 +1,6 @@
 import { Commands } from "@/lib/commands/index"
 import { asyncRun, errorHandler } from "@/util/game"
-
+import type { Player } from "@minecraft/server"
 import { Handler } from "./Handler.class"
 import { option } from "./option"
 
@@ -23,7 +23,7 @@ const SUB_COMMANDS = [
   "-o",
 ]
 
-export async function tpxCommand(argv, sender) {
+export async function tpxCommand(argv: string[], sender: Player) {
   const name = argv[2] ?? "default"
   const handler = new Handler(sender)
 
@@ -37,7 +37,7 @@ export async function tpxCommand(argv, sender) {
         name,
         option: {
           disposable:
-            argv[3] === "true" ? true : argv[3] === "false" ? false : null,
+            argv[3] === "true" ? true : argv[3] === "false" ? false : undefined,
         },
       })
 
@@ -101,13 +101,13 @@ export async function tpxCommand(argv, sender) {
   }
 }
 
-export async function backCommand(_, sender) {
+export async function backCommand(_: string[], sender: Player) {
   if (option.getPlayer(sender).getItemVal("back_cmd"))
     await Commands.asyncRun("!tpx back", sender)
   else sender.sendMessage("您未启用该命令")
 }
 
-export async function homeCommand(argv, sender) {
+export async function homeCommand(argv: string[], sender: Player) {
   if (option.getPlayer(sender).getItemVal("home_cmd")) {
     switch (argv[1]) {
       case "set": {

@@ -1,3 +1,5 @@
+import type { BlockConfig } from "./types"
+
 export default {
   drops: [
     {
@@ -8,4 +10,4 @@ export default {
       },
     },
   ],
-}
+} as BlockConfig

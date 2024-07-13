@@ -1,10 +1,11 @@
 import { Dialog } from "@/lib/dialog/index"
 import { asyncRun, errorHandler } from "@/util/game"
 
+import type { Player } from "@minecraft/server"
 import { Handler } from "./Handler.class"
 import { option } from "./option"
 
-export async function command(argv, sender) {
+export async function command(argv: string[], sender: Player) {
   const playerOption = option.getPlayer(sender)
   const handler = new Handler(sender)
 

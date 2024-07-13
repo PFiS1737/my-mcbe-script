@@ -1,11 +1,16 @@
+import {
+  ItemComponentTypes,
+  type ItemDurabilityComponent,
+  type ItemStack,
+} from "@minecraft/server"
 import { withProbability } from "../../util/math"
 import { WrappedItemStack } from "./WrappedItemStack.class"
 
 export class ItemStackWithDurability extends WrappedItemStack {
-  constructor(itemStack) {
+  constructor(itemStack: ItemStack) {
     if (!ItemStackWithDurability.match(itemStack))
       throw new TypeError(
-        `The "${itemStack.typeId}" doesn't have the "minecraft:durability" component.`
+        `The "${itemStack.typeId}" doesn't have the "${ItemComponentTypes.Durability}" component.`
       )
 
     super(itemStack)
@@ -16,13 +21,25 @@ export class ItemStackWithDurability extends WrappedItemStack {
   }
 
   get damage() {
-    return this.components.get("durability").damage
+    return (
+      this.components.get(
+        ItemComponentTypes.Durability
+      ) as ItemDurabilityComponent
+    ).damage
   }
   set damage(value) {
-    this.components.get("durability").damage = value < 0 ? 0 : value
+    ;(
+      this.components.get(
+        ItemComponentTypes.Durability
+      ) as ItemDurabilityComponent
+    ).damage = value < 0 ? 0 : value
   }
   get maxDurability() {
-    return this.components.get("durability").maxDurability
+    return (
+      this.components.get(
+        ItemComponentTypes.Durability
+      ) as ItemDurabilityComponent
+    ).maxDurability
   }
   get durability() {
     return this.maxDurability - this.damage
@@ -31,10 +48,14 @@ export class ItemStackWithDurability extends WrappedItemStack {
     this.damage += this.durability - value
   }
 
-  applyDamage(damage) {
-    const unbreakingLevel = this.enchants.hasEnchantment("unbreaking")
+  applyDamage(damage: number) {
+    const unbreakingLevel = this.enchants.getEnchantment("unbreaking")?.level
     const probability =
-      this.components.get("durability").getDamageChance(unbreakingLevel) / 100
+      (
+        this.components.get(
+          ItemComponentTypes.Durability
+        ) as ItemDurabilityComponent
+      ).getDamageChance(unbreakingLevel) / 100
 
     for (let i = 0; i < damage; i++) {
       if (withProbability(probability)) this.durability -= 1

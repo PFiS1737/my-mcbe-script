@@ -1,21 +1,25 @@
+import type { Player } from "@minecraft/server"
 import { waitForFirstPlayerInitialSpawn } from "../util/game"
 import { each, eachAsync } from "../util/index"
-
+import type { IOptionItemRange } from "./OptionItemRange.class"
+import type { IOptionItemSelection } from "./OptionItemSelection.class"
 import { PlayerOption } from "./PlayerOption.class"
 
 export class OptionNamespace {
-  constructor(name) {
+  name: string
+
+  constructor(name: string) {
     this.name = name
   }
 
-  players = new Map()
+  players = new Map<Player, PlayerOption>()
   _items = new Set()
 
-  addItem(opts) {
+  addItem(opts: IOptionItemSelection<any> | IOptionItemRange) {
     this._items.add(opts)
     return this
   }
-  applyPlayer(player) {
+  applyPlayer(player: Player) {
     if (this.players.has(player)) return this.players.get(player)
     const playerOpt = new PlayerOption(player, this.name)
     each(this._items, (item) => {
@@ -35,11 +39,16 @@ export class OptionNamespace {
       const result = await playerOpt.init()
       valueMap.set(player, result)
     })
-    this.applyPlayer = undefined
+    this.applyPlayer = () => {
+      throw new Error("Can't apply player after initialization.")
+    }
     return valueMap
   }
+  getPlayer(player: Player) {
+    const playerOption = this.players.get(player)
 
-  getPlayer(player) {
-    return this.players.get(player)
+    if (!playerOption) throw new Error("Can't get player  options.")
+
+    return playerOption
   }
 }
