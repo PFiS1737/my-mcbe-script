@@ -14,57 +14,24 @@ class BetterConsole {
     }
 }
 
-function each(target, callbackfn, thisArg) {
-    if (Array.isArray(target)) target.forEach(callbackfn, thisArg);
-    else if (target?.[Symbol.iterator]) for (const item of target)callbackfn.call(thisArg, item, target);
-    else if (typeof target === "object") each(Object.keys(target), (key, i)=>callbackfn.call(thisArg, target[key], key, i, target));
-}
-async function eachAsync(target, asyncfn, thisArg) {
-    if (Array.isArray(target)) for(let i = 0; i < target.length; i++)await asyncfn.call(thisArg, target[i], i, target);
-    else if (target?.[Symbol.iterator]) for (const item of target)await asyncfn.call(thisArg, item, target);
-    else if (typeof target === "object") await eachAsync(Object.keys(target), async (key, i)=>await asyncfn.call(thisArg, target[key], key, i, target));
-}
-function safeEval(code, context = {}) {
-    const fn = new Function(...Object.keys(context), `return ${code}`);
-    return fn(...Object.values(context));
-}
-function serialize(obj) {
-    if (obj instanceof Set) return `new Set(${serialize(Array.from(obj))})`;
-    if (obj instanceof Map) return `new Map(${serialize(Array.from(obj.entries()))})`;
-    if (Array.isArray(obj)) return `[${obj.map(serialize).join(",")}]`;
-    if (typeof obj === "object" && obj !== null) {
-        return `{${Object.entries(obj).map(([key, value])=>`${serialize(key)}: ${serialize(value)}`).join(",")}}`;
-    }
-    return JSON.stringify(obj);
-}
-function deserialize(str) {
-    try {
-        return JSON.parse(str);
-    } catch (err) {
-        // console.warn(`Could not use \`JSON.parse()\` to deserialise the string, trying \`safeEval()\`.`, { string: str })
-        return safeEval(`(${str})`);
-    }
-}
-function isAsyncFunc(func) {
-    return Object.prototype.toString.call(func) === "[object AsyncFunction]";
-}
-
 const overworld = world.getDimension(MinecraftDimensionTypes.overworld);
 const CUSTOM_COMMAND_SET = new Set();
 class Commands {
     static run(commandString, target = overworld) {
-        // @ts-ignore
         if (target instanceof Dimension || target instanceof Entity) return target.runCommand(commandString);
         throw new TypeError("Target must be Entity or Dimension.");
     }
     static async asyncRun(commandString, target = overworld) {
-        // @ts-ignore
         if (target instanceof Dimension || target instanceof Entity) {
             const customCommands = [
                 ...CUSTOM_COMMAND_SET
             ].filter(({ regex })=>regex.test(commandString)).map((e)=>e.runner);
-            if (customCommands.length) await eachAsync(customCommands, async (runner)=>await runner(commandString, target));
-            else return await target.runCommandAsync(commandString);
+            if (customCommands.length) {
+                for (const runner of customCommands){
+                    // FIXME: enable entity and dimension to be the target
+                    await runner(commandString, target);
+                }
+            } else return await target.runCommandAsync(commandString);
         } else throw new TypeError("Target must be Entity or Dimension.");
     }
     static register(prefix, command, callback) {
@@ -379,6 +346,31 @@ function isSlowBuffer(obj) {
 var md5Exports = md5$1.exports;
 var md5 = /*@__PURE__*/getDefaultExportFromCjs(md5Exports);
 
+function safeEval(code, context = {}) {
+    const fn = new Function(...Object.keys(context), `return ${code}`);
+    return fn(...Object.values(context));
+}
+function serialize(obj) {
+    if (obj instanceof Set) return `new Set(${serialize(Array.from(obj))})`;
+    if (obj instanceof Map) return `new Map(${serialize(Array.from(obj.entries()))})`;
+    if (Array.isArray(obj)) return `[${obj.map(serialize).join(",")}]`;
+    if (typeof obj === "object" && obj !== null) {
+        return `{${Object.entries(obj).map(([key, value])=>`${serialize(key)}: ${serialize(value)}`).join(",")}}`;
+    }
+    return JSON.stringify(obj);
+}
+function deserialize(str) {
+    try {
+        return JSON.parse(str);
+    } catch (err) {
+        // console.warn(`Could not use \`JSON.parse()\` to deserialise the string, trying \`safeEval()\`.`, { string: str })
+        return safeEval(`(${str})`);
+    }
+}
+function isAsyncFunc(func) {
+    return Object.prototype.toString.call(func) === "[object AsyncFunction]";
+}
+
 const ALL_DATABASES = new Map();
 class Database {
     static open(player, dbName) {
@@ -386,7 +378,7 @@ class Database {
     }
     _syncDataFromScoreboard() {
         this.store.clear();
-        each(this.objective.getParticipants(), (participant)=>{
+        for (const participant of this.objective.getParticipants()){
             const data = deserialize(participant.displayName);
             const key = Object.keys(data)[0];
             const value = data[key];
@@ -394,7 +386,7 @@ class Database {
                 value,
                 participant
             });
-        });
+        }
     }
     has(key) {
         return this.store.has(key);
@@ -409,7 +401,7 @@ class Database {
         return false;
     }
     async clear() {
-        await eachAsync(this.store, async ([, { participant }])=>await asyncRun(()=>this.objective.removeParticipant(participant)));
+        for (const [, { participant }] of this.store)await asyncRun(()=>this.objective.removeParticipant(participant));
         this.store.clear();
     }
     get(key) {
@@ -1131,7 +1123,7 @@ class TpxDB {
     }
     getAll() {
         const output = [];
-        each(this.db, ([name, { info: data, disposable }])=>{
+        for (const [name, { info: data, disposable }] of this.db){
             const info = new LocationInfo(data);
             output.push({
                 name,
@@ -1139,7 +1131,7 @@ class TpxDB {
                 disposable,
                 text: `${name} (${info})${disposable ? " [一次性]" : ""}`
             });
-        });
+        }
         return output;
     }
     constructor(player){
@@ -1190,23 +1182,23 @@ class EventEmitter {
     removeListener(eventName, listener) {
         if (this._events[eventName]) {
             const newListeners = [];
-            each(this._events[eventName], (_listener)=>{
+            for (const _listener of this._events[eventName]){
                 if (_listener !== listener) newListeners.push(_listener);
-            });
+            }
             this._events[eventName] = newListeners;
         }
         return this;
     }
     async emit(eventName, ...args) {
         if (this._events[eventName]) {
-            each(this._events[eventName], (listener)=>listener(...args));
+            for (const listener of this._events[eventName])listener(...args);
         }
         await this.asyncEmit(eventName, ...args);
     }
     async asyncEmit(eventName, ...args) {
         const _eventName = `${eventName}.async`;
         if (this._events[_eventName]) {
-            await eachAsync(this._events[_eventName], async (listener)=>await listener(...args));
+            for (const listener of this._events[_eventName])await listener(...args);
         }
     }
     addListener(eventName, listener) {
@@ -1265,7 +1257,9 @@ class OptionItemRange {
         this.events = new EventEmitter();
         this.reload = reload;
         this._player = _player;
-        if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
+        if (events) {
+            for (const [eventName, listener] of Object.entries(events))this.events.on(eventName, listener);
+        }
         if (defaultValue !== undefined && this._includes(defaultValue)) this.selected = defaultValue;
         else this.selected = this.range.min;
         this.events.emit("inited", this.selected, _player);
@@ -1299,7 +1293,9 @@ class OptionItemSelection {
         this.events = new EventEmitter();
         this.reload = reload;
         this._player = _player;
-        if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
+        if (events) {
+            for (const [eventName, listener] of Object.entries(events))this.events.on(eventName, listener);
+        }
         if (defaultValue !== undefined && this.hasVal(defaultValue)) this.selected = defaultValue;
         else if (values[0]) this.selected = values[0][0];
         this.events.emit("inited", this.selected, _player);
@@ -1316,17 +1312,15 @@ class PlayerOption {
     }
     async _syncToDB() {
         const data = this.getItemValMap();
-        await eachAsync(data, async (value, name)=>{
-            await this.db.set(name, value);
-        });
-        await eachAsync(this.db, async ([name, _])=>{
+        for (const [name, value] of Object.entries(data))await this.db.set(name, value);
+        for (const [name] of this.db){
             if (!this.hasItem(name)) await this.db.delete(name);
-        });
+        }
     }
     async _syncFromDB() {
-        each(this.db, ([name, value])=>this.setItemVal(name, value, undefined, {
-                syncFromDB: true
-            }));
+        for (const [name, value] of this.db)this.setItemVal(name, value, undefined, {
+            syncFromDB: true
+        });
         await this._syncToDB();
     }
     async init() {
@@ -1361,9 +1355,7 @@ class PlayerOption {
     getItemValMap() {
         // TODO: use map
         const result = {};
-        each(this.items, (_, name)=>{
-            result[name] = this.getItemVal(name);
-        });
+        for (const [name] of Object.entries(this.items))result[name] = this.getItemVal(name);
         return result;
     }
     async done(parentDialog) {
@@ -1392,12 +1384,12 @@ class PlayerOption {
     async showDialog(parentDialog) {
         const form = new ModalFormData().title(`${this.name} 选项`);
         const nameMap = [];
-        each(this.items, (item)=>{
+        for (const [, item] of Object.entries(this.items)){
             if (item instanceof OptionItemSelection) {
                 const { name, description, values, selected } = item;
                 if (values.size === 2 && values.get(true) && values.get(false)) {
                     const valuesMap = new Map();
-                    each(values, ([e])=>valuesMap.set(e, e));
+                    for (const [e] of values)valuesMap.set(e, e);
                     nameMap.push({
                         name,
                         valuesMap
@@ -1408,7 +1400,10 @@ class PlayerOption {
                         ...values
                     ];
                     const valuesMap = new Map();
-                    each(valueArray, ([e], i)=>valuesMap.set(i, e));
+                    for(let i = 0; i < valueArray.length; i++){
+                        const [e] = valueArray[i];
+                        valuesMap.set(i, e);
+                    }
                     nameMap.push({
                         name,
                         valuesMap
@@ -1418,25 +1413,27 @@ class PlayerOption {
             } else if (item instanceof OptionItemRange) {
                 const { name, description, range, selected } = item;
                 const valuesMap = new Map();
-                each(range, (i)=>valuesMap.set(i, i));
+                for (const i of range)valuesMap.set(i, i);
                 nameMap.push({
                     name,
                     valuesMap
                 });
                 form.slider(description, range.min, range.max, range.step, selected);
             }
-        });
+        }
         const dialog = new Dialog({
             dialog: form,
             onClose: async ()=>{
                 if (parentDialog) await parentDialog.show(this.player);
             },
             onSubmit: async (result)=>{
-                each(result, (valueIndex, nameIndex)=>{
+                for(let nameIndex = 0; nameIndex < result.length; nameIndex++){
+                    const valueIndex = result[nameIndex];
                     const { name, valuesMap } = nameMap[nameIndex];
+                    // FIXME: as never?
                     const value = valuesMap.get(valueIndex);
                     this.setItemVal(name, value);
-                });
+                }
                 await this.done(parentDialog);
             }
         });
@@ -1459,10 +1456,12 @@ class OptionNamespace {
     applyPlayer(player) {
         if (this.players.has(player)) return this.players.get(player);
         const playerOpt = new PlayerOption(player, this.name);
-        each(this._items, (item)=>{
+        for (const item of this._items){
+            //@ts-ignore
             item._player = player;
+            //@ts-ignore
             playerOpt.addItem(item);
-        });
+        }
         this.players.set(player, playerOpt);
         return playerOpt;
     }
@@ -1472,10 +1471,10 @@ class OptionNamespace {
     }
     async init() {
         const valueMap = new Map();
-        await eachAsync(this.players, async ([player, playerOpt])=>{
+        for (const [player, playerOpt] of this.players){
             const result = await playerOpt.init();
             valueMap.set(player, result);
-        });
+        }
         this.applyPlayer = ()=>{
             throw new Error("Can't apply player after initialization.");
         };
@@ -1507,11 +1506,11 @@ class OptionManager {
     async showDialog(player) {
         const form = new ActionFormData().title("设置选项").body("选择要设置的模块：");
         const nameMap = [];
-        each(this.namespaces, ([name])=>{
+        for (const [name] of this.namespaces){
             nameMap.push(name);
             form.button(name) // TODO: name -> desc
             ;
-        });
+        }
         const dialog = new Dialog({
             dialog: form,
             onSelect: async (selection)=>{
@@ -1800,11 +1799,14 @@ async function homeCommand(argv, sender) {
     } else sender.sendMessage("您未启用该命令");
 }
 
-option.applyMainPlayer().then(()=>each(world.getAllPlayers(), (player)=>option.applyPlayer(player))).then(()=>option.init()).then((optMap)=>{
+option.applyMainPlayer().then(()=>{
+    for (const player of world.getAllPlayers()){
+        option.applyPlayer(player);
+    }
+}).then(()=>option.init()).then((optMap)=>{
     // 将所有玩家的数据库实例化并储存在 ALL_PLAYER_DATABASES 中
     // 同时避免在 beforeEvent 中构建导致的 read-only mode 问题
-    const players = optMap.keys();
-    each(players, (player)=>TpxDB.init(player));
+    for (const player of optMap.keys())TpxDB.init(player);
     Commands.register("!", "tpx", tpxCommand);
     const values = [
         ...optMap.values()

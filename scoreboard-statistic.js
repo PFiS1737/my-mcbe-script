@@ -14,16 +14,46 @@ class BetterConsole {
     }
 }
 
-function each(target, callbackfn, thisArg) {
-    if (Array.isArray(target)) target.forEach(callbackfn, thisArg);
-    else if (target?.[Symbol.iterator]) for (const item of target)callbackfn.call(thisArg, item, target);
-    else if (typeof target === "object") each(Object.keys(target), (key, i)=>callbackfn.call(thisArg, target[key], key, i, target));
+const overworld = world.getDimension(MinecraftDimensionTypes.overworld);
+const CUSTOM_COMMAND_SET = new Set();
+class Commands {
+    static run(commandString, target = overworld) {
+        if (target instanceof Dimension || target instanceof Entity) return target.runCommand(commandString);
+        throw new TypeError("Target must be Entity or Dimension.");
+    }
+    static async asyncRun(commandString, target = overworld) {
+        if (target instanceof Dimension || target instanceof Entity) {
+            const customCommands = [
+                ...CUSTOM_COMMAND_SET
+            ].filter(({ regex })=>regex.test(commandString)).map((e)=>e.runner);
+            if (customCommands.length) {
+                for (const runner of customCommands){
+                    // FIXME: enable entity and dimension to be the target
+                    await runner(commandString, target);
+                }
+            } else return await target.runCommandAsync(commandString);
+        } else throw new TypeError("Target must be Entity or Dimension.");
+    }
+    static register(prefix, command, callback) {
+        if (prefix.startsWith("/")) throw new Error("Unable to register slash commands.");
+        const regex = new RegExp(`^${prefix}${command}( |$)`);
+        const runner = async (commandString, target)=>{
+            const argv = commandString.split(/(".*?"|[^"\s]+)+(?=\s*|\s*$)/g).filter((e)=>e.trim().length > 0);
+            await callback(argv, target);
+        };
+        CUSTOM_COMMAND_SET.add({
+            regex,
+            runner
+        });
+        world.beforeEvents.chatSend.subscribe((event)=>{
+            if (regex.test(event.message)) {
+                event.cancel = true;
+                runner(event.message, event.sender).catch(BetterConsole.error);
+            }
+        });
+    }
 }
-async function eachAsync(target, asyncfn, thisArg) {
-    if (Array.isArray(target)) for(let i = 0; i < target.length; i++)await asyncfn.call(thisArg, target[i], i, target);
-    else if (target?.[Symbol.iterator]) for (const item of target)await asyncfn.call(thisArg, item, target);
-    else if (typeof target === "object") await eachAsync(Object.keys(target), async (key, i)=>await asyncfn.call(thisArg, target[key], key, i, target));
-}
+
 function safeEval(code, context = {}) {
     const fn = new Function(...Object.keys(context), `return ${code}`);
     return fn(...Object.values(context));
@@ -47,44 +77,6 @@ function deserialize(str) {
 }
 function isAsyncFunc(func) {
     return Object.prototype.toString.call(func) === "[object AsyncFunction]";
-}
-
-const overworld = world.getDimension(MinecraftDimensionTypes.overworld);
-const CUSTOM_COMMAND_SET = new Set();
-class Commands {
-    static run(commandString, target = overworld) {
-        // @ts-ignore
-        if (target instanceof Dimension || target instanceof Entity) return target.runCommand(commandString);
-        throw new TypeError("Target must be Entity or Dimension.");
-    }
-    static async asyncRun(commandString, target = overworld) {
-        // @ts-ignore
-        if (target instanceof Dimension || target instanceof Entity) {
-            const customCommands = [
-                ...CUSTOM_COMMAND_SET
-            ].filter(({ regex })=>regex.test(commandString)).map((e)=>e.runner);
-            if (customCommands.length) await eachAsync(customCommands, async (runner)=>await runner(commandString, target));
-            else return await target.runCommandAsync(commandString);
-        } else throw new TypeError("Target must be Entity or Dimension.");
-    }
-    static register(prefix, command, callback) {
-        if (prefix.startsWith("/")) throw new Error("Unable to register slash commands.");
-        const regex = new RegExp(`^${prefix}${command}( |$)`);
-        const runner = async (commandString, target)=>{
-            const argv = commandString.split(/(".*?"|[^"\s]+)+(?=\s*|\s*$)/g).filter((e)=>e.trim().length > 0);
-            await callback(argv, target);
-        };
-        CUSTOM_COMMAND_SET.add({
-            regex,
-            runner
-        });
-        world.beforeEvents.chatSend.subscribe((event)=>{
-            if (regex.test(event.message)) {
-                event.cancel = true;
-                runner(event.message, event.sender).catch(BetterConsole.error);
-            }
-        });
-    }
 }
 
 function round(n) {
@@ -816,9 +808,7 @@ class WrappedEntity extends WrapperTemplate {
         this.typeId = entity.typeId;
         this.scoreboardIdentity = entity.scoreboardIdentity;
         const components = entity.getComponents();
-        each(components, (component)=>{
-            this.components.set(removeMinecraftNamespace(component.typeId), component);
-        });
+        for (const component of components)this.components.set(removeMinecraftNamespace(component.typeId), component);
     }
 }
 
@@ -1399,7 +1389,7 @@ class Database {
     }
     _syncDataFromScoreboard() {
         this.store.clear();
-        each(this.objective.getParticipants(), (participant)=>{
+        for (const participant of this.objective.getParticipants()){
             const data = deserialize(participant.displayName);
             const key = Object.keys(data)[0];
             const value = data[key];
@@ -1407,7 +1397,7 @@ class Database {
                 value,
                 participant
             });
-        });
+        }
     }
     has(key) {
         return this.store.has(key);
@@ -1422,7 +1412,7 @@ class Database {
         return false;
     }
     async clear() {
-        await eachAsync(this.store, async ([, { participant }])=>await asyncRun(()=>this.objective.removeParticipant(participant)));
+        for (const [, { participant }] of this.store)await asyncRun(()=>this.objective.removeParticipant(participant));
         this.store.clear();
     }
     get(key) {
@@ -1610,23 +1600,23 @@ class EventEmitter {
     removeListener(eventName, listener) {
         if (this._events[eventName]) {
             const newListeners = [];
-            each(this._events[eventName], (_listener)=>{
+            for (const _listener of this._events[eventName]){
                 if (_listener !== listener) newListeners.push(_listener);
-            });
+            }
             this._events[eventName] = newListeners;
         }
         return this;
     }
     async emit(eventName, ...args) {
         if (this._events[eventName]) {
-            each(this._events[eventName], (listener)=>listener(...args));
+            for (const listener of this._events[eventName])listener(...args);
         }
         await this.asyncEmit(eventName, ...args);
     }
     async asyncEmit(eventName, ...args) {
         const _eventName = `${eventName}.async`;
         if (this._events[_eventName]) {
-            await eachAsync(this._events[_eventName], async (listener)=>await listener(...args));
+            for (const listener of this._events[_eventName])await listener(...args);
         }
     }
     addListener(eventName, listener) {
@@ -1685,7 +1675,9 @@ class OptionItemRange {
         this.events = new EventEmitter();
         this.reload = reload;
         this._player = _player;
-        if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
+        if (events) {
+            for (const [eventName, listener] of Object.entries(events))this.events.on(eventName, listener);
+        }
         if (defaultValue !== undefined && this._includes(defaultValue)) this.selected = defaultValue;
         else this.selected = this.range.min;
         this.events.emit("inited", this.selected, _player);
@@ -1719,7 +1711,9 @@ class OptionItemSelection {
         this.events = new EventEmitter();
         this.reload = reload;
         this._player = _player;
-        if (events) each(events, (listener, eventName)=>this.events.on(eventName, listener));
+        if (events) {
+            for (const [eventName, listener] of Object.entries(events))this.events.on(eventName, listener);
+        }
         if (defaultValue !== undefined && this.hasVal(defaultValue)) this.selected = defaultValue;
         else if (values[0]) this.selected = values[0][0];
         this.events.emit("inited", this.selected, _player);
@@ -1736,17 +1730,15 @@ class PlayerOption {
     }
     async _syncToDB() {
         const data = this.getItemValMap();
-        await eachAsync(data, async (value, name)=>{
-            await this.db.set(name, value);
-        });
-        await eachAsync(this.db, async ([name, _])=>{
+        for (const [name, value] of Object.entries(data))await this.db.set(name, value);
+        for (const [name] of this.db){
             if (!this.hasItem(name)) await this.db.delete(name);
-        });
+        }
     }
     async _syncFromDB() {
-        each(this.db, ([name, value])=>this.setItemVal(name, value, undefined, {
-                syncFromDB: true
-            }));
+        for (const [name, value] of this.db)this.setItemVal(name, value, undefined, {
+            syncFromDB: true
+        });
         await this._syncToDB();
     }
     async init() {
@@ -1781,9 +1773,7 @@ class PlayerOption {
     getItemValMap() {
         // TODO: use map
         const result = {};
-        each(this.items, (_, name)=>{
-            result[name] = this.getItemVal(name);
-        });
+        for (const [name] of Object.entries(this.items))result[name] = this.getItemVal(name);
         return result;
     }
     async done(parentDialog) {
@@ -1812,12 +1802,12 @@ class PlayerOption {
     async showDialog(parentDialog) {
         const form = new ModalFormData().title(`${this.name} 选项`);
         const nameMap = [];
-        each(this.items, (item)=>{
+        for (const [, item] of Object.entries(this.items)){
             if (item instanceof OptionItemSelection) {
                 const { name, description, values, selected } = item;
                 if (values.size === 2 && values.get(true) && values.get(false)) {
                     const valuesMap = new Map();
-                    each(values, ([e])=>valuesMap.set(e, e));
+                    for (const [e] of values)valuesMap.set(e, e);
                     nameMap.push({
                         name,
                         valuesMap
@@ -1828,7 +1818,10 @@ class PlayerOption {
                         ...values
                     ];
                     const valuesMap = new Map();
-                    each(valueArray, ([e], i)=>valuesMap.set(i, e));
+                    for(let i = 0; i < valueArray.length; i++){
+                        const [e] = valueArray[i];
+                        valuesMap.set(i, e);
+                    }
                     nameMap.push({
                         name,
                         valuesMap
@@ -1838,25 +1831,27 @@ class PlayerOption {
             } else if (item instanceof OptionItemRange) {
                 const { name, description, range, selected } = item;
                 const valuesMap = new Map();
-                each(range, (i)=>valuesMap.set(i, i));
+                for (const i of range)valuesMap.set(i, i);
                 nameMap.push({
                     name,
                     valuesMap
                 });
                 form.slider(description, range.min, range.max, range.step, selected);
             }
-        });
+        }
         const dialog = new Dialog({
             dialog: form,
             onClose: async ()=>{
                 if (parentDialog) await parentDialog.show(this.player);
             },
             onSubmit: async (result)=>{
-                each(result, (valueIndex, nameIndex)=>{
+                for(let nameIndex = 0; nameIndex < result.length; nameIndex++){
+                    const valueIndex = result[nameIndex];
                     const { name, valuesMap } = nameMap[nameIndex];
+                    // FIXME: as never?
                     const value = valuesMap.get(valueIndex);
                     this.setItemVal(name, value);
-                });
+                }
                 await this.done(parentDialog);
             }
         });
@@ -1879,10 +1874,12 @@ class OptionNamespace {
     applyPlayer(player) {
         if (this.players.has(player)) return this.players.get(player);
         const playerOpt = new PlayerOption(player, this.name);
-        each(this._items, (item)=>{
+        for (const item of this._items){
+            //@ts-ignore
             item._player = player;
+            //@ts-ignore
             playerOpt.addItem(item);
-        });
+        }
         this.players.set(player, playerOpt);
         return playerOpt;
     }
@@ -1892,10 +1889,10 @@ class OptionNamespace {
     }
     async init() {
         const valueMap = new Map();
-        await eachAsync(this.players, async ([player, playerOpt])=>{
+        for (const [player, playerOpt] of this.players){
             const result = await playerOpt.init();
             valueMap.set(player, result);
-        });
+        }
         this.applyPlayer = ()=>{
             throw new Error("Can't apply player after initialization.");
         };
@@ -1927,11 +1924,11 @@ class OptionManager {
     async showDialog(player) {
         const form = new ActionFormData().title("设置选项").body("选择要设置的模块：");
         const nameMap = [];
-        each(this.namespaces, ([name])=>{
+        for (const [name] of this.namespaces){
             nameMap.push(name);
             form.button(name) // TODO: name -> desc
             ;
-        });
+        }
         const dialog = new Dialog({
             dialog: form,
             onSelect: async (selection)=>{
@@ -2093,20 +2090,21 @@ class Handler {
                 }
             }
         });
-        await eachAsync(tigger.events, async ({ options, listener }, eventName)=>{
-            if (options) await asyncRun(()=>world.afterEvents[eventName].subscribe(listener, options));
-            else await asyncRun(()=>world.afterEvents[eventName].subscribe(listener)) // 为什么多传参数还报错啊啊啊啊啊啊啊！！！
-            ;
-        });
+        for (const [eventName, { options, listener }] of Object.entries(tigger.events)){
+            await asyncRun(()=>//@ts-ignore
+                world.afterEvents[eventName].subscribe(listener, options));
+        }
         await this.playerDB.add(objectiveId, tigger.events);
         return true;
     }
     async stop({ objectiveId }) {
         if (!this.playerDB.has(objectiveId)) return false;
         const events = this.playerDB.getEvents(objectiveId);
-        await eachAsync(events, async ({ listener }, eventName)=>{
-            await asyncRun(()=>world.afterEvents[eventName].unsubscribe(listener));
-        });
+        if (!events) throw new Error("Unexpected error.");
+        for (const [eventName, { listener }] of Object.entries(events)){
+            await asyncRun(()=>//@ts-ignore
+                world.afterEvents[eventName].unsubscribe(listener));
+        }
         await this.playerDB.delete(objectiveId);
         return true;
     }
@@ -2211,8 +2209,12 @@ async function command(argv, sender) {
     }
 }
 
-option.applyMainPlayer().then(()=>each(world.getAllPlayers(), (player)=>option.applyPlayer(player))).then(()=>option.init()).then(async ()=>{
-    await eachAsync(option.players, async ([player])=>{
+option.applyMainPlayer().then(()=>{
+    for (const player of world.getAllPlayers()){
+        option.applyPlayer(player);
+    }
+}).then(()=>option.init()).then(async ()=>{
+    for (const [player] of option.players){
         // 将所有玩家的数据库实例化并储存在 ALL_PLAYER_DATABASES 中
         const db = EventDB.init(player);
         const handler = new Handler(player);
@@ -2221,13 +2223,13 @@ option.applyMainPlayer().then(()=>each(world.getAllPlayers(), (player)=>option.a
         // 并且 listener 也都失效，
         // 故重新订阅事件
         await db.clear();
-        await eachAsync(participated, async (objectiveId)=>{
+        for (const objectiveId of participated){
             const result = await handler.start({
                 objectiveId
             });
             if (result) player.sendMessage(`已重启您在记分板 ${objectiveId} 上的统计`);
-        });
-    });
+        }
+    }
     Commands.register("!", "statistic", command);
 }).catch(BetterConsole.error);
 //# sourceMappingURL=scoreboard-statistic.js.map
