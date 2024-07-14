@@ -6,7 +6,7 @@ export const option = optionManager
     name: "door",
     description: "允许双开门",
     values: [[true], [false]],
-    defaultValue: true,
+    defaultValue: false,
     events: {
       changed: (selected, original) =>
         console.warn("better-door:door -> from", original, "to", selected),
