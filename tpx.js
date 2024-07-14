@@ -412,8 +412,7 @@ class Database {
         const data = serialize({
             [key]: value
         }).replaceAll('"', "'");
-        // FIXME: has ambiguity
-        if (data.length > 32767) throw new RangeError("Database: Only accepts a string value less than 32767 characters.");
+        if (data.length > 32767) throw new RangeError("Database: Value is too long.");
         await asyncRun(()=>this.objective.setScore(data, 1));
         this._syncDataFromScoreboard();
     }

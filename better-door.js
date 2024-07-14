@@ -5275,8 +5275,7 @@ class Database {
         const data = serialize({
             [key]: value
         }).replaceAll('"', "'");
-        // FIXME: has ambiguity
-        if (data.length > 32767) throw new RangeError("Database: Only accepts a string value less than 32767 characters.");
+        if (data.length > 32767) throw new RangeError("Database: Value is too long.");
         await asyncRun(()=>this.objective.setScore(data, 1));
         this._syncDataFromScoreboard();
     }
@@ -5707,7 +5706,7 @@ const option = optionManager.registerNamesapace("better-door").addItem({
             false
         ]
     ],
-    defaultValue: true,
+    defaultValue: false,
     events: {
         changed: (selected, original)=>console.warn("better-door:door -> from", original, "to", selected)
     }
