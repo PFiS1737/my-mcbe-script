@@ -2,7 +2,6 @@
 
 import { readFileSync, readdirSync } from "node:fs"
 
-// @ts-ignore
 import { getPathAlias, isProduction } from "./src/lib/util/node.js"
 
 import alias from "@rollup/plugin-alias"

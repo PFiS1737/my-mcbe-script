@@ -108,7 +108,6 @@ export class TrapdoorBlock extends WrappedBlock {
       while (--maxLength) {
         // 3. 获取扩展活板门
         //    即能与该活板门延伸联动的另一个活板门
-        // @ts-ignore
         const playerFacing = new WrappedPlayer(player).getFacingDirectionXZ()
         const extensiveBlock = needOpposite
           ? that.getNeighbourBlock(playerFacing.getOpposite())
