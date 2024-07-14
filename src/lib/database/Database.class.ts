@@ -70,11 +70,8 @@ export class Database<V extends Serializable> {
   async set(key: string, value: V) {
     await this.delete(key)
     const data = serialize({ [key]: value }).replaceAll('"', "'")
-    // FIXME: has ambiguity
     if (data.length > 32767)
-      throw new RangeError(
-        "Database: Only accepts a string value less than 32767 characters."
-      )
+      throw new RangeError("Database: Value is too long.")
     await asyncRun(() => this.objective.setScore(data, 1))
 
     this._syncDataFromScoreboard()
