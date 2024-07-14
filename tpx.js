@@ -1355,7 +1355,6 @@ class PlayerOption {
         if (item) return item.selected;
     }
     getItemValMap() {
-        // TODO: use map
         const result = new Map();
         for (const [name] of Object.entries(this.items))result.set(name, this.getItemVal(name));
         return result;

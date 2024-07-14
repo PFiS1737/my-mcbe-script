@@ -876,7 +876,7 @@ class WrappedPlayer extends WrappedEntity {
     async useItemFromInventory(slot, callback) {
         let itemStack = this.inventory.getItem(slot);
         itemStack = await callback(itemStack);
-        this.inventory.setItem(slot, itemStack);
+        if (itemStack) this.inventory.setItem(slot, itemStack);
     }
     async useMainHandItem(callback) {
         await this.useItemFromInventory(this.selectedSlotIndex, callback);
@@ -1750,7 +1750,6 @@ class PlayerOption {
         if (item) return item.selected;
     }
     getItemValMap() {
-        // TODO: use map
         const result = new Map();
         for (const [name] of Object.entries(this.items))result.set(name, this.getItemVal(name));
         return result;

@@ -3726,7 +3726,7 @@ var FortuneRules;
     FortuneRules[FortuneRules["Custom"] = 5] = "Custom";
 })(FortuneRules || (FortuneRules = {}));
 
-var acaciaLog = {
+var acacia_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -3737,7 +3737,7 @@ var acaciaLog = {
     ]
 };
 
-var amethystBlock = {
+var amethyst_block = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -3748,7 +3748,7 @@ var amethystBlock = {
     ]
 };
 
-var amethystCluster = {
+var amethyst_cluster = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -3774,7 +3774,7 @@ var amethystCluster = {
     ]
 };
 
-var ancientDebris = {
+var ancient_debris = {
     drops: [
         {
             dig_by: DIAMOND_PICKAXE_OR_UPPER.toArray(),
@@ -3788,7 +3788,7 @@ var ancientDebris = {
     ]
 };
 
-var birchLog = {
+var birch_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -3799,7 +3799,7 @@ var birchLog = {
     ]
 };
 
-var cherryLog = {
+var cherry_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -3810,7 +3810,7 @@ var cherryLog = {
     ]
 };
 
-var coalOre = {
+var coal_ore = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -3826,7 +3826,7 @@ var coalOre = {
     ]
 };
 
-var copperOre = {
+var copper_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -3845,7 +3845,7 @@ var copperOre = {
     ]
 };
 
-var crimsonStem = {
+var crimson_stem = {
     drops: [
         {
             dig_by: "<default>",
@@ -3856,7 +3856,7 @@ var crimsonStem = {
     ]
 };
 
-var darkOakLog = {
+var dark_oak_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -3878,7 +3878,7 @@ var deepslate = {
     ]
 };
 
-var deepslateCoalOre = {
+var deepslate_coal_ore = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -3894,7 +3894,7 @@ var deepslateCoalOre = {
     ]
 };
 
-var deepslateCopperOre = {
+var deepslate_copper_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -3913,7 +3913,7 @@ var deepslateCopperOre = {
     ]
 };
 
-var deepslateDiamondOre = {
+var deepslate_diamond_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -3929,7 +3929,7 @@ var deepslateDiamondOre = {
     ]
 };
 
-var deepslateEmeraldOre = {
+var deepslate_emerald_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -3945,7 +3945,7 @@ var deepslateEmeraldOre = {
     ]
 };
 
-var deepslateGoldOre = {
+var deepslate_gold_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -3960,7 +3960,7 @@ var deepslateGoldOre = {
     ]
 };
 
-var deepslateIronOre = {
+var deepslate_iron_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -3975,7 +3975,7 @@ var deepslateIronOre = {
     ]
 };
 
-var deepslateLapisOre = {
+var deepslate_lapis_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -3995,7 +3995,7 @@ var deepslateLapisOre = {
     ]
 };
 
-var deepslateRedstoneOre = {
+var deepslate_redstone_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -4015,7 +4015,7 @@ var deepslateRedstoneOre = {
     ]
 };
 
-var diamondOre = {
+var diamond_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -4031,7 +4031,7 @@ var diamondOre = {
     ]
 };
 
-var emeraldOre = {
+var emerald_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -4047,7 +4047,7 @@ var emeraldOre = {
     ]
 };
 
-var goldOre = {
+var gold_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -4062,7 +4062,7 @@ var goldOre = {
     ]
 };
 
-var ironOre = {
+var iron_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -4077,7 +4077,7 @@ var ironOre = {
     ]
 };
 
-var jungleLog = {
+var jungle_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -4088,7 +4088,7 @@ var jungleLog = {
     ]
 };
 
-var lapisOre = {
+var lapis_ore = {
     drops: [
         {
             dig_by: STONE_PICKAXE_OR_UPPER.toArray(),
@@ -4108,7 +4108,7 @@ var lapisOre = {
     ]
 };
 
-var mangroveLog = {
+var mangrove_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -4119,7 +4119,7 @@ var mangroveLog = {
     ]
 };
 
-var netherGoldOre = {
+var nether_gold_ore = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -4142,7 +4142,7 @@ var netherGoldOre = {
     ]
 };
 
-var oakLog = {
+var oak_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -4164,7 +4164,7 @@ var obsidian = {
     ]
 };
 
-var quartzOre = {
+var quartz_ore = {
     drops: [
         {
             dig_by: WOODEN_PICKAXE_OR_UPPER.toArray(),
@@ -4180,7 +4180,7 @@ var quartzOre = {
     ]
 };
 
-var redstoneOre = {
+var redstone_ore = {
     drops: [
         {
             dig_by: IRON_PICKAXE_OR_UPPER.toArray(),
@@ -4200,7 +4200,7 @@ var redstoneOre = {
     ]
 };
 
-var spruceLog = {
+var spruce_log = {
     drops: [
         {
             dig_by: "<default>",
@@ -4225,7 +4225,7 @@ var stone = {
     ]
 };
 
-var warpedStem = {
+var warped_stem = {
     drops: [
         {
             dig_by: "<default>",
@@ -4238,40 +4238,40 @@ var warpedStem = {
 
 // This file is automatically generated.
 var BlockDefinition = {
-    acacia_log: acaciaLog,
-    amethyst_block: amethystBlock,
-    amethyst_cluster: amethystCluster,
-    ancient_debris: ancientDebris,
-    birch_log: birchLog,
-    cherry_log: cherryLog,
-    coal_ore: coalOre,
-    copper_ore: copperOre,
-    crimson_stem: crimsonStem,
-    dark_oak_log: darkOakLog,
-    deepslate: deepslate,
-    deepslate_coal_ore: deepslateCoalOre,
-    deepslate_copper_ore: deepslateCopperOre,
-    deepslate_diamond_ore: deepslateDiamondOre,
-    deepslate_emerald_ore: deepslateEmeraldOre,
-    deepslate_gold_ore: deepslateGoldOre,
-    deepslate_iron_ore: deepslateIronOre,
-    deepslate_lapis_ore: deepslateLapisOre,
-    deepslate_redstone_ore: deepslateRedstoneOre,
-    diamond_ore: diamondOre,
-    emerald_ore: emeraldOre,
-    gold_ore: goldOre,
-    iron_ore: ironOre,
-    jungle_log: jungleLog,
-    lapis_ore: lapisOre,
-    mangrove_log: mangroveLog,
-    nether_gold_ore: netherGoldOre,
-    oak_log: oakLog,
-    obsidian: obsidian,
-    quartz_ore: quartzOre,
-    redstone_ore: redstoneOre,
-    spruce_log: spruceLog,
-    stone: stone,
-    warped_stem: warpedStem
+    "minecraft:acacia_log": acacia_log,
+    "minecraft:amethyst_block": amethyst_block,
+    "minecraft:amethyst_cluster": amethyst_cluster,
+    "minecraft:ancient_debris": ancient_debris,
+    "minecraft:birch_log": birch_log,
+    "minecraft:cherry_log": cherry_log,
+    "minecraft:coal_ore": coal_ore,
+    "minecraft:copper_ore": copper_ore,
+    "minecraft:crimson_stem": crimson_stem,
+    "minecraft:dark_oak_log": dark_oak_log,
+    "minecraft:deepslate": deepslate,
+    "minecraft:deepslate_coal_ore": deepslate_coal_ore,
+    "minecraft:deepslate_copper_ore": deepslate_copper_ore,
+    "minecraft:deepslate_diamond_ore": deepslate_diamond_ore,
+    "minecraft:deepslate_emerald_ore": deepslate_emerald_ore,
+    "minecraft:deepslate_gold_ore": deepslate_gold_ore,
+    "minecraft:deepslate_iron_ore": deepslate_iron_ore,
+    "minecraft:deepslate_lapis_ore": deepslate_lapis_ore,
+    "minecraft:deepslate_redstone_ore": deepslate_redstone_ore,
+    "minecraft:diamond_ore": diamond_ore,
+    "minecraft:emerald_ore": emerald_ore,
+    "minecraft:gold_ore": gold_ore,
+    "minecraft:iron_ore": iron_ore,
+    "minecraft:jungle_log": jungle_log,
+    "minecraft:lapis_ore": lapis_ore,
+    "minecraft:mangrove_log": mangrove_log,
+    "minecraft:nether_gold_ore": nether_gold_ore,
+    "minecraft:oak_log": oak_log,
+    "minecraft:obsidian": obsidian,
+    "minecraft:quartz_ore": quartz_ore,
+    "minecraft:redstone_ore": redstone_ore,
+    "minecraft:spruce_log": spruce_log,
+    "minecraft:stone": stone,
+    "minecraft:warped_stem": warped_stem
 };
 
 class NumberRange {
@@ -4696,7 +4696,7 @@ class WrappedPlayer extends WrappedEntity {
     async useItemFromInventory(slot, callback) {
         let itemStack = this.inventory.getItem(slot);
         itemStack = await callback(itemStack);
-        this.inventory.setItem(slot, itemStack);
+        if (itemStack) this.inventory.setItem(slot, itemStack);
     }
     async useMainHandItem(callback) {
         await this.useItemFromInventory(this.selectedSlotIndex, callback);
@@ -5333,7 +5333,6 @@ class PlayerOption {
         if (item) return item.selected;
     }
     getItemValMap() {
-        // TODO: use map
         const result = new Map();
         for (const [name] of Object.entries(this.items))result.set(name, this.getItemVal(name));
         return result;
