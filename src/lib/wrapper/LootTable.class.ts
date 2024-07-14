@@ -6,9 +6,17 @@ export interface ILootTableItemConfig<T> {
 }
 
 export class LootTable<T = number> {
-  constructor(items: Array<ILootTableItemConfig<T>>) {
+  constructor(items: Array<ILootTableItemConfig<T>> | number[]) {
     if (items) {
-      for (const item of items) this.addItem(item)
+      for (const item of items) {
+        if (typeof item === "number")
+          this.addItem({
+            weight: 1,
+            // @ts-ignore
+            value: item,
+          })
+        else this.addItem(item)
+      }
     }
   }
 
