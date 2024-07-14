@@ -1,4 +1,4 @@
-import type { BlockConfig } from "./types"
+import type { BlockConfig } from "./_types"
 
 export default {
   drops: [

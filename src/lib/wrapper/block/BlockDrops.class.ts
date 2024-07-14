@@ -3,7 +3,7 @@ import {
   type BlockDropsConfigOption,
   FortuneRules,
   type ItemDropConfig,
-} from "@/data/block/types"
+} from "@/data/block/_types"
 import { BlockPermutation } from "@minecraft/server"
 import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
 
