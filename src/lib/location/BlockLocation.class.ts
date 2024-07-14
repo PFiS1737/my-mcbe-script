@@ -11,6 +11,9 @@ export class BlockLocation extends Vector3 {
   static create(vector: Vector3Like) {
     return Vector3.create(vector) as BlockLocation
   }
+  static parse(vectorStr: string) {
+    return Vector3.parse(vectorStr) as BlockLocation
+  }
 
   clone() {
     return new BlockLocation(this.x, this.y, this.z)

@@ -26,14 +26,22 @@ export class Vector3 extends VectorN {
    * @param vector - The vector write in array.
    * @returns The vector.
    */
-  static create(vector: Vector3Like): Vector3 {
-    if (Array.isArray(vector)) return new this(...vector)
-    // @ts-ignore
-    if (typeof vector === "string") return this.parse(vector)
+  static create(vector: Vector3Like) {
+    if (Array.isArray(vector)) return new Vector3(...vector)
+    if (typeof vector === "string") return Vector3.parse(vector)
     if (typeof vector === "object")
-      return new this(vector.x, vector.y, vector.z)
+      return new Vector3(vector.x, vector.y, vector.z)
 
     throw new Error(`Can't create 3d vector for ${serialize(vector)}`)
+  }
+
+  /**
+   * Parse a string to vector.
+   * @param vectorStr - The string to parse.
+   * @returns The vector.
+   */
+  static parse(vectorStr: string) {
+    return VectorN.parse(vectorStr) as Vector3
   }
 
   get magnitude() {

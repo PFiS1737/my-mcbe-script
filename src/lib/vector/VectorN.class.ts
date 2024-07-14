@@ -47,8 +47,8 @@ export class VectorN implements IVector3 {
    * @returns The vector.
    */
   static create(vector: number[] | string): VectorN {
-    if (Array.isArray(vector)) return new this(...vector)
-    if (typeof vector === "string") return this.parse(vector)
+    if (Array.isArray(vector)) return new VectorN(...vector)
+    if (typeof vector === "string") return VectorN.parse(vector)
 
     throw new Error(`Can't create vector for ${serialize(vector)}`)
   }
@@ -59,7 +59,7 @@ export class VectorN implements IVector3 {
    * @returns The vector.
    */
   static parse(vectorStr: string): VectorN {
-    return this.create(vectorStr.split(" ").map(Number))
+    return VectorN.create(vectorStr.split(" ").map(Number))
   }
 
   /**
@@ -67,8 +67,7 @@ export class VectorN implements IVector3 {
    * @returns The string representation of the vector.
    */
   stringify(): string {
-    // @ts-ignore
-    return this[Symbol.toPrimitive]("string")
+    return this.axes.join(" ")
   }
 
   /**
@@ -85,7 +84,7 @@ export class VectorN implements IVector3 {
    * @returns The string representation or the vector itself.
    */
   [Symbol.toPrimitive](hint: string): string | VectorN {
-    if (hint === "string") return this.axes.join(" ")
+    if (hint === "string") return this.stringify()
     return this
   }
 

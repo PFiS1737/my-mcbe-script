@@ -12,6 +12,9 @@ export class Location extends Vector3 {
   static create(vector: Vector3Like) {
     return Vector3.create(vector) as Location
   }
+  static parse(vectorStr: string) {
+    return Vector3.parse(vectorStr) as Location
+  }
 
   clone() {
     return new Location(this.x, this.y, this.z)
