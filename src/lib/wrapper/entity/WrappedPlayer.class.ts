@@ -49,18 +49,18 @@ export class WrappedPlayer extends WrappedEntity {
     this.inventory.setItem(this.selectedSlotIndex, item)
   }
 
-  async useItemFromInventory(
+  async useItemFromInventory<T extends ItemStack | undefined>(
     slot: number,
-    callback: (itemStack: ItemStack | undefined) => Promise<ItemStack>
+    callback: (itemStack: T) => Promise<T>
   ) {
-    let itemStack = this.inventory.getItem(slot)
+    let itemStack = this.inventory.getItem(slot) as T
 
     itemStack = await callback(itemStack)
 
-    this.inventory.setItem(slot, itemStack)
+    if (itemStack) this.inventory.setItem(slot, itemStack)
   }
-  async useMainHandItem(
-    callback: (itemStack: ItemStack | undefined) => Promise<ItemStack>
+  async useMainHandItem<T extends ItemStack | undefined>(
+    callback: (itemStack: T) => Promise<T>
   ) {
     await this.useItemFromInventory(this.selectedSlotIndex, callback)
   }
