@@ -218,8 +218,8 @@ function range(from, to, step = 1) {
    * @param vector - The vector wrote in array or string.
    * @returns The vector.
    */ static create(vector) {
-        if (Array.isArray(vector)) return new this(...vector);
-        if (typeof vector === "string") return this.parse(vector);
+        if (Array.isArray(vector)) return new VectorN(...vector);
+        if (typeof vector === "string") return VectorN.parse(vector);
         throw new Error(`Can't create vector for ${serialize(vector)}`);
     }
     /**
@@ -227,14 +227,13 @@ function range(from, to, step = 1) {
    * @param vectorStr - The string to parse.
    * @returns The vector.
    */ static parse(vectorStr) {
-        return this.create(vectorStr.split(" ").map(Number));
+        return VectorN.create(vectorStr.split(" ").map(Number));
     }
     /**
    * Convert the vector to a string.
    * @returns The string representation of the vector.
    */ stringify() {
-        // @ts-ignore
-        return this[Symbol.toPrimitive]("string");
+        return this.axes.join(" ");
     }
     /**
    * Convert the vector to an array.
@@ -249,7 +248,7 @@ function range(from, to, step = 1) {
    * @param hint - The type hint.
    * @returns The string representation or the vector itself.
    */ [Symbol.toPrimitive](hint) {
-        if (hint === "string") return this.axes.join(" ");
+        if (hint === "string") return this.stringify();
         return this;
     }
     /**
@@ -624,11 +623,17 @@ function range(from, to, step = 1) {
    * @param vector - The vector write in array.
    * @returns The vector.
    */ static create(vector) {
-        if (Array.isArray(vector)) return new this(...vector);
-        // @ts-ignore
-        if (typeof vector === "string") return this.parse(vector);
-        if (typeof vector === "object") return new this(vector.x, vector.y, vector.z);
+        if (Array.isArray(vector)) return new Vector3(...vector);
+        if (typeof vector === "string") return Vector3.parse(vector);
+        if (typeof vector === "object") return new Vector3(vector.x, vector.y, vector.z);
         throw new Error(`Can't create 3d vector for ${serialize(vector)}`);
+    }
+    /**
+   * Parse a string to vector.
+   * @param vectorStr - The string to parse.
+   * @returns The vector.
+   */ static parse(vectorStr) {
+        return VectorN.parse(vectorStr);
     }
     get magnitude() {
         return Vector3Utils.magnitude(this);
@@ -724,11 +729,13 @@ function range(from, to, step = 1) {
 
 class Location extends Vector3 {
     get centerCorrected() {
-        return Location.create(// @ts-ignore
-        Vector3Utils.add(this.floored, new Vector3(0.5, 0.5, 0.5)));
+        return Location.create(Vector3Utils.add(this.floored, new Vector3(0.5, 0.5, 0.5)));
     }
     static create(vector) {
         return Vector3.create(vector);
+    }
+    static parse(vectorStr) {
+        return Vector3.parse(vectorStr);
     }
     clone() {
         return new Location(this.x, this.y, this.z);
@@ -747,6 +754,9 @@ class Location extends Vector3 {
 class BlockLocation extends Vector3 {
     static create(vector) {
         return Vector3.create(vector);
+    }
+    static parse(vectorStr) {
+        return Vector3.parse(vectorStr);
     }
     clone() {
         return new BlockLocation(this.x, this.y, this.z);
@@ -4279,7 +4289,14 @@ class LootTable {
         this.table = new Set();
         this.totalWeight = 0;
         if (items) {
-            for (const item of items)this.addItem(item);
+            for (const item of items){
+                if (typeof item === "number") this.addItem({
+                    weight: 1,
+                    // @ts-ignore
+                    value: item
+                });
+                else this.addItem(item);
+            }
         }
     }
 }
@@ -4892,7 +4909,6 @@ class TrapdoorBlock extends WrappedBlock {
             while(--maxLength){
                 // 3. 获取扩展活板门
                 //    即能与该活板门延伸联动的另一个活板门
-                // @ts-ignore
                 const playerFacing = new WrappedPlayer(player).getFacingDirectionXZ();
                 const extensiveBlock = needOpposite ? that.getNeighbourBlock(playerFacing.getOpposite()) : that.getNeighbourBlock(playerFacing);
                 if (TrapdoorBlock.match(extensiveBlock)) {
@@ -5431,12 +5447,7 @@ class OptionItemSelection {
     constructor({ name, description, values = [], defaultValue, events, reload, _player }){
         this.name = name;
         this.description = description;
-        this.values = new Map(//@ts-ignore
-        values.map((value)=>{
-            if (value[0] === true && !value[1]) value[1] = "开启";
-            else if (value[0] === false && !value[1]) value[1] = "关闭";
-            return value;
-        }));
+        this.values = new Map(values);
         this.events = new EventEmitter();
         this.reload = reload;
         this._player = _player;
@@ -5451,15 +5462,17 @@ class OptionItemSelection {
 }
 
 class PlayerOption {
-    addItem(opts) {
-        //@ts-ignore
-        if (opts.range) this.items[opts.name] = new OptionItemRange(opts);
-        else if (opts.values) this.items[opts.name] = new OptionItemSelection(opts);
+    addSelectionItem(opts) {
+        this.items[opts.name] = new OptionItemSelection(opts);
+        return this;
+    }
+    addRangeItem(opts) {
+        this.items[opts.name] = new OptionItemRange(opts);
         return this;
     }
     async _syncToDB() {
         const data = this.getItemValMap();
-        for (const [name, value] of Object.entries(data))await this.db.set(name, value);
+        for (const [name, value] of data)await this.db.set(name, value);
         for (const [name] of this.db){
             if (!this.hasItem(name)) await this.db.delete(name);
         }
@@ -5471,7 +5484,10 @@ class PlayerOption {
         await this._syncToDB();
     }
     async init() {
-        this.addItem = ()=>{
+        this.addSelectionItem = ()=>{
+            throw new Error("Can't add item after initialization.");
+        };
+        this.addRangeItem = ()=>{
             throw new Error("Can't add item after initialization.");
         };
         await this._syncFromDB();
@@ -5486,7 +5502,7 @@ class PlayerOption {
     setItemVal(name, value, callback = ()=>{}, { syncFromDB = false } = {}) {
         const item = this._getItem(name);
         if (item) {
-            //@ts-ignore
+            // @ts-ignore
             const result = item.select(value);
             if (result) {
                 if (!syncFromDB && item.reload) this.reload = true;
@@ -5501,11 +5517,11 @@ class PlayerOption {
     }
     getItemValMap() {
         // TODO: use map
-        const result = {};
-        for (const [name] of Object.entries(this.items))result[name] = this.getItemVal(name);
+        const result = new Map();
+        for (const [name] of Object.entries(this.items))result.set(name, this.getItemVal(name));
         return result;
     }
-    async done(parentDialog) {
+    async done({ parentDialog } = {}) {
         const handleDone = async ({ reply = true } = {})=>{
             await this._syncToDB();
             if (reply) this.player.sendMessage("设置选项修改成功");
@@ -5523,12 +5539,14 @@ class PlayerOption {
                 },
                 onCancel: async ()=>{
                     await this._syncFromDB();
-                    await this.showDialog(parentDialog);
+                    await this.showDialog({
+                        parentDialog
+                    });
                 }
             });
         } else await handleDone();
     }
-    async showDialog(parentDialog) {
+    async showDialog({ parentDialog } = {}) {
         const form = new ModalFormData().title(`${this.name} 选项`);
         const nameMap = [];
         for (const [, item] of Object.entries(this.items)){
@@ -5555,7 +5573,7 @@ class PlayerOption {
                         name,
                         valuesMap
                     });
-                    form.dropdown(description, valueArray.map((e)=>e[1]), valueArray.map((e)=>e[0]).findIndex((e)=>e === selected));
+                    form.dropdown(description, valueArray.map((e)=>e[1] ?? `${e[0]}`), valueArray.map((e)=>e[0]).findIndex((e)=>e === selected));
                 }
             } else if (item instanceof OptionItemRange) {
                 const { name, description, range, selected } = item;
@@ -5577,11 +5595,12 @@ class PlayerOption {
                 for(let nameIndex = 0; nameIndex < result.length; nameIndex++){
                     const valueIndex = result[nameIndex];
                     const { name, valuesMap } = nameMap[nameIndex];
-                    // FIXME: as never?
                     const value = valuesMap.get(valueIndex);
                     this.setItemVal(name, value);
                 }
-                await this.done(parentDialog);
+                await this.done({
+                    parentDialog
+                });
             }
         });
         await dialog.show(this.player);
@@ -5596,18 +5615,44 @@ class PlayerOption {
 }
 
 class OptionNamespace {
-    addItem(opts) {
-        this._items.add(opts);
+    addSelectionItem(opts) {
+        this._items.selection.add(opts);
+        return this;
+    }
+    addRangeItem(opts) {
+        this._items.range.add(opts);
+        return this;
+    }
+    addToggleItem(opts) {
+        this._items.selection.add({
+            ...opts,
+            values: [
+                [
+                    false,
+                    "关闭"
+                ],
+                [
+                    true,
+                    "开启"
+                ]
+            ]
+        });
         return this;
     }
     applyPlayer(player) {
         if (this.players.has(player)) return this.players.get(player);
-        const playerOpt = new PlayerOption(player, this.name);
-        for (const item of this._items){
-            //@ts-ignore
-            item._player = player;
-            //@ts-ignore
-            playerOpt.addItem(item);
+        const playerOpt = new PlayerOption(player, this.id);
+        for (const item of this._items.selection){
+            playerOpt.addSelectionItem({
+                ...item,
+                _player: player
+            });
+        }
+        for (const item of this._items.range){
+            playerOpt.addRangeItem({
+                ...item,
+                _player: player
+            });
         }
         this.players.set(player, playerOpt);
         return playerOpt;
@@ -5632,37 +5677,42 @@ class OptionNamespace {
         if (!playerOption) throw new Error("Can't get player  options.");
         return playerOption;
     }
-    constructor(name){
+    constructor(id, name){
         this.players = new Map();
-        this._items = new Set();
-        this.name = name;
+        this._items = {
+            range: new Set(),
+            selection: new Set()
+        };
+        this.id = id;
+        this.name = name ?? id;
     }
 }
 
 class OptionManager {
-    registerNamesapace(name) {
-        const namespaces = new OptionNamespace(name);
-        this.namespaces.set(name, namespaces);
+    registerNamesapace({ id, name }) {
+        const namespaces = new OptionNamespace(id, name);
+        this.namespaces.set(id, namespaces);
         return namespaces;
     }
-    getNamesapace(name) {
-        const namespace = this.namespaces.get(name);
+    getNamesapace(id) {
+        const namespace = this.namespaces.get(id);
         if (!namespace) throw new Error("Can't get namespace.");
         return namespace;
     }
     async showDialog(player) {
         const form = new ActionFormData().title("设置选项").body("选择要设置的模块：");
         const nameMap = [];
-        for (const [name] of this.namespaces){
-            nameMap.push(name);
-            form.button(name) // TODO: name -> desc
-            ;
+        for (const [, namespace] of this.namespaces){
+            nameMap.push(namespace.id);
+            form.button(namespace.name);
         }
         const dialog = new Dialog({
             dialog: form,
             onSelect: async (selection)=>{
-                const name = nameMap[selection];
-                await this.getNamesapace(name).getPlayer(player).showDialog(dialog);
+                const id = nameMap[selection];
+                await this.getNamesapace(id).getPlayer(player).showDialog({
+                    parentDialog: dialog
+                });
             }
         });
         await dialog.show(player);
@@ -5691,37 +5741,23 @@ Commands.register("!", "option", async (argv, sender)=>{
     }
 });
 
-const option = optionManager.registerNamesapace("better-door").addItem({
+const option = optionManager.registerNamesapace({
+    id: "better-door"
+}).addToggleItem({
     name: "door",
     description: "允许双开门",
-    values: [
-        [
-            true
-        ],
-        [
-            false
-        ]
-    ],
     defaultValue: false,
     events: {
         changed: (selected, original)=>console.warn("better-door:door -> from", original, "to", selected)
     }
-}).addItem({
+}).addToggleItem({
     name: "trapdoor",
     description: "允许多开活板门",
-    values: [
-        [
-            true
-        ],
-        [
-            false
-        ]
-    ],
     defaultValue: false,
     events: {
         changed: (selected, original)=>console.warn("better-door:trapdoor -> from", original, "to", selected)
     }
-}).addItem({
+}).addRangeItem({
     name: "max_trapdoor_length",
     description: "允许多开活板门的最大距离",
     range: [
@@ -5732,17 +5768,9 @@ const option = optionManager.registerNamesapace("better-door").addItem({
     events: {
         changed: (selected, original)=>console.warn("better-door:max_trapdoor_length -> from", original, "to", selected)
     }
-}).addItem({
+}).addToggleItem({
     name: "should_be_the_same_type",
     description: "是否需要是同种门",
-    values: [
-        [
-            true
-        ],
-        [
-            false
-        ]
-    ],
     defaultValue: true,
     events: {
         changed: (selected, original)=>console.warn("better-door:should_be_the_same_type -> from", original, "to", selected)
@@ -5755,7 +5783,6 @@ const setupListener = ()=>world.beforeEvents.itemUseOn.subscribe((event)=>{
         const shouldBeTheSameType = playerOption.getItemVal("should_be_the_same_type");
         if (DoorBlock.match(block) && playerOption.getItemVal("door")) {
             event.cancel = true;
-            // @ts-ignore
             const doors = new DoorBlock(block).getRelated({
                 shouldBeTheSameType
             });
@@ -5769,8 +5796,7 @@ const setupListener = ()=>world.beforeEvents.itemUseOn.subscribe((event)=>{
         } else if (TrapdoorBlock.match(block) && playerOption.getItemVal("trapdoor")) {
             event.cancel = true;
             const maxLength = playerOption.getItemVal("max_trapdoor_length");
-            // @ts-ignore
-            const trapdoors = TrapdoorBlock.wrap(block).getRelated(player, {
+            const trapdoors = new TrapdoorBlock(block).getRelated(player, {
                 maxLength,
                 shouldBeTheSameType
             });
