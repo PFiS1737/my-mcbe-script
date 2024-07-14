@@ -89,7 +89,6 @@ export class PlayerOption {
     if (item) return item.selected
   }
   getItemValMap() {
-    // TODO: use map
     const result = new Map<string, any>()
     for (const [name] of Object.entries(this.items))
       result.set(name, this.getItemVal(name))
@@ -120,10 +119,7 @@ export class PlayerOption {
     const form = new ModalFormData().title(`${this.name} 选项`)
     const nameMap: Array<{
       name: string
-      valuesMap:
-        | Map<boolean, boolean>
-        | Map<number, string | number | boolean>
-        | Map<number, number>
+      valuesMap: Map<number | boolean, string | number | boolean>
     }> = []
 
     for (const [, item] of Object.entries(this.items)) {
@@ -131,7 +127,7 @@ export class PlayerOption {
         const { name, description, values, selected } = item
 
         if (values.size === 2 && values.get(true) && values.get(false)) {
-          const valuesMap = new Map()
+          const valuesMap = new Map<boolean, boolean>()
           for (const [e] of values) valuesMap.set(e, e)
           nameMap.push({ name, valuesMap })
 
@@ -139,7 +135,7 @@ export class PlayerOption {
         } else {
           const valueArray = [...values]
 
-          const valuesMap = new Map()
+          const valuesMap = new Map<number, string | number | boolean>()
           for (let i = 0; i < valueArray.length; i++) {
             const [e] = valueArray[i]
             valuesMap.set(i, e)
@@ -155,7 +151,7 @@ export class PlayerOption {
       } else if (item instanceof OptionItemRange) {
         const { name, description, range, selected } = item
 
-        const valuesMap = new Map()
+        const valuesMap = new Map<number, number>()
         for (const i of range) valuesMap.set(i, i)
         nameMap.push({ name, valuesMap })
 
@@ -170,7 +166,7 @@ export class PlayerOption {
       },
       onSubmit: async (result) => {
         for (let nameIndex = 0; nameIndex < result.length; nameIndex++) {
-          const valueIndex = result[nameIndex] as number
+          const valueIndex = result[nameIndex] as number | boolean
 
           const { name, valuesMap } = nameMap[nameIndex]
           const value = valuesMap.get(valueIndex)
