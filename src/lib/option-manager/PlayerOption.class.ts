@@ -23,20 +23,17 @@ export class PlayerOption {
   items: Record<string, OptionItemSelection<any> | OptionItemRange> = {}
   reload = false
 
-  addItem(
-    opts: { _player: Player } & (IOptionItemRange | IOptionItemSelection<any>)
-  ) {
-    //@ts-ignore
-    if (opts.range) this.items[opts.name] = new OptionItemRange(opts)
-    //@ts-ignore
-    else if (opts.values) this.items[opts.name] = new OptionItemSelection(opts)
-
+  addSelectionItem(opts: { _player: Player } & IOptionItemSelection<any>) {
+    this.items[opts.name] = new OptionItemSelection(opts)
+    return this
+  }
+  addRangeItem(opts: { _player: Player } & IOptionItemRange) {
+    this.items[opts.name] = new OptionItemRange(opts)
     return this
   }
   async _syncToDB() {
     const data = this.getItemValMap()
-    for (const [name, value] of Object.entries(data))
-      await this.db.set(name, value)
+    for (const [name, value] of data) await this.db.set(name, value)
 
     for (const [name] of this.db) {
       if (!this.hasItem(name)) await this.db.delete(name)
@@ -48,7 +45,10 @@ export class PlayerOption {
     await this._syncToDB()
   }
   async init() {
-    this.addItem = () => {
+    this.addSelectionItem = () => {
+      throw new Error("Can't add item after initialization.")
+    }
+    this.addRangeItem = () => {
       throw new Error("Can't add item after initialization.")
     }
 
@@ -69,13 +69,13 @@ export class PlayerOption {
     callback: (
       selected: T,
       original: T,
-      map: Record<string, any>
+      map: Map<string, any>
     ) => void = () => {},
     { syncFromDB = false } = {}
   ) {
     const item = this._getItem(name)
     if (item) {
-      //@ts-ignore
+      // @ts-ignore
       const result = item.select(value)
       if (result) {
         if (!syncFromDB && item.reload) this.reload = true
@@ -90,12 +90,12 @@ export class PlayerOption {
   }
   getItemValMap() {
     // TODO: use map
-    const result: Record<string, any> = {}
+    const result = new Map<string, any>()
     for (const [name] of Object.entries(this.items))
-      result[name] = this.getItemVal(name)
+      result.set(name, this.getItemVal(name))
     return result
   }
-  async done(parentDialog?: Dialog<any>) {
+  async done({ parentDialog }: { parentDialog?: Dialog<any> } = {}) {
     const handleDone = async ({ reply = true } = {}) => {
       await this._syncToDB()
       if (reply) this.player.sendMessage("设置选项修改成功")
@@ -111,12 +111,12 @@ export class PlayerOption {
         },
         onCancel: async () => {
           await this._syncFromDB()
-          await this.showDialog(parentDialog)
+          await this.showDialog({ parentDialog })
         },
       })
     } else await handleDone()
   }
-  async showDialog(parentDialog?: Dialog<any>) {
+  async showDialog({ parentDialog }: { parentDialog?: Dialog<any> } = {}) {
     const form = new ModalFormData().title(`${this.name} 选项`)
     const nameMap: Array<{
       name: string
@@ -148,7 +148,7 @@ export class PlayerOption {
 
           form.dropdown(
             description,
-            valueArray.map((e) => e[1]),
+            valueArray.map((e) => e[1] ?? `${e[0]}`),
             valueArray.map((e) => e[0]).findIndex((e) => e === selected)
           )
         }
@@ -173,11 +173,10 @@ export class PlayerOption {
           const valueIndex = result[nameIndex] as number
 
           const { name, valuesMap } = nameMap[nameIndex]
-          // FIXME: as never?
-          const value = valuesMap.get(valueIndex as never)
+          const value = valuesMap.get(valueIndex)
           this.setItemVal(name, value)
         }
-        await this.done(parentDialog)
+        await this.done({ parentDialog })
       },
     })
     await dialog.show(this.player)

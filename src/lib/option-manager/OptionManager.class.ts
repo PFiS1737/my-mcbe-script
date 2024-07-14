@@ -1,18 +1,19 @@
 import type { Player } from "@minecraft/server"
 import { ActionFormData } from "@minecraft/server-ui"
+
 import { Dialog } from "../dialog/index"
 import { OptionNamespace } from "./OptionNamespace.class"
 
 export class OptionManager {
   namespaces = new Map<string, OptionNamespace>()
 
-  registerNamesapace(name: string) {
-    const namespaces = new OptionNamespace(name)
-    this.namespaces.set(name, namespaces)
+  registerNamesapace({ id, name }: { id: string; name?: string }) {
+    const namespaces = new OptionNamespace(id, name)
+    this.namespaces.set(id, namespaces)
     return namespaces
   }
-  getNamesapace(name: string) {
-    const namespace = this.namespaces.get(name)
+  getNamesapace(id: string) {
+    const namespace = this.namespaces.get(id)
 
     if (!namespace) throw new Error("Can't get namespace.")
 
@@ -22,17 +23,20 @@ export class OptionManager {
     const form = new ActionFormData()
       .title("设置选项")
       .body("选择要设置的模块：")
+
     const nameMap: string[] = []
-    for (const [name] of this.namespaces) {
-      nameMap.push(name)
-      form.button(name) // TODO: name -> desc
+    for (const [, namespace] of this.namespaces) {
+      nameMap.push(namespace.id)
+      form.button(namespace.name)
     }
 
     const dialog = new Dialog({
       dialog: form,
       onSelect: async (selection) => {
-        const name = nameMap[selection]
-        await this.getNamesapace(name).getPlayer(player).showDialog(dialog)
+        const id = nameMap[selection]
+        await this.getNamesapace(id)
+          .getPlayer(player)
+          .showDialog({ parentDialog: dialog })
       },
     })
     await dialog.show(player)

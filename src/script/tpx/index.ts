@@ -21,11 +21,7 @@ option
     for (const player of optMap.keys()) TpxDB.init(player)
 
     Commands.register("!", "tpx", tpxCommand)
-
-    const values = [...optMap.values()]
-    if (values.some(({ back_cmd }) => back_cmd))
-      Commands.register("!", "back", backCommand)
-    if (values.some(({ home_cmd }) => home_cmd))
-      Commands.register("!", "home", homeCommand)
+    Commands.register("!", "back", backCommand)
+    Commands.register("!", "home", homeCommand)
   })
   .catch(BetterConsole.error)

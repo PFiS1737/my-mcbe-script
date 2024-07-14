@@ -129,7 +129,7 @@ export class Handler {
       tigger.events
     )) {
       await asyncRun(() =>
-        //@ts-ignore
+        // @ts-ignore
         world.afterEvents[eventName].subscribe(listener, options)
       )
     }
@@ -148,7 +148,7 @@ export class Handler {
 
     for (const [eventName, { listener }] of Object.entries(events)) {
       await asyncRun(() =>
-        //@ts-ignore
+        // @ts-ignore
         world.afterEvents[eventName].unsubscribe(listener)
       )
     }

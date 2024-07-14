@@ -5,7 +5,7 @@ import { EventEmitter } from "../EventEmitter.class"
 export interface IOptionItemSelection<T extends string | number | boolean> {
   name: string
   description: string
-  values: Array<[T, string?]>
+  values: Array<[T, string | undefined]>
   defaultValue?: T
   reload?: boolean
   events?: {
@@ -18,7 +18,7 @@ export interface IOptionItemSelection<T extends string | number | boolean> {
 export class OptionItemSelection<T extends string | number | boolean> {
   name: string
   description: string
-  values: Map<T, string>
+  values: Map<T, string | undefined>
   reload?: boolean
   events: EventEmitter
   _player: Player
@@ -37,14 +37,7 @@ export class OptionItemSelection<T extends string | number | boolean> {
   }: { _player: Player } & IOptionItemSelection<T>) {
     this.name = name
     this.description = description
-    this.values = new Map(
-      //@ts-ignore
-      values.map((value) => {
-        if (value[0] === true && !value[1]) value[1] = "开启"
-        else if (value[0] === false && !value[1]) value[1] = "关闭"
-        return value
-      })
-    )
+    this.values = new Map(values)
     this.events = new EventEmitter()
     this.reload = reload
     this._player = _player

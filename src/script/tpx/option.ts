@@ -18,21 +18,19 @@ async function afterEntityDieCallback(event: EntityDieAfterEvent) {
 }
 
 export const option = optionManager
-  .registerNamesapace("tpx")
-  .addItem({
+  .registerNamesapace({ id: "tpx" })
+  .addToggleItem({
     name: "auto_back_point",
     description: "允许使用 tpx 传送时自动添加返回点",
-    values: [[true], [false]],
     defaultValue: true,
     events: {
       changed: (selected, original) =>
         console.warn("tpx:auto_back_point -> from", original, "to", selected),
     },
   })
-  .addItem({
+  .addToggleItem({
     name: "back_after_death",
     description: "允许死亡时自动添加死亡点",
-    values: [[true], [false]],
     defaultValue: true,
     events: {
       changed: (selected, original) => {
@@ -46,10 +44,9 @@ export const option = optionManager
       },
     },
   })
-  .addItem({
+  .addToggleItem({
     name: "back_cmd",
     description: "允许使用独立的 back 命令",
-    values: [[true], [false]],
     defaultValue: false,
     reload: true,
     events: {
@@ -57,10 +54,9 @@ export const option = optionManager
         console.warn("tpx:back_cmd -> from", original, "to", selected),
     },
   })
-  .addItem({
+  .addToggleItem({
     name: "home_cmd",
     description: "允许使用独立的 home 命令",
-    values: [[true], [false]],
     defaultValue: false,
     reload: true,
     events: {
