@@ -1,6 +1,5 @@
-import { GameMode, type ItemStack, type Player } from "@minecraft/server"
+import type { GameMode, ItemStack, Player } from "@minecraft/server"
 
-import { Commands } from "../../commands/index"
 import { EntityContainer } from "../container/index"
 import { WrappedEntity } from "./WrappedEntity.class"
 
@@ -34,20 +33,13 @@ export class WrappedPlayer extends WrappedEntity {
   }
 
   getGameMode() {
-    const matches: GameMode[] = []
-    each(GameMode, (mode) => {
-      if (this.testGameMode(mode)) matches.push(mode)
-    })
-    return matches[0]
+    return this._player.getGameMode()
   }
   testGameMode(mode: GameMode) {
-    const playersUnderMode = this.dimension.getPlayers({ gameMode: mode })
-    return playersUnderMode.some((player) => player.id === this.id)
+    return this.getGameMode() === mode
   }
   setGameMode(mode: GameMode) {
-    if (!Object.values(GameMode).includes(mode))
-      throw new TypeError("Unknown gamemode.")
-    Commands.run(`gamemode ${mode}`, this._player)
+    this._player.setGameMode(mode)
   }
 
   getMainHandItem() {
