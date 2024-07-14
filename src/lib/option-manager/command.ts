@@ -1,3 +1,5 @@
+import type { Player } from "@minecraft/server"
+
 import { Commands } from "../commands/index"
 import { asyncRun, errorHandler } from "../util/game"
 import { optionManager } from "./manager"
@@ -7,12 +9,12 @@ Commands.register("!", "option", async (argv, sender) => {
     case "dialog":
     case "-d":
     case undefined: {
-      // TODO argv[2] -> namespace
-      await asyncRun(() => optionManager.showDialog(sender))
+      // TODO: argv[2] -> namespace
+      await asyncRun(() => optionManager.showDialog(sender as Player))
       break
     }
     default: {
-      throw errorHandler("未知的子命令", sender)
+      throw errorHandler("未知的子命令", sender as Player)
     }
   }
 })
