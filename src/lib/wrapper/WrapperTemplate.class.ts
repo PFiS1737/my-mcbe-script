@@ -1,21 +1,8 @@
 export class WrapperTemplate {
-  static wrap(...args) {
-    // return the class extending this
-    // @ts-ignore
-    return new this(...args)
-  }
-  static tryWrap(...args) {
-    try {
-      // return the class extending this
-      // @ts-ignore
-      return new this(...args)
-    } catch (err) {}
-  }
-
-  static match() {
+  static match(_: unknown): boolean {
     throw new Error("Not implemented.")
   }
-  static assert() {
+  static assert(_: unknown): boolean {
     throw new Error("Not implemented.")
   }
 }

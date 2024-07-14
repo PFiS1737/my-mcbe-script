@@ -1,9 +1,4 @@
-import {
-  type Entity,
-  GameMode,
-  type ItemStack,
-  type Player,
-} from "@minecraft/server"
+import { GameMode, type ItemStack, type Player } from "@minecraft/server"
 
 import { Commands } from "../../commands/index"
 import { EntityContainer } from "../container/index"
@@ -18,10 +13,6 @@ export class WrappedPlayer extends WrappedEntity {
     this.name = player.name
   }
 
-  static match(entity: Entity | WrappedEntity) {
-    return entity.typeId === "minecraft:player"
-  }
-
   get _player() {
     return this._entity as Player
   }
@@ -33,7 +24,10 @@ export class WrappedPlayer extends WrappedEntity {
     return this._player.level
   }
   get inventory() {
-    return new EntityContainer(this, this.components.get("inventory").container)
+    return new EntityContainer(
+      this._player,
+      this.components.get("inventory").container
+    )
   }
   get selectedSlotIndex() {
     return this._player.selectedSlotIndex

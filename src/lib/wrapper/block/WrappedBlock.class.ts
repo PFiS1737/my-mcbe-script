@@ -41,7 +41,11 @@ export class WrappedBlock extends WrapperTemplate {
 
   getOffsetBlock(v: Location | BlockLocation) {
     const location = this.location.clone().offset(v)
-    return new WrappedBlock(this.dimension.getBlock(location))
+    const block = this.dimension.getBlock(location)
+
+    if (!block) throw new Error("Getting block from an unload chunk.")
+
+    return new WrappedBlock(block)
   }
   getNeighbourBlock(direction: Direction) {
     const offset = LocationUtils.getDirectionOffset(direction)

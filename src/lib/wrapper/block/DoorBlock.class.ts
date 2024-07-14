@@ -28,10 +28,10 @@ export class DoorBlock extends WrappedBlocks {
     super(blocks)
   }
 
-  static match(block) {
-    return DOORS.has(block?.typeId)
+  static match(block: Block) {
+    return DOORS.has(block.typeId)
   }
-  static assert(block) {
+  static assert(block: Block) {
     if (DoorBlock.match(block)) return true
 
     throw new TypeError(`The "${block.typeId}" is not a door.`)
@@ -45,7 +45,7 @@ export class DoorBlock extends WrappedBlocks {
   }
 
   get opened() {
-    return this._lower.getState("open_bit")
+    return this._lower.getState("open_bit") as boolean
   }
   get facingDirection() {
     // the direction you are facing when you place the door
@@ -61,11 +61,11 @@ export class DoorBlock extends WrappedBlocks {
         return Directions.North
       default:
         // this branch can't be reached forever
-        throw new Error("Unkonw error.")
+        throw new Error("Unexpected error.")
     }
   }
   get hingeSide() {
-    return this._upper.getState("door_hinge_bit")
+    return this._upper.getState("door_hinge_bit") as boolean
     // true -> right
     // false -> left
   }
@@ -120,7 +120,7 @@ export class DoorBlock extends WrappedBlocks {
 
     // 2. 进行判断
     const relatedBlock = this._lower.getOffsetBlock(offset)
-    if (DoorBlock.match(relatedBlock)) {
+    if (DoorBlock.match(relatedBlock._block)) {
       const relatedDoor = new DoorBlock(relatedBlock._block)
       // 另一扇门应该方向相同，而门轴相反
       if (

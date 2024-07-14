@@ -11,7 +11,6 @@
       "recommended": true,
       "complexity": {
         "noStaticOnlyClass": "off",
-        "noThisInStatic": "off",
         "noBannedTypes": "off"
       },
       "suspicious": {

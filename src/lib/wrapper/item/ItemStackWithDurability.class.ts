@@ -3,23 +3,27 @@ import {
   type ItemDurabilityComponent,
   type ItemStack,
 } from "@minecraft/server"
-
 import { MinecraftEnchantmentTypes } from "@minecraft/vanilla-data"
+
 import { withProbability } from "../../util/math"
 import { WrappedItemStack } from "./WrappedItemStack.class"
 
 export class ItemStackWithDurability extends WrappedItemStack {
   constructor(itemStack: ItemStack) {
-    if (!ItemStackWithDurability.match(itemStack))
-      throw new TypeError(
-        `The "${itemStack.typeId}" doesn't have the "${ItemComponentTypes.Durability}" component.`
-      )
+    ItemStackWithDurability.assert(itemStack)
 
     super(itemStack)
   }
 
-  static match(itemStack) {
-    return itemStack.hasComponent("minecraft:durability")
+  static match(itemStack: ItemStack) {
+    return itemStack.hasComponent(ItemComponentTypes.Durability)
+  }
+  static assert(itemStack: ItemStack) {
+    if (ItemStackWithDurability.match(itemStack)) return true
+
+    throw new TypeError(
+      `The "${itemStack.typeId}" doesn't have the "${ItemComponentTypes.Durability}" component.`
+    )
   }
 
   get damage() {

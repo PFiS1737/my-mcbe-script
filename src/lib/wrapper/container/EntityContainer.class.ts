@@ -1,12 +1,11 @@
 import type { Container, Entity, ItemStack } from "@minecraft/server"
 
-import type { WrappedEntity } from "../entity"
 import { WrappedContainer } from "./WrappedContainer.class"
 
 export class EntityContainer extends WrappedContainer {
   _entity: Entity
 
-  constructor(entity: Entity | WrappedEntity, container: Container) {
+  constructor(entity: Entity, container: Container) {
     super(container)
 
     this._entity = entity

@@ -17,17 +17,17 @@ export class TrapdoorBlock extends WrappedBlock {
     super(block)
   }
 
-  static match(block) {
-    return TRAPDOORS.has(block?.typeId)
+  static match(block: Block) {
+    return TRAPDOORS.has(block.typeId)
   }
-  static assert(block) {
+  static assert(block: Block) {
     if (TrapdoorBlock.match(block)) return true
 
     throw new TypeError(`The "${block.typeId}" is not a trapdoor.`)
   }
 
   get opened() {
-    return this.getState("open_bit")
+    return this.getState("open_bit") as boolean
   }
   get facingDirection() {
     // trapdoor is on the >direction< side of a block
@@ -42,12 +42,11 @@ export class TrapdoorBlock extends WrappedBlock {
       case 3:
         return Directions.North
       default:
-        // this branch can't be reached forever
-        throw new Error("Unkonw error.")
+        throw new Error("Unexpected error.")
     }
   }
   get upsideOrDown() {
-    return this.getState("upside_down_bit")
+    return this.getState("upside_down_bit") as boolean
   }
 
   isWooden() {
@@ -84,8 +83,7 @@ export class TrapdoorBlock extends WrappedBlock {
       const relatedBlock = this.getNeighbourBlock(this.facingDirection)
 
       // 2. 判断是否为相关活板门
-      if (TrapdoorBlock.match(relatedBlock)) {
-        // TODO: refactor _bloc6k
+      if (TrapdoorBlock.match(relatedBlock._block)) {
         const relatedTrapdoor = new TrapdoorBlock(relatedBlock._block)
         // 方向相反，上下位置相同
         if (
@@ -113,7 +111,7 @@ export class TrapdoorBlock extends WrappedBlock {
           ? that.getNeighbourBlock(playerFacing.getOpposite())
           : that.getNeighbourBlock(playerFacing)
 
-        if (TrapdoorBlock.match(extensiveBlock)) {
+        if (TrapdoorBlock.match(extensiveBlock._block)) {
           const extensiveTrapdoor = new TrapdoorBlock(extensiveBlock._block)
 
           // 方向相同，上下位置相同

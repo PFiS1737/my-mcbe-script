@@ -56,9 +56,9 @@ export const setupListener = () =>
           blockTypeId
         )
 
-        const wrappedItem =
-          ItemStackWithDurability.tryWrap(mainHandItem) ??
-          new WrappedItemStack(mainHandItem)
+        const wrappedItem = ItemStackWithDurability.match(mainHandItem)
+          ? new ItemStackWithDurability(mainHandItem)
+          : new WrappedItemStack(mainHandItem)
 
         let totalDamage = 0
 
@@ -69,9 +69,9 @@ export const setupListener = () =>
           blockList.size > 0 &&
           (!playerOption.getItemVal("prevent_tool_destruction") ||
             (playerOption.getItemVal("prevent_tool_destruction") &&
-              totalDamage <
-                // @ts-ignore
-                (wrappedItem.durability ?? Number.POSITIVE_INFINITY)))
+              (wrappedItem instanceof ItemStackWithDurability
+                ? totalDamage < wrappedItem.durability
+                : true)))
         ) {
           const block = blockList.shift()
 
