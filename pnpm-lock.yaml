@@ -18,8 +18,8 @@ importers:
         specifier: 1.2.0-beta.1.21.2-stable
         version: 1.2.0-beta.1.21.2-stable
       '@minecraft/vanilla-data':
-        specifier: ^1.21.2
-        version: 1.21.2
+        specifier: ^1.21.3
+        version: 1.21.3
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.8.3
@@ -140,8 +140,8 @@ packages:
   '@minecraft/server@1.12.0-beta.1.21.2-stable':
     resolution: {integrity: sha512-y/R6AaYglBQUhOPmKJuvTWvBZUIUdE6zLT/JF1Q9gHbFCkcMoqV8WFeVvnFWjGxp27gPaQbvShZbRmLww1WXOg==}
 
-  '@minecraft/vanilla-data@1.21.2':
-    resolution: {integrity: sha512-djEeUBhSktng/9JlcjuY20ejsRmXeqgCNBJE7/xOdbH4uNp8ThSyypbrZlZbLDdgeJqoE9b9PMwgzSw4cgrh6g==}
+  '@minecraft/vanilla-data@1.21.3':
+    resolution: {integrity: sha512-y0XWlCSCwRtRjWN/0zgyOyH0P2mOqOYT6ZzH/KmoVCJFPBC+ljLTUnPDBKT+SU++z3pgIDTs6QoUo6GdJyEBBw==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -363,8 +363,8 @@ packages:
   '@types/md5@2.3.5':
     resolution: {integrity: sha512-/i42wjYNgE6wf0j2bcTX6kuowmdL/6PE4IVitMpm2eYKBUuYCprdcWVK+xEF0gcV6ufMCRhtxmReGfc6hIK7Jw==}
 
-  '@types/node@20.14.10':
-    resolution: {integrity: sha512-MdiXf+nDuMvY0gJKxyfZ7/6UFsETO7mGKF54MVD/ekJS6HdFtpZFBgrh6Pseu64XTb2MLyFPlbW6hj8HYRQNOQ==}
+  '@types/node@20.14.11':
+    resolution: {integrity: sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==}
 
   '@types/picomatch@3.0.0':
     resolution: {integrity: sha512-iX/Qwk9vU17N/5Q7QrV46wzciloTdCqTRt6z8A7uFFADM2+Sy5oQh9ldZhAiTXH+l0sM/EkXatEhJIs8FUyOBQ==}
@@ -754,9 +754,8 @@ packages:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
 
-  jackspeak@3.4.2:
-    resolution: {integrity: sha512-qH3nOSj8q/8+Eg8LUPOq3C+6HWkpUioIjDsq1+D4zY91oZvpPttw8GwtF1nReRYKXl+1AORyFqtm2f5Q1SB6/Q==}
-    engines: {node: 14 >=14.21 || 16 >=16.20 || >=18}
+  jackspeak@3.4.3:
+    resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
   last-run@2.0.0:
     resolution: {integrity: sha512-j+y6WhTLN4Itnf9j5ZQos1BGPCS8DAwmgMroR3OzfxAsBxam0hMw7J8M3KqZl0pLQJ1jNnwIexg5DYpC/ctwEQ==}
@@ -1144,7 +1143,7 @@ snapshots:
     dependencies:
       '@minecraft/common': 1.2.0
 
-  '@minecraft/vanilla-data@1.21.2': {}
+  '@minecraft/vanilla-data@1.21.3': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -1299,20 +1298,20 @@ snapshots:
 
   '@types/glob-stream@8.0.2':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       '@types/picomatch': 3.0.0
       '@types/streamx': 2.9.5
 
   '@types/gulp@4.0.17':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       '@types/undertaker': 1.2.11
       '@types/vinyl-fs': 3.0.5
       chokidar: 3.6.0
 
   '@types/md5@2.3.5': {}
 
-  '@types/node@20.14.10':
+  '@types/node@20.14.11':
     dependencies:
       undici-types: 5.26.5
 
@@ -1322,26 +1321,26 @@ snapshots:
 
   '@types/streamx@2.9.5':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/undertaker-registry@1.0.4': {}
 
   '@types/undertaker@1.2.11':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       '@types/undertaker-registry': 1.0.4
       async-done: 1.3.2
 
   '@types/vinyl-fs@3.0.5':
     dependencies:
       '@types/glob-stream': 8.0.2
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       '@types/vinyl': 2.0.12
 
   '@types/vinyl@2.0.12':
     dependencies:
       '@types/expect': 1.20.4
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   ansi-regex@5.0.1: {}
 
@@ -1581,7 +1580,7 @@ snapshots:
   glob@10.4.5:
     dependencies:
       foreground-child: 3.2.1
-      jackspeak: 3.4.2
+      jackspeak: 3.4.3
       minimatch: 9.0.5
       minipass: 7.1.2
       package-json-from-dist: 1.0.0
@@ -1710,7 +1709,7 @@ snapshots:
 
   isobject@3.0.1: {}
 
-  jackspeak@3.4.2:
+  jackspeak@3.4.3:
     dependencies:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:

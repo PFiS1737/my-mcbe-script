@@ -26,7 +26,7 @@
     "@minecraft/common": "^1.2.0",
     "@minecraft/server": "1.12.0-beta.1.21.2-stable",
     "@minecraft/server-ui": "1.2.0-beta.1.21.2-stable",
-    "@minecraft/vanilla-data": "^1.21.2"
+    "@minecraft/vanilla-data": "^1.21.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
@@ -42,5 +42,5 @@
     "rollup": "^4.18.1",
     "typescript": "^5.5.3"
   },
-  "packageManager": "pnpm@9.3.0+sha512.ee7b93e0c2bd11409c6424f92b866f31d3ea1bef5fbe47d3c7500cdc3c9668833d2e55681ad66df5b640c61fa9dc25d546efa54d76d7f8bf54b13614ac293631"
+  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903"
 }
