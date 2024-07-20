@@ -2,7 +2,6 @@ import type { Block } from "@minecraft/server"
 
 import { BlockLocation, Directions } from "../../location/index"
 import { WrappedBlock } from "./WrappedBlock.class"
-import { WrappedBlocks } from "./WrappedBlocks.class"
 
 import {
   COPPER_DOORS,
@@ -10,7 +9,7 @@ import {
   WOODEN_DOORS,
 } from "./BlockTypeGroups.enumeration"
 
-export class DoorBlock extends WrappedBlocks {
+export class DoorBlock extends WrappedBlock {
   constructor(block: Block) {
     DoorBlock.assert(block)
 
@@ -25,8 +24,14 @@ export class DoorBlock extends WrappedBlocks {
       isUpper ? wrappedBlock : wrappedBlock.getNeighbourBlock(Directions.Up),
     ]
 
-    super(blocks)
+    super(blocks[0]._block)
+
+    this._lower = blocks[0]
+    this._upper = blocks[1]
   }
+
+  _lower: WrappedBlock
+  _upper: WrappedBlock
 
   static match(block: Block) {
     return DOORS.has(block.typeId)
@@ -35,13 +40,6 @@ export class DoorBlock extends WrappedBlocks {
     if (DoorBlock.match(block)) return true
 
     throw new TypeError(`The "${block.typeId}" is not a door.`)
-  }
-
-  get _lower() {
-    return this._blocks[0]
-  }
-  get _upper() {
-    return this._blocks[1]
   }
 
   get opened() {
