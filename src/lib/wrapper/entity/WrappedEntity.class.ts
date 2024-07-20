@@ -3,10 +3,9 @@ import type { MinecraftEntityTypes } from "@minecraft/vanilla-data"
 
 import { Directions, Location } from "../../location/index"
 import { removeMinecraftNamespace } from "../../util/game"
+import type { Implementable } from "../../util/types"
 
-import { WrapperTemplate } from "../WrapperTemplate.class"
-
-export class WrappedEntity extends WrapperTemplate {
+export class WrappedEntity implements Implementable<Entity> {
   _entity: Entity
   id: Entity["id"]
   typeId: MinecraftEntityTypes
@@ -14,8 +13,6 @@ export class WrappedEntity extends WrapperTemplate {
   components = new Map()
 
   constructor(entity: Entity) {
-    super()
-
     this._entity = entity
 
     this.id = entity.id

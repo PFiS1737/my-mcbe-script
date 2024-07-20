@@ -1,13 +1,11 @@
 import type { Container, ItemStack } from "@minecraft/server"
 
-import { WrapperTemplate } from "../WrapperTemplate.class"
+import type { Implementable } from "../../util/types"
 
-export class WrappedContainer extends WrapperTemplate {
+export class WrappedContainer implements Implementable<Container> {
   _container: Container
 
   constructor(container: Container) {
-    super()
-
     this._container = container
   }
 

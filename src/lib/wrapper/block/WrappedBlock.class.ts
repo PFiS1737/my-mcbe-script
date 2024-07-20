@@ -15,11 +15,11 @@ import {
   type Location,
   LocationUtils,
 } from "../../location/index"
-import { WrapperTemplate } from "../WrapperTemplate.class"
+import type { Implementable } from "../../util/types"
 import { WrappedItemStack } from "../item/index"
 import { BlockDrops } from "./BlockDrops.class"
 
-export class WrappedBlock extends WrapperTemplate {
+export class WrappedBlock implements Implementable<Block> {
   _block: Block
   type: Block["type"]
   typeId: MinecraftBlockTypes
@@ -28,8 +28,6 @@ export class WrappedBlock extends WrapperTemplate {
   permutation: Block["permutation"]
 
   constructor(block: Block) {
-    super()
-
     this._block = block
 
     this.type = block.type

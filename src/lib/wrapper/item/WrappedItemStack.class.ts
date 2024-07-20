@@ -7,9 +7,9 @@ import {
 import type { MinecraftItemTypes } from "@minecraft/vanilla-data"
 
 import { removeMinecraftNamespace } from "../../util/game"
-import { WrapperTemplate } from "../WrapperTemplate.class"
+import type { Implementable } from "../../util/types"
 
-export class WrappedItemStack extends WrapperTemplate {
+export class WrappedItemStack implements Implementable<ItemStack> {
   _item: ItemStack
   type: ItemStack["type"]
   typeId: MinecraftItemTypes
@@ -19,8 +19,6 @@ export class WrappedItemStack extends WrapperTemplate {
   >()
 
   constructor(itemStack: ItemStack) {
-    super()
-
     this._item = itemStack
 
     this.type = itemStack.type
