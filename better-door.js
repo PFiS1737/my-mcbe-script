@@ -903,15 +903,6 @@ Directions.North = new Direction(4) // z-
 Directions.Down = new Direction(5) // y-
 ;
 
-class WrapperTemplate {
-    static match(_) {
-        throw new Error("Not implemented.");
-    }
-    static assert(_) {
-        throw new Error("Not implemented.");
-    }
-}
-
 const DIAMOND_PICKAXE_OR_UPPER = new TypeGroup([
     "minecraft:diamond_pickaxe",
     "minecraft:netherite_pickaxe"
@@ -930,7 +921,7 @@ const WOODEN_PICKAXE_OR_UPPER = new TypeGroup([
     "minecraft:wooden_pickaxe"
 ]);
 
-class WrappedItemStack extends WrapperTemplate {
+class WrappedItemStack {
     hasComponent(componentId) {
         return this._item.hasComponent(componentId);
     }
@@ -938,7 +929,6 @@ class WrappedItemStack extends WrapperTemplate {
         return this.components.get(ItemComponentTypes.Enchantable);
     }
     constructor(itemStack){
-        super();
         this.components = new Map();
         this._item = itemStack;
         this.type = itemStack.type;
@@ -4453,7 +4443,7 @@ class BlockDrops {
     }
 }
 
-class WrappedBlock extends WrapperTemplate {
+class WrappedBlock {
     getOffsetBlock(v) {
         const location = this.location.clone().offset(v);
         const block = this.dimension.getBlock(location);
@@ -4516,7 +4506,6 @@ class WrappedBlock extends WrapperTemplate {
         };
     }
     constructor(block){
-        super();
         this._block = block;
         this.type = block.type;
         this.typeId = block.typeId;
@@ -4526,44 +4515,13 @@ class WrappedBlock extends WrapperTemplate {
     }
 }
 
-class WrappedBlocks extends WrapperTemplate {
-    get _block() {
-        return this._blocks[0];
-    }
-    get type() {
-        return this._block.type;
-    }
-    get typeId() {
-        return this._block.typeId;
-    }
-    get location() {
-        return this._block.location;
-    }
-    get dimension() {
-        return this._block.dimension;
-    }
-    get permutation() {
-        return this._block.permutation;
-    }
-    constructor(blocks){
-        super();
-        this._blocks = blocks;
-    }
-}
-
-class DoorBlock extends WrappedBlocks {
+class DoorBlock extends WrappedBlock {
     static match(block) {
         return DOORS.has(block.typeId);
     }
     static assert(block) {
         if (DoorBlock.match(block)) return true;
         throw new TypeError(`The "${block.typeId}" is not a door.`);
-    }
-    get _lower() {
-        return this._blocks[0];
-    }
-    get _upper() {
-        return this._blocks[1];
     }
     get opened() {
         return this._lower.getState("open_bit");
@@ -4643,11 +4601,13 @@ class DoorBlock extends WrappedBlocks {
             // _upper
             isUpper ? wrappedBlock : wrappedBlock.getNeighbourBlock(Directions.Up)
         ];
-        super(blocks);
+        super(blocks[0]._block);
+        this._lower = blocks[0];
+        this._upper = blocks[1];
     }
 }
 
-class WrappedEntity extends WrapperTemplate {
+class WrappedEntity {
     get nameTag() {
         return this._entity.nameTag;
     }
@@ -4672,7 +4632,6 @@ class WrappedEntity extends WrapperTemplate {
         throw new Error("Unexpected error.");
     }
     constructor(entity){
-        super();
         this.components = new Map();
         this._entity = entity;
         this.id = entity.id;
@@ -4683,7 +4642,7 @@ class WrappedEntity extends WrapperTemplate {
     }
 }
 
-class WrappedContainer extends WrapperTemplate {
+class WrappedContainer {
     get size() {
         return this._container.size;
     }
@@ -4700,7 +4659,6 @@ class WrappedContainer extends WrapperTemplate {
         return this._container.addItem(itemStack);
     }
     constructor(container){
-        super();
         this._container = container;
     }
 }

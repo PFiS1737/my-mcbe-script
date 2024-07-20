@@ -758,16 +758,7 @@ Directions.North = new Direction(4) // z-
 Directions.Down = new Direction(5) // y-
 ;
 
-class WrapperTemplate {
-    static match(_) {
-        throw new Error("Not implemented.");
-    }
-    static assert(_) {
-        throw new Error("Not implemented.");
-    }
-}
-
-class WrappedEntity extends WrapperTemplate {
+class WrappedEntity {
     get nameTag() {
         return this._entity.nameTag;
     }
@@ -792,7 +783,6 @@ class WrappedEntity extends WrapperTemplate {
         throw new Error("Unexpected error.");
     }
     constructor(entity){
-        super();
         this.components = new Map();
         this._entity = entity;
         this.id = entity.id;
@@ -803,7 +793,7 @@ class WrappedEntity extends WrapperTemplate {
     }
 }
 
-class WrappedContainer extends WrapperTemplate {
+class WrappedContainer {
     get size() {
         return this._container.size;
     }
@@ -820,7 +810,6 @@ class WrappedContainer extends WrapperTemplate {
         return this._container.addItem(itemStack);
     }
     constructor(container){
-        super();
         this._container = container;
     }
 }
